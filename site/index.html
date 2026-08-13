@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0e14">
+    <meta name="description" content="《Random Dice 2》骰子樹互動攻略與全節點數值資料庫。">
+    <title>Random Dice 2｜骰子樹互動資料庫</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="show-currency-badges">
+    <main class="app-shell" aria-labelledby="page-title">
+      <header class="topbar">
+        <h1 id="page-title" class="sr-only">Random Dice 2 骰子樹互動資料庫</h1>
+        <div class="search-block" role="search">
+          <label class="sr-only" for="search-input">搜尋骰子樹節點</label>
+          <div class="search-field">
+            <svg class="search-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="search-input" type="search" autocomplete="off" spellcheck="false" placeholder="搜尋骰子、符文、特性、技能關鍵字…">
+            <button id="search-clear" class="icon-button search-clear" type="button" aria-label="清除搜尋內容" hidden>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <kbd class="search-kbd" aria-hidden="true">/</kbd>
+          </div>
+          <div id="filter-bar" class="filter-bar" aria-label="多維條件篩選">
+            <div class="filter-group filter-branches" role="group" aria-label="篩選陣營">
+              <button type="button" class="filter-chip branch-chip" data-branch="1" style="--chip-color: #8ae665;">自然</button>
+              <button type="button" class="filter-chip branch-chip" data-branch="2" style="--chip-color: #f9da67;">工學</button>
+              <button type="button" class="filter-chip branch-chip" data-branch="3" style="--chip-color: #4591f0;">魔法</button>
+              <button type="button" class="filter-chip branch-chip" data-branch="4" style="--chip-color: #9c97bc;">秩序</button>
+              <button type="button" class="filter-chip branch-chip" data-branch="5" style="--chip-color: #aa3cea;">混沌</button>
+            </div>
+            <span class="filter-divider" aria-hidden="true"></span>
+            <div class="filter-group filter-types" role="group" aria-label="篩選節點類型">
+              <button type="button" class="filter-chip type-chip" data-type="DICE">骰子</button>
+              <button type="button" class="filter-chip type-chip" data-type="DICE_RUNE">符文</button>
+              <button type="button" class="filter-chip type-chip" data-type="PLAYER_PASSIVE">被動</button>
+              <button type="button" class="filter-chip type-chip" data-type="PERK">支援</button>
+            </div>
+            <button id="filter-clear-btn" type="button" class="filter-clear-btn" title="清除所有篩選" hidden>
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>清除</span>
+            </button>
+          </div>
+          <div id="search-results" class="search-results" role="listbox" aria-label="搜尋結果" hidden></div>
+          <p id="search-status" class="search-status" aria-live="polite">239 個節點</p>
+        </div>
+      </header>
+
+      <aside id="minimap-panel" class="minimap-panel" aria-label="骰子樹全景小地圖">
+        <div class="panel-heading">
+          <span id="zoom-readout" class="zoom-readout">100%</span>
+        </div>
+        <button id="minimap" class="minimap" type="button" aria-label="點擊小地圖定位視野">
+          <canvas id="minimap-canvas" class="minimap-canvas" width="400" height="340" aria-label="骰子樹全圖縮圖"></canvas>
+          <span id="minimap-window" class="minimap-window" aria-hidden="true"></span>
+        </button>
+      </aside>
+
+      <section id="viewport" class="map-viewport" aria-label="可互動骰子樹" tabindex="0">
+        <div id="scene" class="map-scene" aria-hidden="true"></div>
+        <div id="empty-state" class="empty-state" hidden>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>找不到符合條件的節點</span>
+        </div>
+      </section>
+
+      <div class="hud-toggle-group" aria-label="地圖輔助檢視功能">
+        <button id="toggle-prereq-btn" class="hud-feature-btn is-active" type="button" aria-pressed="true" title="開啟後選取節點將標示其所有前置節點路徑">
+          <span class="hud-checkbox-box">
+            <svg class="hud-check-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+              <path d="M4 12L9 17L19.5 5.5" fill="none" stroke="#22c55e" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <span class="hud-feature-label">查看前置節點</span>
+        </button>
+
+        <button id="toggle-currency-btn" class="hud-feature-btn is-active" type="button" aria-pressed="true" title="在所有節點上方顯示解鎖消耗">
+          <span class="hud-checkbox-box">
+            <svg class="hud-check-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+              <path d="M4 12L9 17L19.5 5.5" fill="none" stroke="#22c55e" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <span class="hud-feature-label">查看貨幣</span>
+        </button>
+      </div>
+
+      <nav class="map-toolbar" aria-label="地圖檢視控制">
+        <button id="zoom-out" class="toolbar-button" type="button" aria-label="縮小視野">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button id="zoom-reset" class="toolbar-button toolbar-button-wide" type="button" aria-label="重設為 100% 縮放">100%</button>
+        <button id="zoom-in" class="toolbar-button" type="button" aria-label="放大視野">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <span class="toolbar-divider" aria-hidden="true"></span>
+        <button id="zoom-fit" class="toolbar-button toolbar-button-wide" type="button" aria-label="縮放至全圖視野">全景</button>
+        <button id="minimap-toggle" class="toolbar-button toolbar-button-mobile" type="button" aria-label="切換小地圖顯示">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+        </button>
+      </nav>
+
+      <footer class="statusbar">
+        <span id="interaction-status" class="interaction-status">拖曳移動視野・點擊節點查看詳情</span>
+        <span class="status-shortcuts"><kbd>+</kbd><kbd>−</kbd> 縮放 <kbd>0</kbd> 重設 <kbd>/</kbd> 搜尋 <kbd>Esc</kbd> 關閉</span>
+      </footer>
+
+      <article id="tooltip" class="node-tooltip" role="dialog" aria-modal="false" aria-labelledby="tooltip-title" aria-live="polite" hidden>
+        <div class="tooltip-header">
+          <div class="tooltip-heading">
+            <h2 id="tooltip-title" class="tooltip-title">節點名稱</h2>
+            <div class="tooltip-badges">
+              <span id="tooltip-branch-badge" class="badge branch-badge">自然</span>
+              <span id="tooltip-type-badge" class="badge type-badge">骰子</span>
+              <span id="tooltip-rank-badge" class="badge rank-badge">1/1</span>
+            </div>
+          </div>
+          <div id="tooltip-dice-visual" class="tooltip-dice-visual" aria-hidden="true">
+            <img id="tooltip-dice-img" class="tooltip-dice-img" src="" alt="" />
+          </div>
+        </div>
+        <div id="tooltip-body" class="tooltip-body"></div>
+      </article>
+    </main>
+    <script src="data/tree_data.js"></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>

@@ -1,2 +1,29 @@
+# Dependencies
+node_modules/
+xlsx_build/node_modules/
+
+# Big Binary & Archives
+*.ipa
+*.zip
+*.tar
+*.gz
+
+# Raw App Dumps & Extractions
+Random Dice 2 1.0.0/
+outputs/
+research/random-dice-2-1.0.0/
+research/string_literals.txt
+research/*.txt
+research/*.png
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# OS & Temp
 .DS_Store
 Thumbs.db
+desktop.ini
+.agents/
+.vscode/
+.idea/
