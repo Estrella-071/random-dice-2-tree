@@ -1,0 +1,1764 @@
+:root {
+  color-scheme: dark;
+
+  /* --- Official Game Palette (#2F2942 Canvas & #201831 Tooltip with #59449B Border) --- */
+  --canvas: #2F2942;
+  --canvas-subtle: #252035;
+  --surface-base: rgba(32, 24, 49, 0.88);
+  --surface-solid: #201831;
+  --surface-raised: rgba(47, 41, 66, 0.85);
+  --surface-overlay: #201831;
+  
+  /* Precision Borders & Dividers */
+  --border-subtle: rgba(89, 68, 155, 0.25);
+  --border-medium: #59449B;
+  --border-focus: rgba(142, 114, 230, 0.7);
+  --divider: rgba(89, 68, 155, 0.35);
+
+  /* High Legibility Typography Tokens */
+  --ink-primary: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --ink-muted: #9ba3b8;
+  --ink-subtle: #798299;
+  --ink-inverse: #201831;
+
+  /* --- Perceptually Uniform OKLCH Faction System --- */
+  /* 自然 (Nature): Fresh emerald-lime */
+  --faction-nature: oklch(0.78 0.18 135);
+  --faction-nature-surface: rgba(126, 227, 82, 0.14);
+  --faction-nature-border: rgba(126, 227, 82, 0.35);
+  --faction-nature-ink: #071203;
+
+  /* 工學 (Engineering): Crisp technical gold/amber */
+  --faction-engineering: oklch(0.82 0.16 85);
+  --faction-engineering-surface: rgba(245, 211, 88, 0.14);
+  --faction-engineering-border: rgba(245, 211, 88, 0.35);
+  --faction-engineering-ink: #140d02;
+
+  /* 魔法 (Magic): Luminescent sapphire blue */
+  --faction-magic: oklch(0.72 0.16 250);
+  --faction-magic-surface: rgba(93, 160, 255, 0.14);
+  --faction-magic-border: rgba(93, 160, 255, 0.35);
+  --faction-magic-ink: #030c18;
+
+  /* 秩序 (Order): Elegant moonlit lavender (Calibrated brightness for high contrast) */
+  --faction-order: oklch(0.75 0.12 300);
+  --faction-order-surface: rgba(186, 166, 224, 0.14);
+  --faction-order-border: rgba(186, 166, 224, 0.35);
+  --faction-order-ink: #11091a;
+
+  /* 混沌 (Chaos): Vibrant violet-magenta */
+  --faction-chaos: oklch(0.70 0.20 325);
+  --faction-chaos-surface: rgba(203, 101, 255, 0.14);
+  --faction-chaos-border: rgba(203, 101, 255, 0.35);
+  --faction-chaos-ink: #14031a;
+
+  /* Active Node Dynamic Faction Color fallback */
+  --node-faction: var(--faction-nature);
+  --node-faction-surface: var(--faction-nature-surface);
+  --node-faction-border: var(--faction-nature-border);
+  --node-faction-ink: var(--faction-nature-ink);
+
+  /* Status Colors */
+  --accent: #5da0ff;
+  --gold-currency: #f5d358;
+  --core-currency: #4cd5ff;
+  --positive: #7ee352;
+  --danger: #ff5c5c;
+
+  /* Multi-Layer Physical Elevation (Key + Ambient + Inset Glare) */
+  --elevation-low: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --elevation-panel: 
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 16px 36px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+
+  --elevation-modal:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 12px 32px rgba(0, 0, 0, 0.65),
+    0 28px 64px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* Concentric Border Radius Tokens: R_outer = R_inner + Padding */
+  --radius-xs: 4px;
+  --radius-sm: 6px;     /* Chips, Pills, Kbd */
+  --radius-base: 8px;   /* Small cards, list items, buttons */
+  --radius-card: 12px;  /* Field containers, detail panels */
+  --radius-panel: 16px; /* Desktop inspector, minimap card, toolbars */
+  --radius-sheet: 20px; /* Mobile bottom sheet top radius */
+
+  /* Type Scale Tokens */
+  --font-sans: "Inter", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--canvas);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  font-variant-numeric: tabular-nums;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+  user-select: none;
+}
+
+button:focus-visible,
+input:focus-visible,
+.map-viewport:focus-visible {
+  outline: 2px solid var(--faction-magic);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Base App Shell & Micro-Grid Atmosphere */
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.app-shell::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image: 
+    radial-gradient(circle at 50% 15%, rgba(93, 160, 255, 0.04), transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%);
+}
+
+/* ==========================================================================
+   HUD Header & Navigation Bar
+   ========================================================================== */
+.topbar {
+  position: absolute;
+  z-index: 40;
+  top: 14px;
+  right: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* 靠右對齊搜尋框 */
+  gap: 16px;
+  pointer-events: none;
+}
+
+.search-block,
+.minimap-panel,
+.map-toolbar,
+.statusbar,
+.node-tooltip,
+.empty-state {
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   Search HUD Field & Auto-complete Results (主要色彩改為黑色，保留透明度)
+   ========================================================================== */
+.search-block {
+  position: relative;
+  z-index: 50;
+  width: min(340px, 38vw);
+  min-width: 230px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 6px 0 11px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.72); /* 黑色半透明 */
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-card); /* R_outer = 12px */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition-property: border-color, box-shadow, background-color;
+  transition-duration: 120ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search-field:focus-within {
+  background: rgba(0, 0, 0, 0.88);
+  border-color: rgba(93, 160, 255, 0.65);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(93, 160, 255, 0.18);
+}
+
+.search-icon-svg {
+  flex-shrink: 0;
+  color: var(--ink-muted);
+}
+
+#search-input {
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  padding: 0 8px;
+  color: var(--ink-primary);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 13px;
+}
+
+#search-input::placeholder {
+  color: var(--ink-subtle);
+  opacity: 1;
+}
+
+.search-kbd {
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1;
+}
+
+.icon-button {
+  position: relative;
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  padding: 0;
+  color: var(--ink-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  transition-property: color, background-color, transform;
+  transition-duration: 120ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Touch Target Minimum 44px expansion */
+.icon-button::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.icon-button:hover {
+  color: var(--ink-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-button:active,
+.toolbar-button:active,
+.minimap:active,
+.search-result:active,
+.node-link-pill:active,
+.upgrade-btn:active {
+  transform: scale(0.96);
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  z-index: 60;
+  max-height: min(360px, 48vh);
+  margin-top: 0;
+  padding: 4px;
+  overflow: auto;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-modal);
+  backdrop-filter: blur(18px);
+}
+
+.search-result {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  text-align: start;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-base);
+  transition-property: background-color, transform;
+  transition-duration: 100ms;
+  transition-timing-function: ease;
+}
+
+.search-result:hover,
+.search-result[aria-selected="true"] {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.search-result-dot {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  background: var(--result-accent, var(--faction-nature));
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--result-accent);
+}
+
+.search-result-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.search-result-title {
+  display: block;
+  overflow: hidden;
+  color: var(--ink-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-result-meta {
+  display: block;
+  margin-top: 1px;
+  overflow: hidden;
+  color: var(--ink-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-status {
+  margin: 4px 0 0;
+  padding-inline: 4px;
+  color: var(--ink-muted);
+  font-size: 11px;
+  text-align: end;
+}
+
+/* ==========================================================================
+   Map Viewport & SVG Scene Rendering (Vector Crisp Sharpness at All Scales)
+   ========================================================================== */
+.map-viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: transparent;
+}
+
+.map-viewport.is-dragging,
+.map-viewport.is-navigating {
+  cursor: grabbing;
+}
+
+/* 在鏡頭運動（平移、縮放、慣性滑動）期間暫時關閉射線 Hit-Testing，消除每幀重排重繪開銷 */
+body.is-navigating .map-scene,
+body.is-zooming .map-scene,
+.map-viewport.is-dragging .map-scene {
+  pointer-events: none !important;
+}
+
+body.is-navigating .search-field,
+body.is-zooming .search-field,
+body.is-navigating .minimap-panel,
+body.is-zooming .minimap-panel,
+body.is-navigating .map-toolbar,
+body.is-zooming .map-toolbar,
+body.is-navigating .node-tooltip,
+body.is-zooming .node-tooltip {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.map-scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4000px;
+  height: 3400px;
+  transform-origin: 0 0;
+  contain: layout style paint;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.map-scene > svg {
+  display: block;
+  width: 4000px;
+  height: 3400px;
+  overflow: visible;
+  user-select: none;
+  shape-rendering: auto;
+  text-rendering: optimizeLegibility;
+  image-rendering: auto;
+}
+
+.map-scene image,
+.map-scene use,
+.map-scene foreignObject {
+  image-rendering: auto;
+}
+
+/* ==========================================================================
+   Level of Detail (LOD) 遠景動態降噪與次像素反閃爍引擎 (即時硬切)
+   ========================================================================== */
+/* 1. 關閉全景非必要的高負擔模糊陰影濾鏡（消除高斯卷積計算，釋放 80% GPU 負載） */
+body.is-low-lod .map-scene .node-icon,
+body.is-low-lod .map-scene .node-icon-deep,
+body.is-low-lod .map-scene .cost-badge,
+body.is-low-lod .map-scene .rank-badge,
+body.is-low-lod .map-scene .guide-label,
+body.is-low-lod .map-scene .tree-center-tree-icon {
+  filter: none !important;
+}
+
+/* 確保骰子陰影在任何模式與運動中均維持純黑剪影，絕不消失或變白 */
+.map-scene .dice-shadow,
+body.is-low-lod .map-scene .dice-shadow {
+  filter: brightness(0) saturate(100%) !important;
+  opacity: 0.34 !important;
+}
+
+/* 2. 次像素反閃爍：遠景時平滑淡化文字描邊，消除黑斑重疊與摩爾紋閃爍，肉眼過渡極致自然 */
+body.is-low-lod .map-scene text:not(.is-highlighted-text) {
+  stroke-width: 0.35px !important;
+  stroke-opacity: 0.3 !important;
+}
+
+/* 3. 遠景連線抗碎裂：確保線段在縮小後依然平滑連續，無次像素跳動 */
+body.is-low-lod .map-scene path.edge,
+body.is-low-lod .map-scene line.edge {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 4. 保留當前選取節點與高亮篩選目標的必要光效 */
+body.is-low-lod .map-scene g.node.is-selected,
+body.is-low-lod .map-scene g.node.is-filter-matched,
+body.is-low-lod .map-scene g.node.is-prereq-active {
+  filter: drop-shadow(0 0 10px var(--node-hover-color, #ffffff)) !important;
+}
+
+/* SVG Node States & Precise Borders */
+/* SVG Node States & Game-Accurate Selection Box (#4692F1 + #7CFAFD Rotating Dual Runners) */
+.map-scene .node {
+  cursor: pointer;
+  outline: none;
+  pointer-events: all;
+}
+
+.map-scene .node .node-body {
+  transform-box: fill-box;
+  transform-origin: center center;
+  transition: transform 220ms cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+.map-scene .node.is-pressing .node-body {
+  transform: scale(0.93) !important;
+  transition: transform 120ms cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+.map-scene .node * {
+  pointer-events: all;
+}
+
+.node-selection-layer {
+  display: none;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.map-scene .node.is-selected .node-selection-layer,
+.map-scene .node.is-linked-selected .node-selection-layer {
+  display: block;
+}
+
+/* 統一所有選取框在物理螢幕上的視覺粗細（以骰子 scale(0.72) 為基準） */
+.sel-box-base {
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.sel-box-runner {
+  stroke-width: 3.8px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 10px currentColor);
+  will-change: stroke-dashoffset;
+}
+
+/* 符文節點等比補償（scale(0.56) 下補償 0.72/0.56 ≈ 1.2857 倍，達到與骰子完全一致的物理粗細） */
+g[transform^="scale(0.56)"] .sel-box-base,
+.node-type-dice-rune .sel-box-base {
+  stroke-width: 3.86px;
+}
+
+g[transform^="scale(0.56)"] .sel-box-runner,
+.node-type-dice-rune .sel-box-runner {
+  stroke-width: 4.89px;
+}
+
+@keyframes selRunnerSpin {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: calc(var(--path-len, 360) * -1px);
+  }
+}
+
+.map-scene .node .node-body rect:first-child {
+  transition-property: stroke, stroke-width, stroke-opacity;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.map-scene .node:hover .node-body rect:first-child,
+.map-scene .node.is-hovered .node-body rect:first-child {
+  stroke: var(--node-hover-color, #ffffff) !important;
+  stroke-width: 4px !important;
+  stroke-opacity: 1 !important;
+}
+
+.map-scene .node:focus-visible .node-body rect:first-child {
+  stroke: var(--node-hover-color, #4692F1) !important;
+  stroke-width: 4px !important;
+}
+
+/* Search Highlights */
+.map-scene.has-search .node {
+  transition: opacity 120ms ease;
+}
+
+.map-scene.has-search .node:not(.is-match) {
+  opacity: 0.16;
+}
+
+.map-scene.has-search .node.is-match {
+  opacity: 1;
+}
+
+.map-scene.has-search .node.is-match .node-body rect:first-child {
+  stroke: var(--positive) !important;
+  stroke-width: 4.5px !important;
+  stroke-opacity: 1 !important;
+}
+
+/* ==========================================================================
+/* ==========================================================================
+   Minimap Panel (平常隱藏，僅在拖曳、鏡頭移動、縮放時淡入顯示，停止後延遲淡出)
+   ========================================================================== */
+.minimap-panel {
+  position: absolute;
+  z-index: 16;
+  top: 14px;
+  left: 16px;
+  width: 216px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.75); /* 黑色半透明 */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-panel);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0; /* 平常靜止時隱藏淡出 */
+  pointer-events: none;
+  /* 平常淡出：延遲 700ms 後優雅淡出 560ms */
+  transition: opacity 560ms cubic-bezier(0.25, 1, 0.5, 1) 700ms;
+  will-change: opacity;
+}
+
+/* 中央骰子樹圖示陰影收斂：僅在下方有陰影，避免四周一圈發黑 */
+.map-scene .tree-center-tree-icon {
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.4)) !important;
+}
+
+.map-scene .tree-center-base {
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35)) !important;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px 6px;
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.zoom-readout {
+  color: var(--ink-primary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.minimap {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4000 / 3400;
+  padding: 0;
+  overflow: hidden;
+  cursor: crosshair;
+  background: #0b0d13;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-base); /* R_inner = 16 - 8 = 8px */
+}
+
+.minimap-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.minimap-window {
+  position: absolute;
+  display: block;
+  min-width: 2px;
+  min-height: 2px;
+  background: rgba(93, 160, 255, 0.18);
+  border: 1.5px solid #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Map Toolbar (Bottom Right HUD)
+   ========================================================================== */
+.map-toolbar {
+  position: absolute;
+  z-index: 35;
+  right: 16px;
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  background: var(--surface-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card); /* 12px */
+  box-shadow: var(--elevation-panel);
+  backdrop-filter: blur(16px);
+}
+
+.toolbar-button {
+  display: inline-grid;
+  min-width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0 8px;
+  color: var(--ink-primary);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  border-radius: var(--radius-base); /* R_inner = 12 - 4 = 8px */
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  transition-property: color, background-color, border-color, transform;
+  transition-duration: 120ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toolbar-button-wide {
+  min-width: 44px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.toolbar-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-subtle);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 16px;
+  margin: 0 2px;
+  background: var(--divider);
+}
+
+.toolbar-button-mobile {
+  display: none;
+}
+
+/* Statusbar */
+.statusbar {
+  position: absolute;
+  z-index: 14;
+  right: 16px;
+  bottom: 10px;
+  left: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--ink-muted);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.status-shortcuts {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-shortcuts kbd {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+/* ==========================================================================
+   Badges, Chips & Faction Accents (WCAG AAA High-Contrast Text)
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--radius-sm);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.branch-badge {
+  color: var(--node-faction-ink, #071203);
+  background: var(--node-faction, var(--faction-nature));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.type-badge {
+  color: var(--ink-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+}
+
+.rank-badge {
+  color: var(--gold-currency);
+  background: rgba(245, 211, 88, 0.12);
+  border: 1px solid rgba(245, 211, 88, 0.28);
+}
+
+/* ==========================================================================
+   Inspector / Node Detail HUD (Docked Right on Desktop / Bottom Sheet on Mobile)
+   ========================================================================== */
+/* ==========================================================================
+   Contextual Floating Node Tooltip (Smart Anchored, High Legibility Bold & Large)
+   ========================================================================== */
+.node-tooltip {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(580px, calc(100vh - 90px));
+  display: flex;
+  flex-direction: column;
+  overflow: visible; /* 允許 3 系列 PNG 頂部 1/3 破格超出頂邊框 */
+  color: var(--ink-primary);
+  background: var(--surface-overlay);
+  border: 3px solid var(--border-medium); /* 加粗邊框 */
+  border-radius: var(--radius-card); /* 14px */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* 大幅降低陰影 */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 25%; /* 出現中心上調至上四分之一處 (50% 25%) */
+}
+
+/* Tooltip 正下方水平中心小三角形（稍微放大且下移至 3px 邊框外緣下方，絕不遮擋卡片底邊框線） */
+.node-tooltip::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + 3px); /* 完全下移至 3px 邊框最外底緣下方，保證底邊線 100% 完整連續 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 10px solid var(--surface-overlay);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Tooltip 出現動畫：由中間向兩側彈開，彈到最大寬度時微幅回彈一次再展開 */
+@keyframes tooltip-spring-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.35, 0.75);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(1.045, 1.015); /* 彈到最大寬度微過衝 */
+  }
+  82% {
+    transform: scale(0.985, 0.995); /* 微幅回彈一次 */
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1, 1); /* 就位展開 */
+  }
+}
+
+/* Tooltip 消失動畫：以橫向中心偏下方為中點縮小消失（由慢速啟動，加速到普通速度） */
+@keyframes tooltip-scale-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 0.95;
+    transform: scale(0.92); /* 由慢速啟動 */
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.28); /* 到普通速度縮小消失 */
+  }
+}
+
+.node-tooltip.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 入場動畫：由中心向兩側輕快彈開展開 */
+.node-tooltip.is-entering {
+  transform-origin: 50% 25%; /* 出現中心：上四分之一處 */
+  animation: tooltip-spring-enter 260ms cubic-bezier(0.18, 0.9, 0.3, 1.15) forwards;
+}
+
+/* 出場動畫：俐落縮小淡出消失 */
+.node-tooltip.is-closing {
+  pointer-events: none;
+  transform-origin: 50% 85%; /* 消失中心：橫向中心偏下方 */
+  animation: tooltip-scale-exit 140ms cubic-bezier(0.4, 0, 0.9, 0.4) forwards;
+}
+
+/* Tooltip Header */
+.tooltip-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.tooltip-heading {
+  min-width: 0;
+  flex: 1;
+  padding-right: 8px;
+}
+
+.tooltip-title {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-size: 22px; /* 放大 50% */
+  font-weight: 800; /* 全面粗體 */
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.tooltip-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 非骰子節點（符文、被動、支援等）：名稱與標籤一律居中對齊 */
+.node-tooltip.is-non-dice .tooltip-header {
+  justify-content: center;
+}
+
+.node-tooltip.is-non-dice .tooltip-heading {
+  padding-right: 0;
+  text-align: center;
+}
+
+.node-tooltip.is-non-dice .tooltip-title {
+  text-align: center;
+}
+
+.node-tooltip.is-non-dice .tooltip-badges {
+  justify-content: center;
+}
+
+.tooltip-badges .badge {
+  font-size: 13.5px; /* 放大 50% */
+  font-weight: 700;
+  padding: 2px 8px;
+}
+
+/* 純灰底階級標籤（純灰底、粗體白字） */
+.tooltip-badges .rank-badge {
+  background: #3e3a4e !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Tooltip 3 系列 PNG 圖示（縮小 -20%：108px × 108px，頂部 1/3 破格超出 Tooltip 頂部邊框，僅骰子節點顯示） */
+.tooltip-dice-visual {
+  position: relative;
+  width: 80px;
+  height: 44px; /* 標題欄右側佔位寬度 */
+  flex: 0 0 80px;
+  pointer-events: none;
+}
+
+.tooltip-dice-img {
+  position: absolute;
+  right: -8px;
+  top: -17px; /* 抵消 header 14px padding 與 3px border-top */
+  width: 108px; /* 縮小 -20% (原 136px * 0.8 ≈ 108px) */
+  height: 108px;
+  transform: translateY(-33.33%); /* 上三分之一（36px）精準超出 Tooltip 頂部外邊框 */
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.tooltip-dice-img[hidden] {
+  display: none !important;
+}
+
+/* Tooltip Body & Sections */
+.tooltip-body {
+  padding: 14px 16px 16px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-label {
+  color: var(--ink-subtle);
+  font-size: 14px; /* 放大 50% */
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.detail-copy {
+  margin: 0;
+  color: #f0f2f8;
+  font-size: 18px; /* 放大 50% */
+  font-weight: 600; /* 全面粗體 */
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.detail-copy strong {
+  color: #ffffff;
+  font-size: 19.5px;
+  font-weight: 900;
+  font-family: var(--font-mono);
+}
+
+/* Compact Stats Row */
+.stat-compact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px; /* 放大 50% */
+}
+
+.stat-compact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e4e7f0;
+  font-weight: 600;
+}
+
+.stat-compact-item .stat-label {
+  color: var(--ink-muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.stat-compact-item .stat-value {
+  color: #ffffff;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+/* Meta Footer Line (Cost & Prerequisite) */
+.tooltip-meta-box {
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px; /* 放大 50% */
+  font-weight: 600;
+}
+
+.meta-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--ink-secondary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.meta-cost {
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.currency-icon-svg {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  vertical-align: -3px;
+  margin-inline-end: 2px;
+  flex-shrink: 0;
+  overflow: visible;
+  filter: drop-shadow(0 1.5px 2px rgba(0, 0, 0, 0.45));
+}
+
+.node-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  color: #ffffff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  font-size: 15px;
+  font-weight: 700;
+  transition-property: background-color, color, border-color, transform;
+  transition-duration: 100ms;
+}
+
+.node-link-pill:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #fff;
+}
+
+.node-link-pill:active {
+  transform: scale(0.96);
+}
+
+/* Compact Clean Upgrade Table */
+.upgrade-table-container {
+  max-height: 160px;
+  margin-top: 6px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-width: thin;
+}
+
+.upgrade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px; /* 放大 50% */
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-align: end;
+}
+
+.upgrade-table th,
+.upgrade-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.upgrade-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: var(--ink-muted);
+  font-weight: 700;
+  font-size: 13.5px;
+  background: #111520;
+}
+
+.upgrade-table td {
+  color: #e2e5f0;
+}
+
+.upgrade-table td:first-child,
+.upgrade-table th:first-child {
+  text-align: start;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Empty State */
+.empty-state {
+  position: absolute;
+  z-index: 12;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: var(--ink-secondary);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-base);
+  box-shadow: var(--elevation-modal);
+  transform: translate(-50%, -50%);
+  font-size: 13px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Mobile Responsive Viewport (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .topbar {
+    top: 8px;
+    right: 10px;
+    left: 10px;
+    gap: 8px;
+  }
+
+  .brand-block {
+    margin-left: 0;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  h1#page-title {
+    font-size: 16px;
+  }
+
+  .topbar {
+    padding: 10px 12px;
+    align-items: flex-start;
+  }
+
+  .search-block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  /* 手機版搜尋：略大圓形黑色按鈕，白色 icon，點擊向左平滑展開為搜尋膠囊 */
+  .search-field {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 22px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    overflow: hidden;
+    justify-content: center;
+    transition: width 320ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 320ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease;
+  }
+
+  .search-icon-svg {
+    flex: 0 0 44px;
+    width: 19px;
+    height: 19px;
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+    stroke-width: 2.5;
+    margin: 0;
+  }
+
+  #search-input {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+    font-size: 13px;
+    pointer-events: none;
+    transition: opacity 180ms ease, width 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .search-field.is-expanded,
+  .search-field:focus-within {
+    width: min(calc(100vw - 24px), 320px);
+    border-radius: 22px;
+    padding: 0 8px 0 0;
+    justify-content: flex-start;
+  }
+
+  .search-field.is-expanded #search-input,
+  .search-field:focus-within #search-input {
+    opacity: 1;
+    width: 100%;
+    padding: 0 6px;
+    pointer-events: auto;
+  }
+
+  .search-kbd {
+    display: none;
+  }
+
+  /* 手機版篩選工具列 */
+  .filter-bar {
+    display: none;
+    margin-top: 8px;
+    max-width: min(calc(100vw - 24px), 320px);
+  }
+
+  .search-field.is-expanded ~ .filter-bar,
+  .search-field:focus-within ~ .filter-bar,
+  .filter-bar.is-expanded-mobile {
+    display: flex;
+  }
+
+  /* Collapsible Minimap on Mobile */
+  .minimap-panel {
+    top: auto;
+    right: 10px;
+    bottom: 52px;
+    left: auto;
+    width: 150px;
+    padding: 5px;
+    display: none;
+  }
+
+  .minimap-panel.is-open {
+    display: block;
+  }
+
+  .toolbar-button-mobile {
+    display: inline-grid;
+  }
+
+  .map-toolbar {
+    right: 10px;
+    bottom: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .toolbar-button {
+    min-width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .toolbar-button-wide {
+    min-width: 36px;
+    font-size: 10px;
+  }
+
+  .statusbar {
+    display: none;
+  }
+
+  /* 修復手機端 Tooltip：統一精緻懸浮卡片，移除奇怪頂部邊框與拉手條 */
+  .node-tooltip {
+    position: fixed;
+    top: auto;
+    right: 12px;
+    bottom: 16px;
+    left: 12px;
+    width: auto;
+    max-width: 440px;
+    margin: 0 auto;
+    max-height: 80vh;
+    border-radius: var(--radius-panel);
+    border: 1px solid var(--node-faction-border, rgba(255, 255, 255, 0.2));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+    transform: translateY(0);
+  }
+
+  .tooltip-header {
+    padding: 10px 14px 8px;
+  }
+
+  .tooltip-title {
+    font-size: 18px;
+  }
+
+  .tooltip-body {
+    max-height: calc(80vh - 65px);
+    padding: 8px 14px 14px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ==========================================================================
+   HUD Feature Toggle Controls (Check Currency & Prerequisite Path Tracker)
+   ========================================================================== */
+.hud-toggle-group {
+  position: absolute;
+  right: 16px;
+  bottom: 88px; /* 16px + 46px (toolbar) + 26px 寬裕安全間隔，絕對不重疊 */
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.hud-feature-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 58px;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 6px 4px 5px;
+  color: #ffffff;
+  cursor: pointer;
+  background: rgba(43, 38, 56, 0.52); /* 調高透明度，更清透 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none; /* 無外框、無顏色 */
+  border-radius: 8px; /* 圓角方形 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  overflow: visible; /* 允許大綠勾與文字自由超出 */
+  transition: background-color 120ms, transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-feature-btn:hover {
+  background: rgba(56, 50, 72, 0.75);
+}
+
+.hud-feature-btn:active,
+.hud-feature-btn.is-pressing {
+  background: rgba(30, 26, 40, 0.85);
+  transform: scale(0.92) !important;
+  transition: transform 50ms ease-out !important;
+}
+
+.hud-checkbox-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  background: #181224;
+  border: 2px solid #6D48C2;
+  border-radius: 5px;
+  box-sizing: border-box;
+  overflow: visible; /* 允許大勾超出邊界 */
+  transition: transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-feature-btn:active .hud-checkbox-box,
+.hud-feature-btn.is-pressing .hud-checkbox-box {
+  transform: scale(0.88) !important;
+}
+
+.hud-check-icon {
+  position: absolute;
+  top: -11px; /* 綠勾再上移，更鮮明突出 */
+  left: -1px;
+  width: 32px;
+  height: 32px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: visible;
+  transition: opacity 120ms ease;
+}
+
+.hud-feature-btn.is-active .hud-check-icon,
+.hud-checkbox-box.is-checked .hud-check-icon,
+.hud-feature-btn[aria-pressed="true"] .hud-check-icon {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.85));
+}
+
+.hud-feature-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.1;
+  white-space: nowrap; /* 自由超出，絕不折行 */
+  user-select: none;
+  overflow: visible;
+  margin-top: auto; /* 下移到底部對齊 */
+  padding-bottom: 1px;
+}
+
+/* ==========================================================================
+   Node Currency Badges on Canvas (Smart Toggleable)
+   ========================================================================== */
+.node-currency-badge,
+.map-scene .cost-badge {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+body.show-currency-badges .node-currency-badge,
+body.show-currency-badges .map-scene .cost-badge {
+  opacity: 1;
+}
+
+.map-scene .cost-badge text.is-special-cost-text,
+.map-scene .cost-badge.is-special-cost-badge text {
+  text-anchor: middle !important;
+}
+
+/* ==========================================================================
+   Prerequisite Ancestor Path Highlighting Mode (Smooth Transitions)
+   ========================================================================== */
+.map-scene g.node {
+  transition: opacity 320ms cubic-bezier(0.25, 1, 0.5, 1), filter 320ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.map-scene path.edge,
+.map-scene line.edge {
+  transition: opacity 320ms cubic-bezier(0.25, 1, 0.5, 1), stroke 320ms cubic-bezier(0.25, 1, 0.5, 1), stroke-width 320ms cubic-bezier(0.25, 1, 0.5, 1), filter 320ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+body.has-prereq-highlight .map-scene g.node {
+  opacity: 0.14;
+}
+
+body.has-prereq-highlight .map-scene g.node.is-prereq-active {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 14px rgba(126, 227, 82, 0.75)) !important;
+}
+
+body.has-prereq-highlight .map-scene g.node.is-prereq-target {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 18px #ffffff) !important;
+}
+
+body.has-prereq-highlight .map-scene path.edge,
+body.has-prereq-highlight .map-scene line.edge,
+body.has-prereq-highlight .map-scene path.tree-center-link {
+  opacity: 0.12;
+  transition: opacity 200ms ease;
+}
+
+body.has-prereq-highlight .map-scene path.edge.is-prereq-edge,
+body.has-prereq-highlight .map-scene line.edge.is-prereq-edge,
+body.has-prereq-highlight .map-scene path.tree-center-link.is-prereq-edge {
+  opacity: 1 !important;
+  stroke: #ffffff !important;
+  stroke-width: 4.5px !important;
+  filter: drop-shadow(0 0 8px rgba(126, 227, 82, 0.9)) !important;
+}
+
+/* ==========================================================================
+   UI Controls Always Visible & Minimap Motion Overlay
+   ========================================================================== */
+/* 永久隱藏左下角無意義狀態提示 */
+#interaction-status,
+.interaction-status {
+  display: none !important;
+}
+
+.topbar {
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+.search-block,
+.map-toolbar,
+.hud-toggle-group {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* 小地圖僅在拖曳、鏡頭移動、縮放時淡入顯示（0ms 延遲立即浮現） */
+body.is-zooming #minimap-panel,
+body.is-navigating #minimap-panel {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1) 0ms !important;
+}
+
+/* Tooltip 在選取後始終保持完全清晰可見，絕不暫時隱藏 */
+#tooltip.is-active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ==========================================================================
+   Filter Bar & Multi-dimensional Highlighting
+   ========================================================================== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.filter-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
+}
+
+.filter-chip {
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #a19db3;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+}
+
+.filter-chip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.filter-chip:active {
+  transform: scale(0.94);
+}
+
+.filter-chip.is-selected {
+  color: #ffffff !important;
+  background: var(--chip-color, #6d48c2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 0 10px var(--chip-color, rgba(109, 72, 194, 0.7));
+}
+
+.filter-chip.type-chip.is-selected {
+  background: #5046e5 !important;
+  box-shadow: 0 0 10px rgba(80, 70, 229, 0.7);
+}
+
+.filter-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, transform 80ms ease;
+  margin-left: 2px;
+}
+
+.filter-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.28);
+  color: #ffffff;
+}
+
+.filter-clear-btn:active {
+  transform: scale(0.94);
+}
+
+/* 畫布多維篩選高亮與暗化（僅直接符合條件節點高亮，前置節點不高亮） */
+body.has-active-filter .map-scene g.node {
+  opacity: 0.12;
+  transition: opacity 200ms ease;
+}
+
+body.has-active-filter .map-scene g.node.is-filter-matched {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 12px var(--node-hover-color, #ffffff)) !important;
+}
+
+/* 篩選分支線條：顯示已標示節點到初始節點的分支線條（不需要派系光暈，乾淨清晰） */
+body.has-active-filter .map-scene path.edge,
+body.has-active-filter .map-scene line.edge,
+body.has-active-filter .map-scene path.tree-center-link {
+  opacity: 0.08;
+  transition: opacity 200ms ease;
+}
+
+body.has-active-filter .map-scene path.edge.is-filter-edge,
+body.has-active-filter .map-scene line.edge.is-filter-edge,
+body.has-active-filter .map-scene path.tree-center-link.is-filter-edge {
+  opacity: 0.8 !important;
+  stroke: rgba(255, 255, 255, 0.75) !important;
+  stroke-width: 2.2px !important;
+  filter: none !important; /* 不需要派系光暈 */
+}
+
+/* 篩選模式下：中央分支圖示與數字預設暗化，僅活躍分支保持點亮 */
+.map-scene .tree-center-stat-mark,
+.map-scene text.tree-center-stat-name,
+.map-scene text.tree-center-stat-value {
+  transition: opacity 200ms ease;
+}
+
+body.has-active-filter .map-scene .tree-center-stat-mark,
+body.has-active-filter .map-scene text.tree-center-stat-name,
+body.has-active-filter .map-scene text.tree-center-stat-value {
+  opacity: 0.08;
+}
+
+body.has-active-filter .map-scene text.tree-center-stat-name.is-branch-active,
+body.has-active-filter .map-scene text.tree-center-stat-value.is-branch-active {
+  opacity: 1 !important;
+}
+
+body.has-active-filter .map-scene .tree-center-stat-mark.is-branch-active {
+  opacity: 0.5 !important; /* 亮狀態提升 50% 可見度，不全亮刺眼 */
+}
+
+/* 前置路徑高亮模式下：中央線段、圖示與數字暗化與高亮 */
+body.has-prereq-highlight .map-scene path.tree-center-link {
+  opacity: 0.08;
+  transition: opacity 200ms ease;
+}
+
+body.has-prereq-highlight .map-scene path.tree-center-link.is-prereq-edge {
+  opacity: 0.8 !important;
+}
+
+body.has-prereq-highlight .map-scene .tree-center-stat-mark,
+body.has-prereq-highlight .map-scene text.tree-center-stat-name,
+body.has-prereq-highlight .map-scene text.tree-center-stat-value {
+  opacity: 0.08;
+}
+
+body.has-prereq-highlight .map-scene text.tree-center-stat-name.is-branch-active,
+body.has-prereq-highlight .map-scene text.tree-center-stat-value.is-branch-active {
+  opacity: 1 !important;
+}
+
+body.has-prereq-highlight .map-scene .tree-center-stat-mark.is-branch-active {
+  opacity: 0.5 !important; /* 亮狀態提升 50% 可見度，不全亮刺眼 */
+}
+
