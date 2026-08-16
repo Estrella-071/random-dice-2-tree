@@ -3,8 +3,23 @@
 
   const MAP_WIDTH = 4000;
   const MAP_HEIGHT = 3400;
-  const MIN_SCALE = 0.33; // 最小 33%
-  const MAX_SCALE = 2.0;  // 最大 200%
+  
+  function getBaseScale() {
+    return window.innerWidth <= 768 ? 0.5 : 1.0;
+  }
+  function getMinScale() {
+    return window.innerWidth <= 768 ? 0.16 : 0.33;
+  }
+  function getMaxScale() {
+    return window.innerWidth <= 768 ? 1.4 : 2.0;
+  }
+  function formatZoomPercent(scale = state.scale) {
+    const base = getBaseScale();
+    return `${Math.round((scale / base) * 100)}%`;
+  }
+
+  const MIN_SCALE = 0.33;
+  const MAX_SCALE = 2.0;
   const DATA_URL = "data/dice_tree.json";
   const SVG_URL = "data/dice_tree.svg";
 
@@ -121,7 +136,6 @@
   const minimapCanvas = $("#minimap-canvas");
   const minimapWindow = $("#minimap-window");
   const minimapPanel = $("#minimap-panel");
-  const minimapToggle = $("#minimap-toggle");
   const tooltip = $("#tooltip");
   const sheetHandle = $("#sheet-handle");
   const tooltipTitle = $("#tooltip-title");
@@ -166,7 +180,18 @@
     tooltipPinned: false,
 
     showPrereqMode: true,
-    showCurrencyBadges: true,
+    showCurrencyBadges: false,
+
+    // 加載期深度預算與預渲染快取 (Deep Pre-computation & Pre-baking Pipeline)
+    prereqGraph: new Map(),        // nodeId -> { nodeIds: Set, branches: Set }
+    tooltipDomCache: new Map(),    // nodeId -> DocumentFragment
+    parsedEdges: [],               // [{ element, startId, endId }]
+    searchIndex: new Map(),        // nodeId -> { name, dice, branch, type, desc, combined, tokens }
+    branchNodesMap: new Map(),     // branchId (1~5) -> Set of DOM Elements
+    typeNodesMap: new Map(),       // typeKey -> Set of DOM Elements
+    nodeGeometryMap: new Map(),    // nodeId -> { cx, cy, isLarge, radius, branch, type }
+    branchCentroids: new Map(),    // branchId -> { cx, cy }
+    minimapBaseCanvas: null,       // 離屏小地圖底圖 Canvas (Offscreen Pre-baked Canvas)
 
     pointers: new Map(),
     drag: null,
@@ -181,27 +206,27 @@
     if (node) {
       if (node.node_type === "PLAYER_PASSIVE") {
         const v0 = node.passive_value ?? "0";
-        const v1 = node.passive_rank_add ? `（每階 +${node.passive_rank_add}%）` : "";
+        const v1 = node.passive_rank_add ? `<span class="stat-green-add">(+${node.passive_rank_add}%)</span>` : "";
         text = text.replace(/\{0\}/g, `<strong>${v0}</strong>`)
                    .replace(/<color=[^>]*>\(\+\{1\}%?\b[^)]*\)<\/color>|\(\+\{1\}%?\b[^)]*\)/gi, v1)
                    .replace(/\{1\}/g, node.passive_rank_add || "");
       } else if (node.node_type === "DICE_RUNE") {
         const v1 = node.rune_value1 ?? "";
-        const v1_add = node.rune_value1_rank_add ? `（每階 +${node.rune_value1_rank_add}%）` : "";
+        const v1_add = node.rune_value1_rank_add ? `<span class="stat-green-add">(+${node.rune_value1_rank_add}%)</span>` : "";
         const v2 = node.rune_value2 ?? "";
-        const v2_add = node.rune_value2_rank_add ? `（每階 +${node.rune_value2_rank_add}%）` : "";
+        const v2_add = node.rune_value2_rank_add ? `<span class="stat-green-add">(+${node.rune_value2_rank_add}%)</span>` : "";
         const dur = node.rune_duration ?? "";
-        const dur_add = node.rune_duration_rank_add ? `（每階 +${node.rune_duration_rank_add}秒）` : "";
+        const dur_add = node.rune_duration_rank_add ? `<span class="stat-green-add">(+${node.rune_duration_rank_add}秒)</span>` : "";
 
         let p0 = v1 ? `<strong>${v1}</strong>` : "";
-        let p1 = node.rune_value1_rank_add || (v2 && !text.includes("{2}") ? `<strong>${v2}</strong>` : "");
+        let p1 = node.rune_value1_rank_add ? `<span class="stat-green-add">(+${node.rune_value1_rank_add})</span>` : (v2 && !text.includes("{2}") ? `<strong>${v2}</strong>` : "");
         let p2 = v2 ? `<strong>${v2}</strong>` : "";
-        let p3 = node.rune_value2_rank_add || "";
+        let p3 = node.rune_value2_rank_add ? `<span class="stat-green-add">(+${node.rune_value2_rank_add})</span>` : "";
         let p4 = dur ? `<strong>${dur}</strong>` : "";
-        let p5 = node.rune_duration_rank_add || "";
+        let p5 = node.rune_duration_rank_add ? `<span class="stat-green-add">(+${node.rune_duration_rank_add})</span>` : "";
 
         if (node.rune_value1_rank_add) {
-          text = text.replace(/<color=[^>]*>\(\+\{1\}(%?|秒?|個?|次?)\)<\/color>|\(\+\{1\}(%?|秒?|個?|次?)\)/gi, (m, u) => `（每階 +${node.rune_value1_rank_add}${u || (text.includes("{0}%") ? "%" : "")}）`);
+          text = text.replace(/<color=[^>]*>\(\+\{1\}(%?|秒?|個?|次?)\)<\/color>|\(\+\{1\}(%?|秒?|個?|次?)\)/gi, (m, u) => `<span class="stat-green-add">(+${node.rune_value1_rank_add}${u || (text.includes("{0}%") ? "%" : "")})</span>`);
         }
         if (node.rune_value2_rank_add) {
           text = text.replace(/<color=[^>]*>\(\+\{3\}(%?|秒?)\)<\/color>|\(\+\{3\}(%?|秒?)\)/gi, v2_add);
@@ -224,16 +249,35 @@
 
     text = text.replace(/<color=[^>]*>\(\+\s*[%秒]?\)<\/color>|\(\+\s*[%秒]?\)/gi, "");
 
-    return text
+    // 格式化綠色增量數值
+    text = text.replace(/<color=[^>]*>\(\+([^)]+)\)<\/color>/gi, '<span class="stat-green-add">(+$1)</span>');
+
+    text = text
       .replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&quot;/g, '"')
       .replace(/&#039;/g, "'")
-      .replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => TAG_MAP[tag.toUpperCase()] || tag)
+      .replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => {
+        const tagKey = tag.toUpperCase();
+        const tagName = TAG_MAP[tagKey] || tag;
+        return `<u class="tooltip-tag-inline" data-tag-key="${tagKey}" role="button" tabindex="0">${tagName}</u>`;
+      })
       .replace(/<color=[^>]*>(.*?)<\/color>/gi, '$1')
       .replace(/<br\s*\/?>/gi, " ")
       .trim();
+
+    // 對未標註 <tag> 但有對應中文標籤名詞的名詞自動包裹白色底線
+    const tagDefs = window.TREE_DATA?.tag_definitions || {};
+    Object.keys(tagDefs).forEach(tagKey => {
+      const tagName = tagDefs[tagKey]?.name_zh;
+      if (tagName && tagName.length >= 2 && text.includes(tagName) && !text.includes(`data-tag-key="${tagKey}"`)) {
+        const reg = new RegExp(`(?<!<[^>]*)${tagName}(?![^<]*>)`, 'g');
+        text = text.replace(reg, `<u class="tooltip-tag-inline" data-tag-key="${tagKey}" role="button" tabindex="0">${tagName}</u>`);
+      }
+    });
+
+    return text;
   }
 
   // Plaintext version for search indexing & labels
@@ -362,20 +406,25 @@
     const { width, height } = viewportSize();
     const scaledWidth = MAP_WIDTH * scale;
     const scaledHeight = MAP_HEIGHT * scale;
-    const marginX = Math.min(320, width * 0.45);
-    const marginY = Math.min(280, height * 0.4);
+    // 預留充足的邊界滑動緩衝空間，讓小縮放（如 0.16 ~ 0.5）時依然能自由順暢滑動
+    const marginX = Math.max(width * 0.45, 260);
+    const marginY = Math.max(height * 0.45, 240);
 
     let minPanX, maxPanX, minPanY, maxPanY;
 
     if (scaledWidth <= width) {
-      minPanX = maxPanX = (width - scaledWidth) / 2;
+      const centerPanX = (width - scaledWidth) / 2;
+      minPanX = centerPanX - marginX;
+      maxPanX = centerPanX + marginX;
     } else {
       minPanX = width - scaledWidth - marginX;
       maxPanX = marginX;
     }
 
     if (scaledHeight <= height) {
-      minPanY = maxPanY = (height - scaledHeight) / 2;
+      const centerPanY = (height - scaledHeight) / 2;
+      minPanY = centerPanY - marginY;
+      maxPanY = centerPanY + marginY;
     } else {
       minPanY = height - scaledHeight - marginY;
       maxPanY = marginY;
@@ -416,10 +465,10 @@
   }
 
   function applySceneTransform() {
-    scene.style.transform = `translate3d(${state.panX}px, ${state.panY}px, 0) scale(${state.scale})`;
+    scene.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
     updateLodState();
     const targetAnchorId = closingNodeId || state.selectedId;
-    if (!tooltip.hidden && targetAnchorId && window.innerWidth > 768) {
+    if (!tooltip.hidden && targetAnchorId) {
       positionTooltip(targetAnchorId);
     }
   }
@@ -512,7 +561,7 @@
       state.targetPanX = state.panX;
       state.targetPanY = state.panY;
 
-      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+      zoomReadout.textContent = formatZoomPercent(state.scale);
 
       if (progress >= 1) {
         state.scale = zoomAnim.targetScale;
@@ -579,7 +628,11 @@
 
   // 縮放專用控制器（以 anchorWorldX/Y 為錨點）
   function startCameraZoom(nextScale, anchorWorldX = null, anchorWorldY = null, immediate = false) {
-    const clampedScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale));
+    const isMobile = window.innerWidth <= 768;
+    const effectiveImmediate = immediate || isMobile; // 手機端縮放不需要平滑，即時瞬發
+    const minS = getMinScale();
+    const maxS = getMaxScale();
+    const clampedScale = Math.min(maxS, Math.max(minS, nextScale));
     const { width, height } = viewportSize();
     const cx = width / 2;
     const cy = height / 2;
@@ -590,7 +643,7 @@
     const targetPanX = cx - wx * clampedScale;
     const targetPanY = cy - wy * clampedScale;
 
-    if (immediate) {
+    if (effectiveImmediate) {
       zoomAnim = null;
       state.scale = clampedScale;
       state.targetScale = clampedScale;
@@ -600,7 +653,7 @@
       state.targetPanY = targetPanY;
       applySceneTransform();
       updateMinimapWindow();
-      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+      zoomReadout.textContent = formatZoomPercent(state.scale);
       if (!panAnim && !state.drag?.isDragging) {
         setNavigating(false, true);
       }
@@ -633,7 +686,7 @@
       stopAllAnimations();
       applySceneTransform();
       updateMinimapWindow();
-      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+      zoomReadout.textContent = formatZoomPercent(state.scale);
       if (!state.drag?.isDragging) {
         setNavigating(false, true);
       }
@@ -664,21 +717,24 @@
     }
   }
 
-  // 預設 100% 縮放且位於正中間
+  // 預設 100% 縮放且位於正中間（手機端 100% 縮放即為 0.5 舒適視野）
   function resetToCenter(immediate = false) {
     const { width, height } = viewportSize();
-    state.targetScale = 1.0;
-    state.targetPanX = (width - MAP_WIDTH * 1.0) / 2;
-    state.targetPanY = (height - MAP_HEIGHT * 1.0) / 2;
-    startCameraZoom(1.0, MAP_WIDTH / 2, MAP_HEIGHT / 2, immediate);
+    const baseScale = getBaseScale();
+    state.targetScale = baseScale;
+    state.targetPanX = (width - MAP_WIDTH * baseScale) / 2;
+    state.targetPanY = (height - MAP_HEIGHT * baseScale) / 2;
+    startCameraZoom(baseScale, MAP_WIDTH / 2, MAP_HEIGHT / 2, immediate);
     interactionStatus.textContent = "已重設為 100% 縮放（居中）";
   }
 
   function fitToViewport(immediate = false) {
     const { width, height } = viewportSize();
-    const horizontalRoom = Math.max(300, width - 60);
-    const verticalRoom = Math.max(260, height - 120);
-    const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(horizontalRoom / MAP_WIDTH, verticalRoom / MAP_HEIGHT)));
+    const horizontalRoom = Math.max(300, width - 40);
+    const verticalRoom = Math.max(260, height - 80);
+    const minS = getMinScale();
+    const maxS = getMaxScale();
+    const nextScale = Math.min(maxS, Math.max(minS, Math.min(horizontalRoom / MAP_WIDTH, verticalRoom / MAP_HEIGHT)));
 
     state.targetScale = nextScale;
     state.targetPanX = (width - MAP_WIDTH * nextScale) / 2;
@@ -689,8 +745,11 @@
 
   // 縮放始終以「目前畫面中心」為中心錨點
   function setZoom(nextScale, immediate = false) {
-    startCameraZoom(nextScale, null, null, immediate);
-    interactionStatus.textContent = `視野縮放：${Math.round(Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale)) * 100)}%`;
+    const minS = getMinScale();
+    const maxS = getMaxScale();
+    const clampedScale = Math.min(maxS, Math.max(minS, nextScale));
+    startCameraZoom(clampedScale, null, null, immediate);
+    interactionStatus.textContent = `視野縮放：${formatZoomPercent(clampedScale)}`;
   }
 
   function nodePoint(nodeId) {
@@ -722,81 +781,22 @@
     interactionStatus.textContent = `已定位：${node._nameClean || node.name_zh}`;
   }
 
-  // --- High-Performance Minimap Canvas Rendering (Path Batching: 6 Calls Total) ---
+  // --- High-Performance Minimap Canvas Rendering (離屏快取 O(1) 瞬發繪製) ---
   function renderMinimap() {
     if (!minimapCanvas || !state.nodes.length) return;
     const ctx = minimapCanvas.getContext("2d");
     const w = minimapCanvas.width;
     const h = minimapCanvas.height;
-    const scaleX = w / MAP_WIDTH;
-    const scaleY = h / MAP_HEIGHT;
 
-    ctx.clearRect(0, 0, w, h);
-
-    // Background subtle dark tone
-    ctx.fillStyle = "#0b0d13";
-    ctx.fillRect(0, 0, w, h);
-
-    // 1. Batch Draw Connecting Lines (1 Draw Call for all 300+ edges)
-    ctx.beginPath();
-    ctx.lineWidth = 1.0;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    state.nodes.forEach((node) => {
-      const p1 = nodePoint(node.id);
-      if (!p1) return;
-      (node.next_nodes || []).forEach((nextId) => {
-        const p2 = nodePoint(nextId);
-        if (!p2) return;
-        ctx.moveTo(p1.x * scaleX, p1.y * scaleY);
-        ctx.lineTo(p2.x * scaleX, p2.y * scaleY);
-      });
-    });
-    ctx.stroke();
-
-    // 2. Batch Draw Node Dots by Faction (5 Draw Calls Total)
-    const factionBuckets = new Map();
-    for (let f = 1; f <= 5; f++) {
-      factionBuckets.set(f, { dice: [], regular: [] });
+    if (state.minimapBaseCanvas) {
+      ctx.drawImage(state.minimapBaseCanvas, 0, 0);
+      return;
     }
 
-    state.nodes.forEach((node) => {
-      const p = nodePoint(node.id);
-      if (!p) return;
-      const bucket = factionBuckets.get(Number(node.branch)) || factionBuckets.get(1);
-      const isLarge = node.is_base || node.node_type === "DICE";
-      if (isLarge) {
-        bucket.dice.push({ x: p.x * scaleX, y: p.y * scaleY });
-      } else {
-        bucket.regular.push({ x: p.x * scaleX, y: p.y * scaleY });
-      }
-    });
-
-    // Draw regular dots by color
-    factionBuckets.forEach((bucket, branchId) => {
-      const color = branchColor(branchId);
-      if (bucket.regular.length > 0) {
-        ctx.beginPath();
-        bucket.regular.forEach(({ x, y }) => {
-          ctx.moveTo(x + 2, y);
-          ctx.arc(x, y, 2.0, 0, Math.PI * 2);
-        });
-        ctx.fillStyle = color;
-        ctx.fill();
-      }
-
-      if (bucket.dice.length > 0) {
-        ctx.beginPath();
-        bucket.dice.forEach(({ x, y }) => {
-          ctx.moveTo(x + 3.8, y);
-          ctx.arc(x, y, 3.8, 0, Math.PI * 2);
-        });
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
-      }
-    });
+    prebakeMinimap();
+    if (state.minimapBaseCanvas) {
+      ctx.drawImage(state.minimapBaseCanvas, 0, 0);
+    }
   }
 
   function updateMinimapWindow() {
@@ -987,6 +987,294 @@
     return null;
   }
 
+  // --- Pre-compiled Tooltip DOM Cache (加載期預構建，徹底消除每次點擊的 DOM 建立負載) ---
+  function buildNodeDetailFragment(node) {
+    const maxRank = Number(node.max_rank) || 1;
+    const fragment = document.createDocumentFragment();
+
+    // 1. 核心效果（遊戲內原生排版，文案色 #9789AE，底線標籤詞彙）
+    const descHtml = formatGameText(node.description_zh, node);
+    if (descHtml) {
+      const section = document.createElement("div");
+      section.className = "detail-section";
+      const p = document.createElement("p");
+      p.className = "detail-copy";
+      p.innerHTML = descHtml;
+      section.append(p);
+
+      // 下方 #標籤 膠囊列
+      const tagDefs = window.TREE_DATA?.tag_definitions || {};
+      const relevantTags = [];
+      if (Array.isArray(node.tags)) {
+        node.tags.forEach(tKey => {
+          if (tagDefs[tKey] && !relevantTags.includes(tKey)) relevantTags.push(tKey);
+        });
+      }
+      // 從 descHtml 中尋找 data-tag-key
+      const tagMatches = descHtml.matchAll(/data-tag-key="([^"]+)"/g);
+      for (const match of tagMatches) {
+        const tKey = match[1];
+        if (tagDefs[tKey] && !relevantTags.includes(tKey)) relevantTags.push(tKey);
+      }
+
+      if (relevantTags.length > 0) {
+        const hashtagRow = document.createElement("div");
+        hashtagRow.className = "tooltip-hashtag-row";
+        relevantTags.forEach(tKey => {
+          const tDef = tagDefs[tKey];
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tooltip-hashtag-chip";
+          btn.setAttribute("data-tag-key", tKey);
+          btn.textContent = `#${tDef.name_zh || tKey}`;
+          hashtagRow.append(btn);
+        });
+        section.append(hashtagRow);
+      }
+
+      fragment.append(section);
+    }
+
+    // 2. 覺醒效果（若有）
+    const awakenHtml = formatGameText(node.dice_awaken, node);
+    if (awakenHtml) {
+      const section = document.createElement("div");
+      section.className = "detail-section";
+      const label = document.createElement("span");
+      label.className = "section-label";
+      label.textContent = "覺醒效果";
+      const p = document.createElement("p");
+      p.className = "detail-copy";
+      p.innerHTML = awakenHtml;
+      section.append(label, p);
+      fragment.append(section);
+    }
+
+    // 3. 骰子專屬 2 欄式屬性網格（完全比對遊戲截圖 2）
+    if (node.node_type === "DICE") {
+      const divider = document.createElement("hr");
+      divider.className = "tooltip-divider";
+      fragment.append(divider);
+
+      const grid = document.createElement("div");
+      grid.className = "dice-stat-grid";
+
+      // 項目 1: 攻擊力
+      const atkItem = document.createElement("div");
+      atkItem.className = "dice-stat-item";
+      atkItem.innerHTML = `
+        <div class="dice-stat-icon-box">
+          <img src="icons/Attack_Icon.png" alt="攻擊力" />
+        </div>
+        <div class="dice-stat-text">
+          <span class="dice-stat-label">攻擊力</span>
+          <span class="dice-stat-val">${node.dice_attack || "0"}</span>
+        </div>
+      `;
+      grid.append(atkItem);
+
+      // 項目 2: 攻擊速度
+      const spdItem = document.createElement("div");
+      spdItem.className = "dice-stat-item";
+      spdItem.innerHTML = `
+        <div class="dice-stat-icon-box">
+          <img src="icons/attackspeed_icon.png" alt="攻擊速度" />
+        </div>
+        <div class="dice-stat-text">
+          <span class="dice-stat-label">攻擊速度</span>
+          <span class="dice-stat-val">${node.dice_attack_interval || "0"}</span>
+        </div>
+      `;
+      grid.append(spdItem);
+
+      // 項目 3: 目標
+      const targetItem = document.createElement("div");
+      targetItem.className = "dice-stat-item";
+      targetItem.innerHTML = `
+        <div class="dice-stat-icon-box">
+          <img src="icons/targetingtype_icon.png" alt="目標" />
+        </div>
+        <div class="dice-stat-text">
+          <span class="dice-stat-label">目標</span>
+          <span class="dice-stat-val">${node.dice_target_zh || "前方"}</span>
+        </div>
+      `;
+      grid.append(targetItem);
+
+      // 項目 4+: 特殊數值（從解包數據取出）
+      if (Array.isArray(node.special_stats)) {
+        node.special_stats.forEach(st => {
+          const sItem = document.createElement("div");
+          sItem.className = "dice-stat-item";
+          sItem.innerHTML = `
+            <div class="dice-stat-icon-box">
+              <img src="icons/${st.icon || "NodeAttackIcon.png"}" alt="${st.label}" onerror="this.src='icons/Attack_Icon.png'" />
+            </div>
+            <div class="dice-stat-text">
+              <span class="dice-stat-label">${st.label}</span>
+              <span class="dice-stat-val">${st.value}</span>
+            </div>
+          `;
+          grid.append(sItem);
+        });
+      }
+
+      fragment.append(grid);
+
+      // 底部「立即前往」按鈕
+      const gotoBtn = document.createElement("button");
+      gotoBtn.type = "button";
+      gotoBtn.className = "dice-goto-btn";
+      gotoBtn.textContent = "立即前往";
+      gotoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeTooltip();
+      });
+      fragment.append(gotoBtn);
+    } else {
+      // 非骰子節點（符文、被動、支援）：若有持續時間等屬性，以精簡標籤呈現
+      const statItems = [];
+      if (node.rune_duration) statItems.push(["持續時間", `${node.rune_duration} 秒`]);
+      if (node.dice_group) statItems.push(["群組", formatDiceGroup(node.dice_group)]);
+
+      if (statItems.length > 0) {
+        const ul = document.createElement("ul");
+        ul.className = "stat-compact-list";
+        statItems.forEach(([l, v]) => {
+          const li = document.createElement("li");
+          li.className = "stat-compact-item";
+          li.innerHTML = `<span class="stat-label">${l}</span><span class="stat-value">${v}</span>`;
+          ul.append(li);
+        });
+        fragment.append(ul);
+      }
+
+      // 4. 元數據區（消耗、前置與升階表格：專供符文、被動、支援節點使用）
+      const metaBox = document.createElement("div");
+      metaBox.className = "tooltip-meta-box";
+
+      const goldCosts = Array.isArray(node.gold_costs) ? node.gold_costs : [];
+      const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
+      const unlockGold = goldCosts[0] ?? node.unlock_gold ?? 0;
+      const unlockCore = coreCosts[0] ?? node.unlock_core ?? 0;
+      const totalGold = node.total_gold ?? goldCosts.reduce((a, b) => a + b, 0);
+      const totalCore = node.total_core ?? coreCosts.reduce((a, b) => a + b, 0);
+
+      const specialUnlock = SPECIAL_UNLOCK_CONDITIONS[node.id];
+      if (specialUnlock) {
+        const lineSpecial = document.createElement("div");
+        lineSpecial.className = "meta-line";
+        lineSpecial.innerHTML = `
+          <span>解鎖途徑</span>
+          <span class="meta-cost" style="color: #ffd859; font-weight: 700;">${specialUnlock.label}</span>
+        `;
+        metaBox.append(lineSpecial);
+      } else if (unlockGold > 0 || unlockCore > 0) {
+        const lineUnlock = document.createElement("div");
+        lineUnlock.className = "meta-line";
+        const parts = [];
+        if (unlockGold > 0) parts.push(`${SVG_ICONS.gold} ${unlockGold.toLocaleString()}`);
+        if (unlockCore > 0) parts.push(`${SVG_ICONS.core} ${unlockCore.toLocaleString()}`);
+        lineUnlock.innerHTML = `<span>解鎖消耗</span><span class="meta-cost">${parts.join(" ")}</span>`;
+        metaBox.append(lineUnlock);
+      }
+
+      if (maxRank > 1 && (totalGold > unlockGold || totalCore > unlockCore)) {
+        const lineTotal = document.createElement("div");
+        lineTotal.className = "meta-line";
+        const parts = [];
+        if (totalGold > 0) parts.push(`${SVG_ICONS.gold} ${totalGold.toLocaleString()}`);
+        if (totalCore > 0) parts.push(`${SVG_ICONS.core} ${totalCore.toLocaleString()}`);
+        lineTotal.innerHTML = `<span>滿階累計</span><span class="meta-cost">${parts.join(" ")}</span>`;
+        metaBox.append(lineTotal);
+      }
+
+      const incomingIds = node.incoming || [];
+      const incomingNodes = incomingIds
+        .map((id) => state.nodeById.get(id))
+        .filter(Boolean);
+
+      if (incomingNodes.length > 0) {
+        const linePre = document.createElement("div");
+        linePre.className = "meta-line";
+        linePre.innerHTML = `<span>前置節點</span>`;
+        const pillWrap = document.createElement("span");
+        incomingNodes.forEach((inc) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "node-link-pill";
+          btn.setAttribute("data-target-id", inc.id);
+          btn.textContent = `${inc._nameClean || formatValue(inc.name_zh)} →`;
+          btn.title = `跳轉至 ${inc._nameClean || inc.name_zh}`;
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            centerOnNode(inc.id, true);
+            showTooltip(inc.id, true);
+          });
+          pillWrap.append(btn);
+        });
+        linePre.append(pillWrap);
+        metaBox.append(linePre);
+      } else if (node.is_base) {
+        const lineBase = document.createElement("div");
+        lineBase.className = "meta-line";
+        lineBase.innerHTML = `<span>起點</span><span>核心初始節點</span>`;
+        metaBox.append(lineBase);
+      }
+
+      // 升階明細表格（多階節點專用，乾淨收納，0值顯示為—）
+      if (maxRank > 1) {
+        const tableContainer = document.createElement("div");
+        tableContainer.className = "upgrade-table-container";
+        const table = document.createElement("table");
+        table.className = "upgrade-table";
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>階級</th>
+              <th>單階金幣</th>
+              <th>單階核心</th>
+              <th>累計金幣</th>
+              <th>累計核心</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        const tbody = table.querySelector("tbody");
+        let cumGold = 0;
+        let cumCore = 0;
+        for (let r = 1; r <= maxRank; r++) {
+          const g = goldCosts[r - 1] || 0;
+          const c = coreCosts[r - 1] || 0;
+          cumGold += g;
+          cumCore += c;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>第 ${r} 階</td>
+            <td>${g > 0 ? `${SVG_ICONS.gold} ${g.toLocaleString()}` : "—"}</td>
+            <td>${c > 0 ? `${SVG_ICONS.core} ${c.toLocaleString()}` : "—"}</td>
+            <td>${cumGold > 0 ? `${SVG_ICONS.gold} ${cumGold.toLocaleString()}` : "—"}</td>
+            <td>${cumCore > 0 ? `${SVG_ICONS.core} ${cumCore.toLocaleString()}` : "—"}</td>
+          `;
+          tbody.append(tr);
+        }
+        tableContainer.append(table);
+        metaBox.append(tableContainer);
+      }
+
+      fragment.append(metaBox);
+    }
+
+    return fragment;
+  }
+
+  function precompileTooltipPanels() {
+    state.tooltipDomCache.clear();
+    state.nodes.forEach((node) => {
+      state.tooltipDomCache.set(node.id, buildNodeDetailFragment(node));
+    });
+  }
+
   // --- Tooltip Rendering (Clean, Compact, High-Utility Card) ---
   function renderDetailPanel(node) {
     const fData = branchData(node.branch);
@@ -1017,6 +1305,7 @@
 
     tooltipTitle.textContent = node._nameClean || formatValue(node.name_zh, "未命名節點");
 
+
     // 渲染 3 系列 PNG 圖示（放大兩倍 136px，上 1/3 破格超出 Tooltip 頂部，僅骰子大節點顯示）
     const iconFilename = resolveNode3Icon(node);
     if (iconFilename && tooltipDiceImg) {
@@ -1030,174 +1319,27 @@
       if (tooltipDiceVisual) tooltipDiceVisual.style.display = "none";
     }
 
-    const fragment = document.createDocumentFragment();
-
-    // 1. 核心效果（流暢繁中排版，數值加粗純白，無花哨碎標籤）
-    const descHtml = formatGameText(node.description_zh, node);
-    if (descHtml) {
-      const section = document.createElement("div");
-      section.className = "detail-section";
-      const p = document.createElement("p");
-      p.className = "detail-copy";
-      p.innerHTML = descHtml;
-      section.append(p);
-      fragment.append(section);
+    // 零成本 O(1) 取出預編譯之 DocumentFragment
+    let cachedFragment = state.tooltipDomCache.get(node.id);
+    if (!cachedFragment) {
+      cachedFragment = buildNodeDetailFragment(node);
+      state.tooltipDomCache.set(node.id, cachedFragment);
     }
 
-    // 2. 覺醒效果（若有）
-    const awakenHtml = formatGameText(node.dice_awaken, node);
-    if (awakenHtml) {
-      const section = document.createElement("div");
-      section.className = "detail-section";
-      const label = document.createElement("span");
-      label.className = "section-label";
-      label.textContent = "覺醒效果";
-      const p = document.createElement("p");
-      p.className = "detail-copy";
-      p.innerHTML = awakenHtml;
-      section.append(label, p);
-      fragment.append(section);
-    }
-
-    // 3. 戰鬥指標（清晰高價值核心數值，不含屬性、品階、適用等冗餘欄位）
-    const statItems = [];
-    if (node.dice_attack) statItems.push(["基礎攻擊", node.dice_attack]);
-    if (node.dice_attack_interval) statItems.push(["攻速間隔", `${node.dice_attack_interval} 秒`]);
-    if (node.rune_duration) statItems.push(["持續時間", `${node.rune_duration} 秒`]);
-    if (node.dice_group) statItems.push(["群組", formatDiceGroup(node.dice_group)]);
-
-    if (statItems.length > 0) {
-      const ul = document.createElement("ul");
-      ul.className = "stat-compact-list";
-      statItems.forEach(([l, v]) => {
-        const li = document.createElement("li");
-        li.className = "stat-compact-item";
-        li.innerHTML = `<span class="stat-label">${l}</span><span class="stat-value">${v}</span>`;
-        ul.append(li);
-      });
-      fragment.append(ul);
-    }
-
-    // 4. 元數據區（消耗與前置）
-    const metaBox = document.createElement("div");
-    metaBox.className = "tooltip-meta-box";
-
-    const goldCosts = Array.isArray(node.gold_costs) ? node.gold_costs : [];
-    const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
-    const unlockGold = goldCosts[0] ?? node.unlock_gold ?? 0;
-    const unlockCore = coreCosts[0] ?? node.unlock_core ?? 0;
-    const totalGold = node.total_gold ?? goldCosts.reduce((a, b) => a + b, 0);
-    const totalCore = node.total_core ?? coreCosts.reduce((a, b) => a + b, 0);
-
-    const specialUnlock = SPECIAL_UNLOCK_CONDITIONS[node.id];
-    if (specialUnlock) {
-      const lineSpecial = document.createElement("div");
-      lineSpecial.className = "meta-line";
-      lineSpecial.innerHTML = `
-        <span>解鎖途徑</span>
-        <span class="meta-cost" style="color: #ffd859; font-weight: 700;">${specialUnlock.label}</span>
-      `;
-      metaBox.append(lineSpecial);
-    } else {
-      const unlockCostHtml = formatCostHtml(unlockGold, unlockCore);
-      if (unlockCostHtml) {
-        const lineCost = document.createElement("div");
-        lineCost.className = "meta-line";
-        lineCost.innerHTML = `
-          <span>解鎖消耗</span>
-          <span class="meta-cost">${unlockCostHtml}</span>
-        `;
-        metaBox.append(lineCost);
-      }
-    }
-
-    if (maxRank > 1) {
-      const totalCostHtml = formatCostHtml(totalGold, totalCore);
-      if (totalCostHtml && (specialUnlock || totalCostHtml !== formatCostHtml(unlockGold, unlockCore))) {
-        const lineTotal = document.createElement("div");
-        lineTotal.className = "meta-line";
-        lineTotal.innerHTML = `
-          <span>滿階累計</span>
-          <span class="meta-cost">${totalCostHtml}</span>
-        `;
-        metaBox.append(lineTotal);
-      }
-    }
-
-    const incomingIds = node.incoming || [];
-    const incomingNodes = incomingIds
-      .map((id) => state.nodeById.get(id))
-      .filter(Boolean);
-
-    if (incomingNodes.length > 0) {
-      const linePre = document.createElement("div");
-      linePre.className = "meta-line";
-      linePre.innerHTML = `<span>前置節點</span>`;
-      const pillWrap = document.createElement("span");
-      incomingNodes.forEach((inc) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "node-link-pill";
-        btn.textContent = `${inc._nameClean || formatValue(inc.name_zh)} →`;
-        btn.title = `跳轉至 ${inc._nameClean || inc.name_zh}`;
+    const cloned = cachedFragment.cloneNode(true);
+    // 綁定前置跳轉按鈕事件
+    cloned.querySelectorAll(".node-link-pill").forEach((btn) => {
+      const targetId = btn.getAttribute("data-target-id");
+      if (targetId) {
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
-          centerOnNode(inc.id, false);
-          showTooltip(inc.id, true);
+          centerOnNode(targetId, false);
+          showTooltip(targetId, true);
         });
-        pillWrap.append(btn);
-      });
-      linePre.append(pillWrap);
-      metaBox.append(linePre);
-    } else if (node.is_base) {
-      const lineBase = document.createElement("div");
-      lineBase.className = "meta-line";
-      lineBase.innerHTML = `<span>起點</span><span>核心初始節點</span>`;
-      metaBox.append(lineBase);
-    }
-
-    // 升階明細表格（多階節點專用，乾淨收納，0值顯示為—）
-    if (maxRank > 1) {
-      const tableContainer = document.createElement("div");
-      tableContainer.className = "upgrade-table-container";
-      const table = document.createElement("table");
-      table.className = "upgrade-table";
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>階級</th>
-            <th>單階金幣</th>
-            <th>單階核心</th>
-            <th>累計金幣</th>
-            <th>累計核心</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      `;
-      const tbody = table.querySelector("tbody");
-      let cumGold = 0;
-      let cumCore = 0;
-      for (let r = 1; r <= maxRank; r++) {
-        const g = goldCosts[r - 1] || 0;
-        const c = coreCosts[r - 1] || 0;
-        cumGold += g;
-        cumCore += c;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>第 ${r} 階</td>
-          <td>${g > 0 ? `${SVG_ICONS.gold} ${g.toLocaleString()}` : "—"}</td>
-          <td>${c > 0 ? `${SVG_ICONS.core} ${c.toLocaleString()}` : "—"}</td>
-          <td>${cumGold > 0 ? `${SVG_ICONS.gold} ${cumGold.toLocaleString()}` : "—"}</td>
-          <td>${cumCore > 0 ? `${SVG_ICONS.core} ${cumCore.toLocaleString()}` : "—"}</td>
-        `;
-        tbody.append(tr);
       }
-      tableContainer.append(table);
-      metaBox.append(tableContainer);
-    }
+    });
 
-    fragment.append(metaBox);
-    tooltipBody.replaceChildren(fragment);
+    tooltipBody.replaceChildren(cloned);
   }
 
   // --- Smart Contextual Tooltip Positioning (零 Reflow 純幾何換算，消除逐幀 Layout Thrashing) ---
@@ -1212,13 +1354,6 @@
   }
 
   function positionTooltip(nodeId, forceMeasure = false) {
-    if (window.innerWidth <= 768) {
-      tooltip.style.left = "";
-      tooltip.style.top = "";
-      tooltip.style.transform = "translateY(0)";
-      return;
-    }
-
     const pt = state.nodePositions.get(nodeId);
     if (!pt) return;
 
@@ -1234,12 +1369,65 @@
     const node = state.nodeById.get(nodeId);
     const isLarge = node?.node_type === "DICE" || node?.node_type === "PERK";
     const nodeRadius = (isLarge ? 52 : 36) * state.scale;
+    const gap = 16;
 
-    const top = screenY - nodeRadius - cachedTipHeight - 14;
-    const left = screenX - cachedTipWidth / 2;
+    let top;
+    // 空間感知智能定位：若節點上方空間不足容納 Tooltip，自動置於節點下方
+    if (screenY - nodeRadius - cachedTipHeight - gap < 16) {
+      top = screenY + nodeRadius + gap;
+    } else {
+      top = screenY - nodeRadius - cachedTipHeight - gap;
+    }
+
+    let left = screenX - cachedTipWidth / 2;
+    if (left < 16) left = 16;
+    if (left + cachedTipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - 16 - cachedTipWidth;
+    }
 
     tooltip.style.left = `${Math.round(left)}px`;
     tooltip.style.top = `${Math.round(top)}px`;
+  }
+
+  // --- Tag Micro-Tooltip Popover System ---
+  const tagPopover = document.getElementById("tag-popover");
+  const tagPopoverBadge = document.getElementById("tag-popover-badge");
+  const tagPopoverDesc = document.getElementById("tag-popover-desc");
+
+  function showTagPopover(tagKey, targetEl) {
+    if (!tagPopover || !tagKey || !targetEl) return;
+    const tagDefs = window.TREE_DATA?.tag_definitions || {};
+    const tDef = tagDefs[tagKey];
+    if (!tDef) return;
+
+    tagPopoverBadge.textContent = `#${tDef.name_zh || tagKey}`;
+    tagPopoverDesc.textContent = tDef.desc_zh || "暫無詳細機制說明。";
+
+    tagPopover.hidden = false;
+    tagPopover.setAttribute("aria-hidden", "false");
+
+    const rect = targetEl.getBoundingClientRect();
+    const popWidth = Math.min(280, window.innerWidth - 32);
+    let top = rect.bottom + 8;
+    let left = rect.left + rect.width / 2 - popWidth / 2;
+
+    if (left < 16) left = 16;
+    if (left + popWidth > window.innerWidth - 16) {
+      left = window.innerWidth - 16 - popWidth;
+    }
+
+    if (top + 110 > window.innerHeight) {
+      top = rect.top - 100;
+    }
+
+    tagPopover.style.left = `${Math.round(left)}px`;
+    tagPopover.style.top = `${Math.round(top)}px`;
+  }
+
+  function hideTagPopover() {
+    if (!tagPopover || tagPopover.hidden) return;
+    tagPopover.hidden = true;
+    tagPopover.setAttribute("aria-hidden", "true");
   }
 
   let sheetDismissTimer = null;
@@ -1249,6 +1437,7 @@
   let closingNodeId = null;
 
   function showTooltip(nodeId, pinned = false) {
+    hideTagPopover();
     if (sheetDismissTimer) {
       clearTimeout(sheetDismissTimer);
       sheetDismissTimer = null;
@@ -1360,6 +1549,7 @@
   }
 
   function closeTooltip(immediate = false) {
+    hideTagPopover();
     if (sheetDismissTimer) {
       clearTimeout(sheetDismissTimer);
       sheetDismissTimer = null;
@@ -1479,40 +1669,125 @@
     centerOnNode(nodeId, false);
   }
 
-  function applySearch(query) {
+  // --- Unified Canvas Focus & Topology Highlighting Engine (DRY) ---
+  function computeUpstreamTopologyPath(targetNodeIds) {
+    const activePathNodeIds = new Set(targetNodeIds);
+    const queue = [...targetNodeIds];
+    while (queue.length > 0) {
+      const currId = queue.shift();
+      const currNode = state.nodeById.get(currId);
+      if (currNode && currNode.incoming) {
+        for (const incId of currNode.incoming) {
+          if (!activePathNodeIds.has(incId)) {
+            activePathNodeIds.add(incId);
+            queue.push(incId);
+          }
+        }
+      }
+    }
+    const activeBranches = new Set();
+    activePathNodeIds.forEach((id) => {
+      const n = state.nodeById.get(id);
+      if (n && n.branch) activeBranches.add(Number(n.branch));
+    });
+    return { activePathNodeIds, activeBranches };
+  }
+
+  function applyTopologyHighlight({
+    modeClass,
+    matchedNodeIds,
+    activePathNodeIds,
+    activeBranches,
+    nodeClass,
+    edgeClass,
+    targetNodeId = null,
+  }) {
+    document.body.classList.add(modeClass);
+
+    // 標記節點樣式
+    state.elementsById.forEach((element, id) => {
+      const isMatched = matchedNodeIds.has(id);
+      element.classList.toggle(nodeClass, isMatched);
+      if (targetNodeId !== null) {
+        element.classList.toggle("is-prereq-target", id === targetNodeId);
+      }
+    });
+
+    // 標記分支連線高亮（利用已解析的邊緣陣列，0 次正則與距離計算！）
+    state.parsedEdges.forEach((edge) => {
+      const isConnected = activePathNodeIds.has(edge.startId) && activePathNodeIds.has(edge.endId);
+      edge.element.classList.toggle(edgeClass, isConnected);
+    });
+
+    // 標記中央至五大初始起點的線段（只要該陣營有節點在活躍路徑中即點亮）
+    scene.querySelectorAll("path.tree-center-link").forEach((linkEl) => {
+      const d = linkEl.getAttribute("d") || "";
+      let isBranchActive = false;
+      if (d.includes("1460.00") && activeBranches.has(1)) isBranchActive = true; // 自然 (火)
+      else if (d.includes("1840.00") && activeBranches.has(2)) isBranchActive = true; // 工學 (雷)
+      else if (d.includes("2160.00") && activeBranches.has(3)) isBranchActive = true; // 魔法 (冰)
+      else if (d.includes("1720.00") && activeBranches.has(4)) isBranchActive = true; // 秩序 (風/陰陽/迪奇)
+      else if (d.includes("2280.00") && activeBranches.has(5)) isBranchActive = true; // 混沌 (恐懼/吞噬/貪婪)
+
+      linkEl.classList.toggle(edgeClass, isBranchActive);
+    });
+
+    // 標記中央五大分支圖示與文字（活躍陣營點亮，其餘暗化）
+    scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
+      const b = Number(el.getAttribute("data-branch"));
+      el.classList.toggle("is-branch-active", activeBranches.has(b));
+    });
+  }
+
+  function clearTopologyHighlight({ modeClass, nodeClass, edgeClass }) {
+    document.body.classList.remove(modeClass);
+
+    state.elementsById.forEach((element) => {
+      element.classList.remove(nodeClass, "is-prereq-target");
+    });
+
+    state.parsedEdges.forEach((edge) => {
+      edge.element.classList.remove(edgeClass);
+    });
+
+    scene.querySelectorAll(`path.tree-center-link.${edgeClass}`).forEach((pathEl) => {
+      pathEl.classList.remove(edgeClass);
+    });
+
+    // 若無其他活躍的焦點模式，則清除中央分支活躍標記
+    const isAnyActive = document.body.classList.contains("has-active-filter") ||
+                        document.body.classList.contains("has-search-active") ||
+                        document.body.classList.contains("has-prereq-highlight");
+    if (!isAnyActive) {
+      scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
+        el.classList.remove("is-branch-active");
+      });
+    }
+  }
+
+  function applySearch(raw = "") {
+    const query = typeof raw === "string" ? raw : (raw?.target?.value || "");
     const normalized = normalizeSearchString(query.trim());
     const tokens = normalized.split(/\s+/).filter(Boolean);
     state.resultIndex = tokens.length ? 0 : -1;
+
     state.matches = tokens.length
-      ? state.nodes.filter((node) => tokens.every((token) => node._searchText.includes(token)))
+      ? state.nodes.filter((node) => {
+          const idx = state.searchIndex.get(node.id);
+          if (!idx) return (node._searchText || "").includes(normalized);
+          return tokens.every((token) => idx.combined.includes(token));
+        })
       : [];
 
-    scene.classList.toggle("has-search", tokens.length > 0);
-
-    // O(1) Match Lookup with Set & Dirty Check Batching
-    const currentMatchedIds = new Set(state.matches.map((n) => n.id));
-
-    if (tokens.length === 0) {
-      prevMatchedIds.forEach((id) => state.elementsById.get(id)?.classList.remove("is-match"));
-      prevMatchedIds.clear();
-    } else {
-      // Remove classes only from nodes that are no longer matched
-      prevMatchedIds.forEach((id) => {
-        if (!currentMatchedIds.has(id)) {
-          state.elementsById.get(id)?.classList.remove("is-match");
-        }
-      });
-      // Add classes only to newly matched nodes
-      currentMatchedIds.forEach((id) => {
-        if (!prevMatchedIds.has(id)) {
-          state.elementsById.get(id)?.classList.add("is-match");
-        }
-      });
-      prevMatchedIds = currentMatchedIds;
-    }
-
     searchClear.hidden = tokens.length === 0;
+
     if (tokens.length === 0) {
+      clearTopologyHighlight({
+        modeClass: "has-search-active",
+        nodeClass: "is-search-matched",
+        edgeClass: "is-search-edge",
+      });
+
       if (state.filterBranches.size > 0 || state.filterTypes.size > 0) {
         applyFilterHighlighting();
       } else {
@@ -1520,9 +1795,32 @@
       }
       emptyState.hidden = true;
     } else if (!state.matches.length) {
+      clearTopologyHighlight({
+        modeClass: "has-search-active",
+        nodeClass: "is-search-matched",
+        edgeClass: "is-search-edge",
+      });
       searchStatus.textContent = "找不到符合節點";
       emptyState.hidden = false;
     } else {
+      // 搜尋命中時，先清除前置高亮與 Tooltip，套用與篩選完全相同的畫布焦點與拓撲高亮特效 (DRY)
+      if (state.activePrereqNodeIds) {
+        clearPrereqHighlight(false);
+      }
+      closeTooltip();
+
+      const matchedNodeIds = new Set(state.matches.map((n) => n.id));
+      const { activePathNodeIds, activeBranches } = computeUpstreamTopologyPath(state.matches.map((n) => n.id));
+
+      applyTopologyHighlight({
+        modeClass: "has-search-active",
+        matchedNodeIds,
+        activePathNodeIds,
+        activeBranches,
+        nodeClass: "is-search-matched",
+        edgeClass: "is-search-edge",
+      });
+
       searchStatus.textContent = `符合 ${state.matches.length} 個節點`;
       emptyState.hidden = true;
     }
@@ -1536,20 +1834,15 @@
     const hasTypeFilter = state.filterTypes.size > 0;
     const hasAnyFilter = hasBranchFilter || hasTypeFilter;
 
-    document.body.classList.toggle("has-active-filter", hasAnyFilter);
     if (filterClearBtn) {
       filterClearBtn.hidden = !hasAnyFilter;
     }
 
     if (!hasAnyFilter) {
-      state.elementsById.forEach((element) => {
-        element.classList.remove("is-filter-matched");
-      });
-      scene.querySelectorAll("path.edge.is-filter-edge, line.edge.is-filter-edge, path.tree-center-link.is-filter-edge").forEach((pathEl) => {
-        pathEl.classList.remove("is-filter-edge");
-      });
-      scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-        el.classList.remove("is-branch-active");
+      clearTopologyHighlight({
+        modeClass: "has-active-filter",
+        nodeClass: "is-filter-matched",
+        edgeClass: "is-filter-edge",
       });
       if (!searchInput.value.trim()) {
         searchStatus.textContent = `${state.nodes.length} 個節點`;
@@ -1571,77 +1864,15 @@
       }
     });
 
-    // 向上回溯所有符合條件節點至初始起點的完整分支脈絡鏈路
-    const activePathNodeIds = new Set(matchedNodeIds);
-    const queue = [...matchedNodeIds];
-    while (queue.length > 0) {
-      const currId = queue.shift();
-      const currNode = state.nodeById.get(currId);
-      if (currNode && currNode.incoming) {
-        for (const incId of currNode.incoming) {
-          if (!activePathNodeIds.has(incId)) {
-            activePathNodeIds.add(incId);
-            queue.push(incId);
-          }
-        }
-      }
-    }
+    const { activePathNodeIds, activeBranches } = computeUpstreamTopologyPath(matchedNodeIds);
 
-    // 收集所有活躍路徑涵蓋的陣營
-    const activeBranches = new Set();
-    activePathNodeIds.forEach((id) => {
-      const n = state.nodeById.get(id);
-      if (n && n.branch) activeBranches.add(Number(n.branch));
-    });
-
-    // 標記節點樣式（僅直接匹配之節點高亮，前置節點不顯示高亮）
-    state.elementsById.forEach((element, id) => {
-      const isDirectMatch = matchedNodeIds.includes(id);
-      element.classList.toggle("is-filter-matched", isDirectMatch);
-    });
-
-    // 標記分支線條高亮（從已標示節點到初始起點的分支連線，不需要派系光暈）
-    scene.querySelectorAll("path.edge").forEach((pathEl) => {
-      const d = pathEl.getAttribute("d") || "";
-      const match = /M\s+([\d.-]+)\s+([\d.-]+)\s+L\s+([\d.-]+)\s+([\d.-]+)/.exec(d);
-      if (match) {
-        const x1 = parseFloat(match[1]), y1 = parseFloat(match[2]);
-        const x2 = parseFloat(match[3]), y2 = parseFloat(match[4]);
-        let startNodeId = null;
-        let endNodeId = null;
-        for (const id of activePathNodeIds) {
-          const pt = state.nodePositions.get(id);
-          if (!pt) continue;
-          if (!startNodeId && Math.hypot(pt.x - x1, pt.y - y1) < 14) startNodeId = id;
-          if (!endNodeId && Math.hypot(pt.x - x2, pt.y - y2) < 14) endNodeId = id;
-          if (startNodeId && endNodeId) break;
-        }
-
-        const isConnectedBranch = Boolean(
-          startNodeId && endNodeId &&
-          (activePathNodeIds.has(startNodeId) && activePathNodeIds.has(endNodeId))
-        );
-        pathEl.classList.toggle("is-filter-edge", isConnectedBranch);
-      }
-    });
-
-    // 標記中央至五大初始起點的線段（只要該陣營有節點在活躍路徑中即點亮）
-    scene.querySelectorAll("path.tree-center-link").forEach((linkEl) => {
-      const d = linkEl.getAttribute("d") || "";
-      let isBranchActive = false;
-      if (d.includes("1460.00") && activeBranches.has(1)) isBranchActive = true; // 自然 (火)
-      else if (d.includes("1840.00") && activeBranches.has(2)) isBranchActive = true; // 工學 (雷)
-      else if (d.includes("2160.00") && activeBranches.has(3)) isBranchActive = true; // 魔法 (冰)
-      else if (d.includes("1720.00") && activeBranches.has(4)) isBranchActive = true; // 秩序 (風/陰陽/迪奇)
-      else if (d.includes("2280.00") && activeBranches.has(5)) isBranchActive = true; // 混沌 (恐懼/吞噬/貪婪)
-
-      linkEl.classList.toggle("is-filter-edge", isBranchActive);
-    });
-
-    // 標記中央五大分支圖示與文字（活躍陣營點亮，其餘暗化）
-    scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-      const b = Number(el.getAttribute("data-branch"));
-      el.classList.toggle("is-branch-active", activeBranches.has(b));
+    applyTopologyHighlight({
+      modeClass: "has-active-filter",
+      matchedNodeIds: new Set(matchedNodeIds),
+      activePathNodeIds,
+      activeBranches,
+      nodeClass: "is-filter-matched",
+      edgeClass: "is-filter-edge",
     });
 
     searchStatus.textContent = `已篩選 ${matchedCount} 個節點`;
@@ -1669,7 +1900,7 @@
 
   // --- Pointer & Touch State Machine with RAF Batching ---
   const DRAG_THRESHOLD = 8;
-  let dragRafPending = false;
+  let renderRafPending = false;
 
   function pointerDistance(a, b) {
     return Math.hypot(a.x - b.x, a.y - b.y);
@@ -1679,20 +1910,31 @@
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
 
+  function scheduleRenderBatch() {
+    if (!renderRafPending) {
+      renderRafPending = true;
+      requestAnimationFrame(() => {
+        renderRafPending = false;
+        applySceneTransform();
+        updateMinimapWindow();
+      });
+    }
+  }
+
   function startPinch() {
     const points = [...state.pointers.values()];
     if (points.length !== 2) return;
     const [a, b] = points;
     const center = pointerCenter(a, b);
-    const rect = viewport.getBoundingClientRect();
     const initialDistance = Math.max(10, pointerDistance(a, b));
 
+    setZooming(true);
     setNavigating(true);
     state.pinch = {
       initialDistance,
       initialScale: state.targetScale,
-      mapX: (center.x - rect.left - state.targetPanX) / state.targetScale,
-      mapY: (center.y - rect.top - state.targetPanY) / state.targetScale,
+      mapX: (center.x - state.targetPanX) / state.targetScale,
+      mapY: (center.y - state.targetPanY) / state.targetScale,
     };
     state.drag = null;
     state.justPinched = true;
@@ -1776,7 +2018,6 @@
     stopAllAnimations();
 
     state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    state.pointerSamples = [{ x: event.clientX, y: event.clientY, time: performance.now() }];
 
     if (state.pointers.size === 2) {
       startPinch();
@@ -1785,6 +2026,7 @@
     }
 
     if (state.pointers.size === 1) {
+      state.pointerSamples = [{ x: event.clientX, y: event.clientY, time: performance.now() }];
       state.drag = {
         pointerId: event.pointerId,
         startX: event.clientX,
@@ -1801,6 +2043,37 @@
     if (!state.pointers.has(event.pointerId)) return;
     state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
+    // 2-finger pinch zoom with unified RAF batching (Zero Layout Thrashing)
+    if (state.pointers.size === 2 && state.pinch) {
+      setZooming(true);
+      setNavigating(true);
+      state.drag = null; // 縮放時鎖定純縮放，避免誤觸發平移
+      state.pointerSamples = []; // 雙指縮放期間嚴格清空單指滑動速度採樣
+      const points = [...state.pointers.values()];
+      const [a, b] = points;
+      const distance = Math.max(10, pointerDistance(a, b));
+      const center = pointerCenter(a, b);
+
+      const minS = getMinScale();
+      const maxS = getMaxScale();
+      const scaleRatio = distance / state.pinch.initialDistance;
+      const nextScale = Math.min(maxS, Math.max(minS, state.pinch.initialScale * scaleRatio));
+
+      state.scale = nextScale;
+      state.targetScale = nextScale;
+      state.panX = center.x - state.pinch.mapX * nextScale;
+      state.panY = center.y - state.pinch.mapY * nextScale;
+      state.targetPanX = state.panX;
+      state.targetPanY = state.panY;
+
+      zoomReadout.textContent = formatZoomPercent(state.scale);
+      scheduleRenderBatch();
+      event.preventDefault();
+      return;
+    }
+
+    // 1-finger canvas drag with unified RAF Batching
+    if (!state.drag || state.drag.pointerId !== event.pointerId) return;
     const now = performance.now();
     if (!state.pointerSamples) state.pointerSamples = [];
     state.pointerSamples.push({ x: event.clientX, y: event.clientY, time: now });
@@ -1808,31 +2081,6 @@
       state.pointerSamples.shift();
     }
 
-    // 2-finger pinch zoom
-    if (state.pointers.size === 2 && state.pinch) {
-      setZooming(true);
-      state.drag = null; // 縮放時鎖定純縮放，避免誤觸發平移
-      const points = [...state.pointers.values()];
-      const [a, b] = points;
-      const distance = Math.max(10, pointerDistance(a, b));
-      const center = pointerCenter(a, b);
-      const rect = viewport.getBoundingClientRect();
-
-      setNavigating(true);
-      const scaleRatio = distance / state.pinch.initialDistance;
-      const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, state.pinch.initialScale * scaleRatio));
-
-      state.targetScale = nextScale;
-      state.targetPanX = center.x - rect.left - state.pinch.mapX * nextScale;
-      state.targetPanY = center.y - rect.top - state.pinch.mapY * nextScale;
-
-      setTransform({ immediate: true });
-      event.preventDefault();
-      return;
-    }
-
-    // 1-finger canvas drag with single RAF Batching
-    if (!state.drag || state.drag.pointerId !== event.pointerId) return;
     const dx = event.clientX - state.drag.startX;
     const dy = event.clientY - state.drag.startY;
     const dist = Math.hypot(dx, dy);
@@ -1856,14 +2104,7 @@
       state.targetPanX = state.panX;
       state.targetPanY = state.panY;
 
-      if (!dragRafPending) {
-        dragRafPending = true;
-        requestAnimationFrame(() => {
-          dragRafPending = false;
-          applySceneTransform();
-          updateMinimapWindow();
-        });
-      }
+      scheduleRenderBatch();
       event.preventDefault();
     }
   }
@@ -1871,32 +2112,28 @@
   function onViewportPointerUp(event) {
     state.pointers.delete(event.pointerId);
 
+    // 若剛才處於雙指縮放模式，任一手指離開立即結束 Pinch，且嚴格清空拖曳與速度採樣（絕不繼承慣性滑行！）
     if (state.pinch) {
+      state.pinch = null;
+      state.drag = null;
+      state.pointerSamples = [];
       state.justPinched = true;
       window.setTimeout(() => {
         state.justPinched = false;
-      }, 250);
+      }, 300);
 
-      if (state.pointers.size === 1) {
-        const [remainingId, pos] = [...state.pointers.entries()][0];
-        state.drag = {
-          pointerId: remainingId,
-          startX: pos.x,
-          startY: pos.y,
-          startTime: performance.now(),
-          initialPanX: state.targetPanX,
-          initialPanY: state.targetPanY,
-          isDragging: true,
-        };
-      }
-      state.pinch = null;
+      clampTargetPan();
+      setTransform({ immediate: false });
+      viewport.classList.remove("is-dragging");
+      setNavigating(false, true);
+      return;
     }
 
     if (!state.pointers.size) {
-      const moved = state.drag?.isDragging;
+      const moved = state.drag?.isDragging && !state.justPinched;
 
       if (moved) {
-        // 計算釋放瞬間的滑動速度向量 (Velocity)
+        // 計算釋放瞬間的單指滑動速度向量 (Velocity)
         const samples = state.pointerSamples || [];
         let vx = 0;
         let vy = 0;
@@ -1909,7 +2146,7 @@
         }
 
         const speed = Math.hypot(vx, vy);
-        const maxInitialSpeed = 2.4;
+        const maxInitialSpeed = 1.8;
         if (speed > maxInitialSpeed) {
           vx = (vx / speed) * maxInitialSpeed;
           vy = (vy / speed) * maxInitialSpeed;
@@ -1937,8 +2174,13 @@
         window.setTimeout(() => {
           state.justDragged = false;
         }, 120);
+      } else {
+        clampTargetPan();
+        setTransform({ immediate: false });
+        setNavigating(false, true);
       }
       state.drag = null;
+      state.pointerSamples = [];
       viewport.classList.remove("is-dragging");
     }
   }
@@ -1971,8 +2213,10 @@
     }
 
     // 快速滾動時以乘數連續複合累計，滾動越快縮放響應越迅速
+    const minS = getMinScale();
+    const maxS = getMaxScale();
     const zoomMultiplier = Math.exp(-event.deltaY * 0.0018);
-    targetWheelScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, targetWheelScale * zoomMultiplier));
+    targetWheelScale = Math.min(maxS, Math.max(minS, targetWheelScale * zoomMultiplier));
 
     if (!wheelZoomRafId) {
       function smoothWheelZoomStep() {
@@ -1987,7 +2231,7 @@
           state.targetPanY = state.panY;
           applySceneTransform();
           updateMinimapWindow();
-          zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+          zoomReadout.textContent = formatZoomPercent(state.scale);
 
           stopSmoothWheelZoom();
           setZooming(false);
@@ -2005,68 +2249,13 @@
 
         applySceneTransform();
         updateMinimapWindow();
-        zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+        zoomReadout.textContent = formatZoomPercent(state.scale);
 
         wheelZoomRafId = requestAnimationFrame(smoothWheelZoomStep);
       }
 
       wheelZoomRafId = requestAnimationFrame(smoothWheelZoomStep);
     }
-  }
-
-  // --- Mobile Bottom Sheet Gesture Support ---
-  let sheetTouchStartY = 0;
-  let sheetTouchCurrentY = 0;
-  let isSheetDragging = false;
-
-  function initBottomSheetGestures() {
-    if (!sheetHandle) return;
-
-    const handleTouchStart = (e) => {
-      if (window.innerWidth > 768) return;
-      if (!e.touches || !e.touches.length) return;
-      if (e.target.closest("button")) return;
-      sheetTouchStartY = e.touches[0].clientY;
-      sheetTouchCurrentY = sheetTouchStartY;
-      isSheetDragging = true;
-      tooltip.style.transition = "none";
-    };
-
-    sheetHandle.addEventListener("touchstart", handleTouchStart, { passive: true });
-    const header = tooltip.querySelector(".tooltip-header");
-    header?.addEventListener("touchstart", handleTouchStart, { passive: true });
-
-    window.addEventListener("touchmove", (e) => {
-      if (!isSheetDragging || !e.touches.length) return;
-      sheetTouchCurrentY = e.touches[0].clientY;
-      const deltaY = sheetTouchCurrentY - sheetTouchStartY;
-      if (deltaY > 0) {
-        tooltip.style.transform = `translateY(${deltaY}px)`;
-      } else {
-        tooltip.style.transform = `translateY(${deltaY * 0.2}px)`;
-      }
-    }, { passive: true });
-
-    const handleTouchEnd = () => {
-      if (!isSheetDragging) return;
-      isSheetDragging = false;
-      const deltaY = sheetTouchCurrentY - sheetTouchStartY;
-      tooltip.style.transition = "transform 240ms cubic-bezier(0.16, 1, 0.3, 1)";
-      if (deltaY > 70) {
-        tooltip.style.transform = "translateY(100%)";
-        if (sheetDismissTimer) clearTimeout(sheetDismissTimer);
-        sheetDismissTimer = setTimeout(() => {
-          closeTooltip(true);
-          tooltip.style.transform = "";
-          sheetDismissTimer = null;
-        }, 240);
-      } else {
-        tooltip.style.transform = "translateY(0)";
-      }
-    };
-
-    window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("touchcancel", handleTouchEnd);
   }
 
   function centerOnNode(nodeId, immediate = false) {
@@ -2093,11 +2282,14 @@
     const targetX = width / 2 - pt.x * currentScale;
 
     // 直向定位：使節點位於下方，使 Tooltip 始終在節點正上方且居中
-    const tipHeight = tooltip.offsetHeight || 320;
-    const nodeRadius = 65; // 節點本體半徑 + 內外邊框
-    const GAP = 14;
+    const tipHeight = tooltip.offsetHeight || cachedTipHeight || 320;
+    const node = state.nodeById.get(nodeId);
+    const isLarge = node?.node_type === "DICE" || node?.node_type === "PERK";
+    const nodeRadius = (isLarge ? 52 : 36) * currentScale;
+    const gap = window.innerWidth <= 768 ? 16 : 14;
+    const upwardShift = window.innerWidth <= 768 ? 28 : 0; // 手機端略為上移 28px
     
-    const targetNodeScreenY = height / 2 + nodeRadius + tipHeight / 2 + GAP;
+    const targetNodeScreenY = height / 2 + nodeRadius + tipHeight / 2 + gap + upwardShift;
     const targetY = targetNodeScreenY - pt.y * currentScale;
     startCameraPan(targetX, targetY, immediate);
   }
@@ -2389,85 +2581,253 @@
     }
   }
 
-  // --- Prerequisite Path Highlighting & Traversal System ---
-  function showPrerequisitePath(targetNodeId) {
-    const targetNode = state.nodeById.get(targetNodeId);
-    if (!targetNode) return;
+  // --- Graph Pre-indexing & Prerequisite Graph Pre-computation (加載期預算) ---
+  function preindexEdges() {
+    state.parsedEdges = [];
+    const edgePaths = scene.querySelectorAll("path.edge");
+    edgePaths.forEach((pathEl) => {
+      const d = pathEl.getAttribute("d") || "";
+      const match = /M\s+([\d.-]+)\s+([\d.-]+)\s+L\s+([\d.-]+)\s+([\d.-]+)/.exec(d);
+      if (!match) return;
+      const x1 = parseFloat(match[1]), y1 = parseFloat(match[2]);
+      const x2 = parseFloat(match[3]), y2 = parseFloat(match[4]);
+      let startNodeId = null;
+      let endNodeId = null;
+      for (const [id, pt] of state.nodePositions) {
+        if (!startNodeId && Math.hypot(pt.x - x1, pt.y - y1) < 14) startNodeId = id;
+        if (!endNodeId && Math.hypot(pt.x - x2, pt.y - y2) < 14) endNodeId = id;
+        if (startNodeId && endNodeId) break;
+      }
+      if (startNodeId && endNodeId) {
+        state.parsedEdges.push({
+          element: pathEl,
+          startId: startNodeId,
+          endId: endNodeId,
+        });
+      }
+    });
+  }
 
-    // BFS 遍歷所有祖先節點（完整前置養成鏈路）
-    const prereqNodeIds = new Set([targetNodeId]);
-    const queue = [targetNodeId];
-    while (queue.length > 0) {
-      const currentId = queue.shift();
-      const currNode = state.nodeById.get(currentId);
-      if (!currNode) continue;
-      const incs = currNode.incoming || [];
-      for (const incId of incs) {
-        if (!prereqNodeIds.has(incId)) {
-          prereqNodeIds.add(incId);
-          queue.push(incId);
+  function precomputePrerequisiteGraph() {
+    state.prereqGraph.clear();
+    state.nodes.forEach((targetNode) => {
+      const prereqNodeIds = new Set([targetNode.id]);
+      const queue = [targetNode.id];
+      while (queue.length > 0) {
+        const currentId = queue.shift();
+        const currNode = state.nodeById.get(currentId);
+        if (!currNode) continue;
+        const incs = currNode.incoming || [];
+        for (const incId of incs) {
+          if (!prereqNodeIds.has(incId)) {
+            prereqNodeIds.add(incId);
+            queue.push(incId);
+          }
         }
       }
-    }
 
-    // 收集前置節點所在分支
-    const prereqBranches = new Set();
-    prereqNodeIds.forEach((id) => {
-      const n = state.nodeById.get(id);
-      if (n && n.branch) prereqBranches.add(Number(n.branch));
+      const prereqBranches = new Set();
+      prereqNodeIds.forEach((id) => {
+        const n = state.nodeById.get(id);
+        if (n && n.branch) prereqBranches.add(Number(n.branch));
+      });
+
+      state.prereqGraph.set(targetNode.id, {
+        nodeIds: prereqNodeIds,
+        branches: prereqBranches,
+      });
+    });
+  }
+
+  // --- 加載期深度預熱：搜尋倒排索引與分詞預構建 ---
+  function prebuildSearchIndex() {
+    state.searchIndex.clear();
+    state.nodes.forEach((node) => {
+      const name = normalizeSearchString(node._nameClean || node.name_zh || "");
+      const dice = normalizeSearchString(node.dice_type || node.rune_dice || "");
+      const branch = normalizeSearchString(node.branch_zh || "");
+      const type = normalizeSearchString(node.node_type_zh || "");
+      const desc = normalizeSearchString(node._descClean || "");
+      const awaken = normalizeSearchString(node._awakenClean || "");
+      const rawCombined = `${name} ${dice} ${branch} ${type} ${desc} ${awaken} ${node.id}`;
+      const tokens = new Set(rawCombined.split(/\s+/).filter(Boolean));
+      state.searchIndex.set(node.id, {
+        name,
+        dice,
+        branch,
+        type,
+        desc,
+        combined: rawCombined,
+        tokens,
+      });
+    });
+  }
+
+  // --- 加載期深度預熱：節點幾何座標、派系群心與 DOM 分組 Set 預計算 ---
+  function precomputeGeometryAndGroups() {
+    state.branchNodesMap.clear();
+    state.typeNodesMap.clear();
+    state.nodeGeometryMap.clear();
+    state.branchCentroids.clear();
+
+    for (let b = 1; b <= 5; b++) {
+      state.branchNodesMap.set(b, new Set());
+    }
+    ["DICE", "DICE_RUNE", "PLAYER_PASSIVE", "PERK"].forEach((typeKey) => {
+      state.typeNodesMap.set(typeKey, new Set());
     });
 
+    const branchTotals = new Map();
+
+    state.nodes.forEach((node) => {
+      const el = state.elementsById.get(node.id);
+      const bId = Number(node.branch);
+      const tKey = node.node_type;
+
+      if (el) {
+        state.branchNodesMap.get(bId)?.add(el);
+        state.typeNodesMap.get(tKey)?.add(el);
+      }
+
+      const pt = state.nodePositions.get(node.id);
+      if (pt) {
+        const isLarge = tKey === "DICE" || tKey === "PERK";
+        state.nodeGeometryMap.set(node.id, {
+          cx: pt.x,
+          cy: pt.y,
+          isLarge,
+          radius: isLarge ? 52 : 36,
+          branch: bId,
+          type: tKey,
+        });
+
+        if (!branchTotals.has(bId)) {
+          branchTotals.set(bId, { sumX: 0, sumY: 0, count: 0 });
+        }
+        const bTot = branchTotals.get(bId);
+        bTot.sumX += pt.x;
+        bTot.sumY += pt.y;
+        bTot.count += 1;
+      }
+    });
+
+    branchTotals.forEach((tot, bId) => {
+      if (tot.count > 0) {
+        state.branchCentroids.set(bId, {
+          cx: tot.sumX / tot.count,
+          cy: tot.sumY / tot.count,
+        });
+      }
+    });
+  }
+
+  // --- 加載期深度預熱：小地圖離屏點陣底圖預烘焙 (Pre-baking Offscreen Canvas) ---
+  function prebakeMinimap() {
+    if (!minimapCanvas || !state.nodes.length) return;
+    const w = minimapCanvas.width;
+    const h = minimapCanvas.height;
+    const scaleX = w / MAP_WIDTH;
+    const scaleY = h / MAP_HEIGHT;
+
+    const baseCanvas = document.createElement("canvas");
+    baseCanvas.width = w;
+    baseCanvas.height = h;
+    const ctx = baseCanvas.getContext("2d");
+
+    ctx.fillStyle = "#0b0d13";
+    ctx.fillRect(0, 0, w, h);
+
+    // 1. Batch Draw Connecting Lines (1 Draw Call for all edges)
+    ctx.beginPath();
+    ctx.lineWidth = 1.0;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    state.nodes.forEach((node) => {
+      const p1 = nodePoint(node.id);
+      if (!p1) return;
+      (node.next_nodes || []).forEach((nextId) => {
+        const p2 = nodePoint(nextId);
+        if (!p2) return;
+        ctx.moveTo(p1.x * scaleX, p1.y * scaleY);
+        ctx.lineTo(p2.x * scaleX, p2.y * scaleY);
+      });
+    });
+    ctx.stroke();
+
+    // 2. Batch Draw Node Dots by Faction
+    const factionBuckets = new Map();
+    for (let f = 1; f <= 5; f++) {
+      factionBuckets.set(f, { dice: [], regular: [] });
+    }
+
+    state.nodes.forEach((node) => {
+      const p = nodePoint(node.id);
+      if (!p) return;
+      const bucket = factionBuckets.get(Number(node.branch)) || factionBuckets.get(1);
+      const isLarge = node.is_base || node.node_type === "DICE";
+      if (isLarge) {
+        bucket.dice.push({ x: p.x * scaleX, y: p.y * scaleY });
+      } else {
+        bucket.regular.push({ x: p.x * scaleX, y: p.y * scaleY });
+      }
+    });
+
+    factionBuckets.forEach((bucket, branchId) => {
+      const color = branchColor(branchId);
+      if (bucket.regular.length > 0) {
+        ctx.beginPath();
+        bucket.regular.forEach(({ x, y }) => {
+          ctx.moveTo(x + 2, y);
+          ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+        });
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      if (bucket.dice.length > 0) {
+        ctx.beginPath();
+        bucket.dice.forEach(({ x, y }) => {
+          ctx.moveTo(x + 3.8, y);
+          ctx.arc(x, y, 3.8, 0, Math.PI * 2);
+        });
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+
+        ctx.beginPath();
+        bucket.dice.forEach(({ x, y }) => {
+          ctx.moveTo(x + 2.6, y);
+          ctx.arc(x, y, 2.6, 0, Math.PI * 2);
+        });
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+    });
+
+    state.minimapBaseCanvas = baseCanvas;
+  }
+
+  // --- Prerequisite Path Highlighting & Traversal System (O(1) 瞬發查詢, DRY) ---
+  function showPrerequisitePath(targetNodeId) {
+    let prereq = state.prereqGraph.get(targetNodeId);
+    if (!prereq) {
+      const targetNode = state.nodeById.get(targetNodeId);
+      if (!targetNode) return;
+      const { activePathNodeIds, activeBranches } = computeUpstreamTopologyPath([targetNodeId]);
+      prereq = { nodeIds: activePathNodeIds, branches: activeBranches };
+      state.prereqGraph.set(targetNodeId, prereq);
+    }
+
+    const { nodeIds: prereqNodeIds, branches: prereqBranches } = prereq;
     state.activePrereqNodeIds = prereqNodeIds;
     state.activePrereqTargetId = targetNodeId;
 
-    document.body.classList.add("has-prereq-highlight");
-    scene.classList.add("has-prereq-highlight");
-
-    // 標記節點高亮
-    state.elementsById.forEach((element, id) => {
-      const isPrereq = prereqNodeIds.has(id);
-      const isTarget = id === targetNodeId;
-      element.classList.toggle("is-prereq-active", isPrereq);
-      element.classList.toggle("is-prereq-target", isTarget);
-    });
-
-    // 標記連線高亮 (Edge Highlighting: 必須兩端皆為前置路徑節點，絕不標記往後延伸的分支線段)
-    scene.querySelectorAll("path.edge").forEach((pathEl) => {
-      const d = pathEl.getAttribute("d") || "";
-      const match = /M\s+([\d.-]+)\s+([\d.-]+)\s+L\s+([\d.-]+)\s+([\d.-]+)/.exec(d);
-      if (match) {
-        const x1 = parseFloat(match[1]), y1 = parseFloat(match[2]);
-        const x2 = parseFloat(match[3]), y2 = parseFloat(match[4]);
-        let hasNode1 = false;
-        let hasNode2 = false;
-        for (const id of prereqNodeIds) {
-          const pt = state.nodePositions.get(id);
-          if (!pt) continue;
-          if (Math.hypot(pt.x - x1, pt.y - y1) < 14) hasNode1 = true;
-          if (Math.hypot(pt.x - x2, pt.y - y2) < 14) hasNode2 = true;
-          if (hasNode1 && hasNode2) break;
-        }
-        pathEl.classList.toggle("is-prereq-edge", hasNode1 && hasNode2);
-      }
-    });
-
-    // 標記中央至起點的連線高亮
-    scene.querySelectorAll("path.tree-center-link").forEach((linkEl) => {
-      const d = linkEl.getAttribute("d") || "";
-      let isBranchPrereq = false;
-      if (d.includes("1460.00") && prereqBranches.has(1)) isBranchPrereq = true; // 自然 (火)
-      else if (d.includes("1840.00") && prereqBranches.has(2)) isBranchPrereq = true; // 工學 (雷)
-      else if (d.includes("2160.00") && prereqBranches.has(3)) isBranchPrereq = true; // 魔法 (冰)
-      else if (d.includes("1720.00") && prereqBranches.has(4)) isBranchPrereq = true; // 秩序 (風/陰陽/迪奇)
-      else if (d.includes("2280.00") && prereqBranches.has(5)) isBranchPrereq = true; // 混沌 (恐懼/吞噬/貪婪)
-
-      linkEl.classList.toggle("is-prereq-edge", isBranchPrereq);
-    });
-
-    // 標記中央圖示與數字高亮
-    scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-      const b = Number(el.getAttribute("data-branch"));
-      el.classList.toggle("is-branch-active", prereqBranches.has(b));
+    applyTopologyHighlight({
+      modeClass: "has-prereq-highlight",
+      matchedNodeIds: prereqNodeIds,
+      activePathNodeIds: prereqNodeIds,
+      activeBranches: prereqBranches,
+      nodeClass: "is-prereq-active",
+      edgeClass: "is-prereq-edge",
+      targetNodeId,
     });
   }
 
@@ -2475,19 +2835,10 @@
     state.activePrereqNodeIds = null;
     state.activePrereqTargetId = null;
 
-    document.body.classList.remove("has-prereq-highlight");
-    scene.classList.remove("has-prereq-highlight");
-
-    state.elementsById.forEach((element) => {
-      element.classList.remove("is-prereq-active", "is-prereq-target");
-    });
-
-    scene.querySelectorAll("path.edge.is-prereq-edge, path.tree-center-link.is-prereq-edge").forEach((pathEl) => {
-      pathEl.classList.remove("is-prereq-edge");
-    });
-
-    scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-      el.classList.remove("is-branch-active");
+    clearTopologyHighlight({
+      modeClass: "has-prereq-highlight",
+      nodeClass: "is-prereq-active",
+      edgeClass: "is-prereq-edge",
     });
 
     if (resetButtonState) {
@@ -2581,19 +2932,14 @@
       btn.addEventListener("pointerleave", removeBtnPress);
     });
 
-    // Minimap Toggle for Mobile
-    minimapToggle?.addEventListener("click", () => {
-      minimapPanel.classList.toggle("is-open");
-    });
-
     tooltipClose?.addEventListener("click", closeTooltip);
 
-    // 120ms Debounced search
+    // 60ms Debounced search (極致靈敏響應)
     searchInput.addEventListener("input", () => {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
         applySearch(searchInput.value);
-      }, 120);
+      }, 60);
     });
 
     searchInput.addEventListener("keydown", onSearchKeydown);
@@ -2652,13 +2998,71 @@
       }
     });
 
-    // 點擊空白處時收合手機端搜尋膠囊（若無搜尋輸入內容）
+    // 免責聲明與著作權小工具 (Morphing Widget)
+    const disclaimerWidget = document.getElementById("disclaimer-widget");
+    const disclaimerToggleBtn = document.getElementById("disclaimer-toggle-btn");
+    const disclaimerCloseBtn = document.getElementById("disclaimer-close-btn");
+    const disclaimerCard = document.getElementById("disclaimer-card");
+
+    function openDisclaimer() {
+      if (!disclaimerWidget) return;
+      disclaimerWidget.classList.add("is-expanded");
+      disclaimerToggleBtn?.setAttribute("aria-expanded", "true");
+      disclaimerCard?.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDisclaimer() {
+      if (!disclaimerWidget) return;
+      disclaimerWidget.classList.remove("is-expanded");
+      disclaimerToggleBtn?.setAttribute("aria-expanded", "false");
+      disclaimerCard?.setAttribute("aria-hidden", "true");
+    }
+
+    function toggleDisclaimer() {
+      if (disclaimerWidget?.classList.contains("is-expanded")) {
+        closeDisclaimer();
+      } else {
+        openDisclaimer();
+      }
+    }
+
+    disclaimerToggleBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleDisclaimer();
+    });
+
+    disclaimerCloseBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeDisclaimer();
+    });
+
+    // 點擊空白處時收合手機端搜尋膠囊、免責聲明或標籤解釋 Popover
     window.addEventListener("click", (e) => {
+      // 檢查是否點擊標籤（底線詞彙或 #標籤 晶片）
+      const tagBtn = e.target.closest(".tooltip-tag-inline, .tooltip-hashtag-chip");
+      if (tagBtn) {
+        e.stopPropagation();
+        const tagKey = tagBtn.getAttribute("data-tag-key");
+        if (tagKey) showTagPopover(tagKey, tagBtn);
+        return;
+      }
+
+      // 若點擊 Popover 內部則不關閉
+      if (tagPopover && tagPopover.contains(e.target)) {
+        return;
+      }
+
+      hideTagPopover();
+
       if (window.innerWidth <= 768 && searchField?.classList.contains("is-expanded")) {
         const insideSearch = Boolean(e.target.closest(".search-block"));
         if (!insideSearch && !searchInput.value.trim()) {
           searchField.classList.remove("is-expanded");
         }
+      }
+
+      if (disclaimerWidget && !disclaimerWidget.contains(e.target)) {
+        closeDisclaimer();
       }
     });
 
@@ -2721,7 +3125,7 @@
       clampTargetPan();
       setTransform({ immediate: true });
       if (!tooltip.hidden && state.selectedId && window.innerWidth > 768) {
-        positionTooltipDesktop(state.selectedId);
+        positionTooltip(state.selectedId);
       }
     });
 
@@ -2734,6 +3138,7 @@
         searchInput.focus();
       } else if (event.key === "Escape") {
         closeTooltip();
+        closeDisclaimer();
         searchResults.hidden = true;
       } else if (event.key === "+" || event.key === "=") {
         setZoom(state.targetScale * 1.25, false);
@@ -2743,16 +3148,48 @@
         resetToCenter(false);
       }
     });
+  }
 
-    initBottomSheetGestures();
+  const loadingScreen = document.getElementById("loading-screen");
+  const loaderProgressFill = document.getElementById("loader-progress-fill");
+  const loaderStatusLabel = document.getElementById("loader-status-label");
+
+  function setLoaderProgress(percent, labelText) {
+    if (loaderProgressFill) loaderProgressFill.style.width = `${percent}%`;
+    if (loaderStatusLabel && labelText) loaderStatusLabel.textContent = labelText;
+  }
+
+  function dismissLoader() {
+    if (!loadingScreen || window.__BLOCK_DISMISS_LOADER__) return;
+    loadingScreen.classList.add("is-loaded");
+    // 啟動四周扭曲縮放進場動效與 HUD 交錯彈入
+    document.body.classList.add("app-entering");
+    // 進場後讓小地圖保持亮起一段時間（延後消失），杜絕硬切
+    document.body.classList.add("is-minimap-active");
+
+    setTimeout(() => {
+      loadingScreen.classList.add("is-hidden");
+      loadingScreen.hidden = true;
+    }, 500);
+
+    setTimeout(() => {
+      document.body.classList.remove("app-entering");
+    }, 900);
+
+    // 進場展示 2.4 秒後平滑轉交給 CSS 1600ms 延遲淡出機制
+    setTimeout(() => {
+      document.body.classList.remove("is-minimap-active");
+    }, 2400);
   }
 
   async function loadMap() {
+    setLoaderProgress(15, "正在載入天賦資料...");
     let data = window.__DICE_TREE_DATA__;
     let svgText = window.__DICE_TREE_SVG__;
 
     if (!data || !svgText) {
       try {
+        setLoaderProgress(30, "讀取節點數據中...");
         const [dataResponse, svgResponse] = await Promise.all([fetch(DATA_URL), fetch(SVG_URL)]);
         if (dataResponse.ok && svgResponse.ok) {
           data = await dataResponse.json();
@@ -2763,8 +3200,13 @@
       }
     }
 
-    if (!data || !svgText) return;
+    if (!data || !svgText) {
+      setLoaderProgress(100, "載入失敗，正在重試...");
+      dismissLoader();
+      return;
+    }
 
+    setLoaderProgress(45, "解析 239 個天賦節點...");
     // Pre-clean and cache all text strings during initialization
     state.nodes = (data.nodes || []).map((node) => ({
       ...node,
@@ -2779,19 +3221,51 @@
 
     state.nodeById = new Map(state.nodes.map((node) => [node.id, node]));
 
+    setLoaderProgress(60, "繪製天賦樹圖層...");
     scene.innerHTML = svgText;
     scene.setAttribute("aria-hidden", "false");
     scene.querySelector("svg")?.setAttribute("aria-label", "Random Dice 2 骰子樹完整地圖");
 
     updateViewportSizeCache();
     wireNodes();
+
+    // --- 將即時渲染、幾何換算與索引負擔全面遷移至加載期 ---
+    setLoaderProgress(65, "建立節點連線關係...");
+    preindexEdges();
+
+    setLoaderProgress(75, "計算前置解鎖鏈路...");
+    precomputePrerequisiteGraph();
+
+    setLoaderProgress(82, "建立搜尋與關鍵字索引...");
+    prebuildSearchIndex();
+
+    setLoaderProgress(88, "計算節點幾何與派系分組...");
+    precomputeGeometryAndGroups();
+
+    setLoaderProgress(94, "準備資訊卡片快取...");
+    precompileTooltipPanels();
+
+    setLoaderProgress(98, "產生全景小地圖...");
+    prebakeMinimap();
     renderMinimap();
+
     connectControls();
 
     searchStatus.textContent = `${state.nodes.length} 個節點`;
     // 預設 100% 縮放並位於正中間
     resetToCenter(true);
+
+    setLoaderProgress(100, "載入完成");
+    setTimeout(() => {
+      dismissLoader();
+    }, 280);
   }
+
+  window.__TEST_HOOKS__ = {
+    showTooltip,
+    centerOnNode,
+    closeTooltip
+  };
 
   loadMap();
 })();

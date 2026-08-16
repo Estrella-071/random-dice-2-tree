@@ -80,7 +80,16 @@
       "dice_awaken": "對子彈攻擊擊中的怪物賦予<tag>BURN</tag>",
       "icon_name": "Dice_fire2",
       "icon_file": "sprite_icons/Dice_fire2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "範圍傷害",
+          "value": "50",
+          "icon": "Fire_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1002",
@@ -125,7 +134,28 @@
       "dice_awaken": "設置<tag>BIGTHORN</tag>，對碰撞的怪物造成<br>目前生命值10%的傷害",
       "icon_name": "Dice_Thorn2",
       "icon_file": "sprite_icons/Dice_Thorn2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "尖刺持續時間",
+          "value": "5s",
+          "icon": "Trap_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "7s",
+          "icon": "Trap_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "THORN"
+      ]
     },
     {
       "id": "1003",
@@ -171,7 +201,12 @@
       "dice_awaken": "達到7骰點時爆炸<br>於骰盤上隨機格子發射7個<tag>SOW</tag>",
       "icon_name": "Dice_Flower2",
       "icon_file": "sprite_icons/Dice_Flower2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [],
+      "tags": [
+        "BLOOM"
+      ]
     },
     {
       "id": "1004",
@@ -214,7 +249,29 @@
       "dice_awaken": "召喚時，以30%機率召喚怪物無法摧毀的巨石",
       "icon_name": "Dice_Pillar2",
       "icon_file": "sprite_icons/Dice_Pillar2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Pillar_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "0.5",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "15s",
+          "icon": "Pillar_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "PILLAR",
+        "SUMMON"
+      ]
     },
     {
       "id": "1005",
@@ -258,7 +315,10 @@
       "dice_awaken": "每攻擊111次，傷害增加111",
       "icon_name": "Dice_Wind2",
       "icon_file": "sprite_icons/Dice_Wind2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [],
+      "tags": []
     },
     {
       "id": "1006",
@@ -303,7 +363,18 @@
       "dice_awaken": "使相鄰骰子暴擊率額外增加10%",
       "icon_name": "Dice_Light2",
       "icon_file": "sprite_icons/Dice_Light2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益",
+          "value": "6%",
+          "icon": "LightBoardEffect_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "1007",
@@ -348,7 +419,18 @@
       "dice_awaken": "每10秒對最多7個<tag>FROZEN</tag>狀態怪物發射冰柱，<br>造成對象骰子300%傷害",
       "icon_name": "Dice_ICE2",
       "icon_file": "sprite_icons/Dice_ICE2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "special_stats": [
+        {
+          "label": "冰凍",
+          "value": "5",
+          "icon": "Ice_icon.png"
+        }
+      ],
+      "tags": [
+        "FROZEN"
+      ]
     },
     {
       "id": "1008",
@@ -394,7 +476,18 @@
       "dice_awaken": "基本攻擊擊中時，賦予<tag>POISON</tag>額外1疊加",
       "icon_name": "Dice_Poison2",
       "icon_file": "sprite_icons/Dice_Poison2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "special_stats": [
+        {
+          "label": "中毒傷害",
+          "value": "30",
+          "icon": "Poison_icon.png"
+        }
+      ],
+      "tags": [
+        "POISON"
+      ]
     },
     {
       "id": "1201",
@@ -542,7 +635,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fire_2",
       "icon_file": "sprite_icons/Runenode_Fire_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "範圍傷害",
+          "value": "50",
+          "icon": "Fire_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1301",
@@ -589,7 +693,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fire_1",
       "icon_file": "sprite_icons/Runenode_Fire_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "範圍傷害",
+          "value": "50",
+          "icon": "Fire_icon.png"
+        }
+      ],
+      "tags": [
+        "AREA_DAMAGE"
+      ]
     },
     {
       "id": "1401",
@@ -636,7 +753,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fire_0",
       "icon_file": "sprite_icons/Runenode_Fire_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "範圍傷害",
+          "value": "50",
+          "icon": "Fire_icon.png"
+        }
+      ],
+      "tags": [
+        "BURN"
+      ]
     },
     {
       "id": "1202",
@@ -784,7 +914,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Thorn_0",
       "icon_file": "sprite_icons/Runenode_Thorn_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "750",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "尖刺持續時間",
+          "value": "5s",
+          "icon": "Trap_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "7s",
+          "icon": "Trap_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "THORN"
+      ]
     },
     {
       "id": "1302",
@@ -831,7 +984,32 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Thorn_1",
       "icon_file": "sprite_icons/Runenode_Thorn_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "750",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "尖刺持續時間",
+          "value": "5s",
+          "icon": "Trap_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "7s",
+          "icon": "Trap_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "BIGTHORN",
+        "SUMMON",
+        "THORN"
+      ]
     },
     {
       "id": "1402",
@@ -878,7 +1056,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Thorn_2",
       "icon_file": "sprite_icons/Runenode_Thorn_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "750",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "尖刺持續時間",
+          "value": "5s",
+          "icon": "Trap_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "7s",
+          "icon": "Trap_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "THORN"
+      ]
     },
     {
       "id": "1203",
@@ -1026,7 +1227,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Flower_0",
       "icon_file": "sprite_icons/Runenode_Flower_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "BLOOM"
+      ]
     },
     {
       "id": "1303",
@@ -1073,7 +1281,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Flower_1",
       "icon_file": "sprite_icons/Runenode_Flower_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "BLOOM"
+      ]
     },
     {
       "id": "1403",
@@ -1120,7 +1335,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Flower_2",
       "icon_file": "sprite_icons/Runenode_Flower_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "BLOOM"
+      ]
     },
     {
       "id": "1204",
@@ -1268,7 +1490,28 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Rock_0",
       "icon_file": "sprite_icons/Runenode_Rock_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Pillar_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "0.5",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "15s",
+          "icon": "Pillar_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1304",
@@ -1315,7 +1558,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Rock_1",
       "icon_file": "sprite_icons/Runenode_Rock_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Pillar_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "0.5",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "15s",
+          "icon": "Pillar_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "PILLAR"
+      ]
     },
     {
       "id": "1404",
@@ -1362,7 +1628,28 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Rock_2",
       "icon_file": "sprite_icons/Runenode_Rock_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Pillar_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "0.5",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "15s",
+          "icon": "Pillar_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1205",
@@ -1510,7 +1797,12 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Wind_0",
       "icon_file": "sprite_icons/Runenode_Wind_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "0.45",
+      "special_stats": [],
+      "tags": []
     },
     {
       "id": "1305",
@@ -1557,7 +1849,12 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Wind_1",
       "icon_file": "sprite_icons/Runenode_Wind_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "0.45",
+      "special_stats": [],
+      "tags": []
     },
     {
       "id": "1405",
@@ -1604,7 +1901,12 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Wind_2",
       "icon_file": "sprite_icons/Runenode_Wind_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "0.45",
+      "special_stats": [],
+      "tags": []
     },
     {
       "id": "1206",
@@ -1752,7 +2054,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Light_0",
       "icon_file": "sprite_icons/Runenode_Light_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益",
+          "value": "6%",
+          "icon": "LightBoardEffect_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "1306",
@@ -1799,7 +2114,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Light_1",
       "icon_file": "sprite_icons/Runenode_Light_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益",
+          "value": "6%",
+          "icon": "LightBoardEffect_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1406",
@@ -1846,7 +2172,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Light_2",
       "icon_file": "sprite_icons/Runenode_Light_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益",
+          "value": "6%",
+          "icon": "LightBoardEffect_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "1207",
@@ -1994,7 +2331,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ice_0",
       "icon_file": "sprite_icons/Runenode_Ice_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "120",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "冰凍",
+          "value": "5",
+          "icon": "Ice_icon.png"
+        }
+      ],
+      "tags": [
+        "FROZEN"
+      ]
     },
     {
       "id": "1307",
@@ -2041,7 +2391,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ice_1",
       "icon_file": "sprite_icons/Runenode_Ice_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "120",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "冰凍",
+          "value": "5",
+          "icon": "Ice_icon.png"
+        }
+      ],
+      "tags": [
+        "FROZEN"
+      ]
     },
     {
       "id": "1407",
@@ -2088,7 +2451,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ice_2",
       "icon_file": "sprite_icons/Runenode_Ice_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "120",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "冰凍",
+          "value": "5",
+          "icon": "Ice_icon.png"
+        }
+      ],
+      "tags": [
+        "FROZEN",
+        "SUMMON"
+      ]
     },
     {
       "id": "1208",
@@ -2236,7 +2613,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Poison_1",
       "icon_file": "sprite_icons/Runenode_Poison_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "中毒傷害",
+          "value": "30",
+          "icon": "Poison_icon.png"
+        }
+      ],
+      "tags": [
+        "POISON"
+      ]
     },
     {
       "id": "1308",
@@ -2283,7 +2673,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Poison_0",
       "icon_file": "sprite_icons/Runenode_Poison_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "中毒傷害",
+          "value": "30",
+          "icon": "Poison_icon.png"
+        }
+      ],
+      "tags": [
+        "POISON"
+      ]
     },
     {
       "id": "1408",
@@ -2330,7 +2733,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Poison_2",
       "icon_file": "sprite_icons/Runenode_Poison_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "中毒傷害",
+          "value": "30",
+          "icon": "Poison_icon.png"
+        }
+      ],
+      "tags": [
+        "POISON",
+        "MERGE"
+      ]
     },
     {
       "id": "1101",
@@ -2401,7 +2818,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "1102",
@@ -2543,7 +2963,10 @@
       "passive_rank_add": "1.2",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "1103",
@@ -2616,7 +3039,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "1104",
@@ -2698,7 +3124,10 @@
       "passive_rank_add": "0.5",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "1105",
@@ -2761,7 +3190,8 @@
       "passive_rank_add": "0.45",
       "icon_name": "PassiveBigIcon_CriticalRate",
       "icon_file": "sprite_icons/PassiveBigIcon_CriticalRate.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1106",
@@ -2803,7 +3233,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Nature",
       "icon_file": "sprite_icons/PassiveBigIcon_Nature.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1107",
@@ -2843,7 +3274,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Nature",
       "icon_file": "sprite_icons/PassiveBigIcon_Nature.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1108",
@@ -2883,7 +3315,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Nature",
       "icon_file": "sprite_icons/PassiveBigIcon_Nature.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1109",
@@ -3125,7 +3558,10 @@
       "passive_rank_add": "0.6",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "1110",
@@ -3207,7 +3643,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "1111",
@@ -3289,7 +3728,10 @@
       "passive_rank_add": "3",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "1112",
@@ -3331,7 +3773,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Spup",
       "icon_file": "sprite_icons/PassiveBigIcon_Spup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1113",
@@ -3373,7 +3816,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_HPup",
       "icon_file": "sprite_icons/PassiveBigIcon_HPup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "1114",
@@ -3413,7 +3857,10 @@
       "perk_group": "Nature",
       "icon_name": "Perk_Trash_Profile",
       "icon_file": "sprite_icons/Perk_Trash_Profile.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SP_GAIN"
+      ]
     },
     {
       "id": "1115",
@@ -3455,7 +3902,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Surport_N",
       "icon_file": "sprite_icons/PassiveBigIcon_Surport_N.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2001",
@@ -3498,7 +3946,18 @@
       "dice_awaken": "攻擊<tag>BOSS_MONSTER</tag>時，對周遭怪物造成100%範圍傷害",
       "icon_name": "Dice_iron_2",
       "icon_file": "sprite_icons/Dice_iron_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "高生命值",
+      "special_stats": [
+        {
+          "label": "首領額外傷害",
+          "value": "200%",
+          "icon": "IronInfo_icon.png"
+        }
+      ],
+      "tags": [
+        "BOSS_MONSTER"
+      ]
     },
     {
       "id": "2002",
@@ -3543,7 +4002,16 @@
       "dice_awaken": "無論骰點，可與其他骰子變更位置",
       "icon_name": "Dice_Switch2",
       "icon_file": "sprite_icons/Dice_Switch2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "25s",
+          "icon": "SwitchInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2003",
@@ -3588,7 +4056,16 @@
       "dice_awaken": "達到7骰點時，對自身賦予<tag>BUBBLE</tag>",
       "icon_name": "Dice_Gear2",
       "icon_file": "sprite_icons/Dice_Gear2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "連接額外傷害",
+          "value": "50",
+          "icon": "gear_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2004",
@@ -3633,7 +4110,24 @@
       "dice_awaken": "<tag>ELEMENT</tag>迴轉速度增加50%、迴轉半徑增加1.5倍",
       "icon_name": "Dice_Element2",
       "icon_file": "sprite_icons/Dice_Element2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "原子傷害",
+          "value": "5%",
+          "icon": "Element_icon.png"
+        },
+        {
+          "label": "原子旋轉速度",
+          "value": "7s",
+          "icon": "Element_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "ELEMENT",
+        "SUMMON"
+      ]
     },
     {
       "id": "2005",
@@ -3677,7 +4171,16 @@
       "dice_awaken": "無論骰子數量，總是啟用霓虹效果",
       "icon_name": "Dice_Neon2",
       "icon_file": "sprite_icons/Dice_Neon2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "300",
+          "icon": "neon_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2006",
@@ -3722,7 +4225,19 @@
       "dice_awaken": "每<tag>SAW</tag>撞擊時，使傷害次數增加4次",
       "icon_name": "Dice_SawBlade2",
       "icon_file": "sprite_icons/Dice_SawBlade2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "鋸齒傷害",
+          "value": "500",
+          "icon": "SawBlade_icon.png"
+        }
+      ],
+      "tags": [
+        "SAW",
+        "SUMMON"
+      ]
     },
     {
       "id": "2007",
@@ -3766,7 +4281,23 @@
       "dice_awaken": "該骰子SP生產量增加50%",
       "icon_name": "Dice_Mine2",
       "icon_file": "sprite_icons/Dice_Mine2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "10",
+          "icon": "MineSp_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "12s",
+          "icon": "MineSp_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "SP_GAIN"
+      ]
     },
     {
       "id": "2008",
@@ -3810,7 +4341,23 @@
       "dice_awaken": "無限制發動連鎖狙擊",
       "icon_name": "Dice_Sniper2",
       "icon_file": "sprite_icons/Dice_Sniper2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "最大距離倍率",
+          "value": "400倍",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "5s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "CHAIN"
+      ]
     },
     {
       "id": "2009",
@@ -3854,7 +4401,18 @@
       "dice_awaken": "<tag>LASER</tag>攻擊時，30%機率以滿能量狀態開始",
       "icon_name": "Dice_Ray2",
       "icon_file": "sprite_icons/Dice_Ray2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "50",
+          "icon": "Ray_value_icon.png"
+        }
+      ],
+      "tags": [
+        "LASER"
+      ]
     },
     {
       "id": "2201",
@@ -4002,7 +4560,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Iron_0",
       "icon_file": "sprite_icons/Runenode_Iron_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "高生命值",
+      "dice_attack": "150",
+      "dice_attack_interval": "2",
+      "special_stats": [
+        {
+          "label": "首領額外傷害",
+          "value": "200%",
+          "icon": "IronInfo_icon.png"
+        }
+      ],
+      "tags": [
+        "BOSS_MONSTER"
+      ]
     },
     {
       "id": "2301",
@@ -4049,7 +4620,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Iron_1",
       "icon_file": "sprite_icons/Runenode_Iron_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "高生命值",
+      "dice_attack": "150",
+      "dice_attack_interval": "2",
+      "special_stats": [
+        {
+          "label": "首領額外傷害",
+          "value": "200%",
+          "icon": "IronInfo_icon.png"
+        }
+      ],
+      "tags": [
+        "BOSS_MONSTER"
+      ]
     },
     {
       "id": "2401",
@@ -4096,7 +4680,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Iron_2",
       "icon_file": "sprite_icons/Runenode_Iron_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "高生命值",
+      "dice_attack": "150",
+      "dice_attack_interval": "2",
+      "special_stats": [
+        {
+          "label": "首領額外傷害",
+          "value": "200%",
+          "icon": "IronInfo_icon.png"
+        }
+      ],
+      "tags": [
+        "BIG_MONSTER",
+        "GOLEM_MONSTER"
+      ]
     },
     {
       "id": "2202",
@@ -4244,7 +4842,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Switch_0",
       "icon_file": "sprite_icons/Runenode_Switch_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "25s",
+          "icon": "SwitchInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2302",
@@ -4291,7 +4900,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Switch_1",
       "icon_file": "sprite_icons/Runenode_Switch_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "25s",
+          "icon": "SwitchInfo_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "2402",
@@ -4338,7 +4960,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Switch_2",
       "icon_file": "sprite_icons/Runenode_Switch_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "25s",
+          "icon": "SwitchInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2203",
@@ -4486,7 +5119,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Gear_0",
       "icon_file": "sprite_icons/Runenode_Gear_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連接額外傷害",
+          "value": "50",
+          "icon": "gear_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2303",
@@ -4533,7 +5177,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Gear_1",
       "icon_file": "sprite_icons/Runenode_Gear_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連接額外傷害",
+          "value": "50",
+          "icon": "gear_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2403",
@@ -4580,7 +5235,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Gear_2",
       "icon_file": "sprite_icons/Runenode_Gear_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "75",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連接額外傷害",
+          "value": "50",
+          "icon": "gear_value_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD",
+        "CONNECT"
+      ]
     },
     {
       "id": "2204",
@@ -4728,7 +5397,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Atom_0",
       "icon_file": "sprite_icons/Runenode_Atom_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "原子傷害",
+          "value": "5%",
+          "icon": "Element_icon.png"
+        },
+        {
+          "label": "原子旋轉速度",
+          "value": "7s",
+          "icon": "Element_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "ELEMENT"
+      ]
     },
     {
       "id": "2304",
@@ -4775,7 +5462,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Atom_1",
       "icon_file": "sprite_icons/Runenode_Atom_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "原子傷害",
+          "value": "5%",
+          "icon": "Element_icon.png"
+        },
+        {
+          "label": "原子旋轉速度",
+          "value": "7s",
+          "icon": "Element_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "ELEMENT"
+      ]
     },
     {
       "id": "2404",
@@ -4822,7 +5527,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Atom_2",
       "icon_file": "sprite_icons/Runenode_Atom_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "原子傷害",
+          "value": "5%",
+          "icon": "Element_icon.png"
+        },
+        {
+          "label": "原子旋轉速度",
+          "value": "7s",
+          "icon": "Element_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "ELEMENT"
+      ]
     },
     {
       "id": "2205",
@@ -4970,7 +5693,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Neon_0",
       "icon_file": "sprite_icons/Runenode_Neon_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "300",
+          "icon": "neon_value_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "2305",
@@ -5017,7 +5753,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Neon_1",
       "icon_file": "sprite_icons/Runenode_Neon_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "300",
+          "icon": "neon_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2405",
@@ -5064,7 +5811,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Neon_2",
       "icon_file": "sprite_icons/Runenode_Neon_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "300",
+          "icon": "neon_value_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2206",
@@ -5212,7 +5970,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Saw_0",
       "icon_file": "sprite_icons/Runenode_Saw_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "鋸齒傷害",
+          "value": "500",
+          "icon": "SawBlade_icon.png"
+        }
+      ],
+      "tags": [
+        "SAW"
+      ]
     },
     {
       "id": "2306",
@@ -5259,7 +6030,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Saw_1",
       "icon_file": "sprite_icons/Runenode_Saw_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "鋸齒傷害",
+          "value": "500",
+          "icon": "SawBlade_icon.png"
+        }
+      ],
+      "tags": [
+        "SAW"
+      ]
     },
     {
       "id": "2406",
@@ -5306,7 +6090,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Saw_2",
       "icon_file": "sprite_icons/Runenode_Saw_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "0",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "鋸齒傷害",
+          "value": "500",
+          "icon": "SawBlade_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2207",
@@ -5454,7 +6249,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mine_0",
       "icon_file": "sprite_icons/Runenode_Mine_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "10",
+          "icon": "MineSp_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "12s",
+          "icon": "MineSp_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2307",
@@ -5501,7 +6312,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mine_1",
       "icon_file": "sprite_icons/Runenode_Mine_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "10",
+          "icon": "MineSp_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "12s",
+          "icon": "MineSp_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2407",
@@ -5548,7 +6375,26 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mine_2",
       "icon_file": "sprite_icons/Runenode_Mine_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "10",
+          "icon": "MineSp_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "12s",
+          "icon": "MineSp_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "2208",
@@ -5696,7 +6542,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Sniper_0",
       "icon_file": "sprite_icons/Runenode_Sniper_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "20",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "最大距離倍率",
+          "value": "400倍",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "5s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2308",
@@ -5743,7 +6605,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Sniper_1",
       "icon_file": "sprite_icons/Runenode_Sniper_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "20",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "最大距離倍率",
+          "value": "400倍",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "5s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2408",
@@ -5790,7 +6668,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Sniper_2",
       "icon_file": "sprite_icons/Runenode_Sniper_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "20",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "最大距離倍率",
+          "value": "400倍",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "5s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "2209",
@@ -5938,7 +6832,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ray_0",
       "icon_file": "sprite_icons/Runenode_Ray_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "50",
+          "icon": "Ray_value_icon.png"
+        }
+      ],
+      "tags": [
+        "BULLET",
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "2309",
@@ -5985,7 +6893,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ray_1",
       "icon_file": "sprite_icons/Runenode_Ray_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "50",
+          "icon": "Ray_value_icon.png"
+        }
+      ],
+      "tags": [
+        "LASER"
+      ]
     },
     {
       "id": "2409",
@@ -6032,7 +6953,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Ray_2",
       "icon_file": "sprite_icons/Runenode_Ray_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增加量",
+          "value": "50",
+          "icon": "Ray_value_icon.png"
+        }
+      ],
+      "tags": [
+        "LASER",
+        "AREA_DAMAGE"
+      ]
     },
     {
       "id": "2101",
@@ -6114,7 +7049,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "2102",
@@ -6257,7 +7195,10 @@
       "passive_rank_add": "1.2",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "2103",
@@ -6329,7 +7270,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "2104",
@@ -6412,7 +7356,10 @@
       "passive_rank_add": "0.5",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "2105",
@@ -6474,7 +7421,8 @@
       "passive_rank_add": "0.45",
       "icon_name": "PassiveBigIcon_CriticalRate",
       "icon_file": "sprite_icons/PassiveBigIcon_CriticalRate.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2106",
@@ -6514,7 +7462,8 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_Engineering",
       "icon_file": "sprite_icons/PassiveBigIcon_Engineering.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2107",
@@ -6554,7 +7503,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Engineering",
       "icon_file": "sprite_icons/PassiveBigIcon_Engineering.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2108",
@@ -6594,7 +7544,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Engineering",
       "icon_file": "sprite_icons/PassiveBigIcon_Engineering.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2109",
@@ -6836,7 +7787,10 @@
       "passive_rank_add": "0.6",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "2110",
@@ -6908,7 +7862,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "2111",
@@ -6992,7 +7949,10 @@
       "passive_rank_add": "3",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "2112",
@@ -7034,7 +7994,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Spup",
       "icon_file": "sprite_icons/PassiveBigIcon_Spup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2113",
@@ -7076,7 +8037,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_HPup",
       "icon_file": "sprite_icons/PassiveBigIcon_HPup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2114",
@@ -7118,7 +8080,8 @@
       "perk_group": "Engineering",
       "icon_name": "Perk_Change_Profile",
       "icon_file": "sprite_icons/Perk_Change_Profile.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "2115",
@@ -7160,7 +8123,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Surport_E",
       "icon_file": "sprite_icons/PassiveBigIcon_Surport_E.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "3001",
@@ -7202,7 +8166,18 @@
       "dice_awaken": "連鎖攻擊擊中時，50%機率使目標短暫<tag>STUN</tag>",
       "icon_name": "Dice_Electric2",
       "icon_file": "sprite_icons/Dice_Electric2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "連鎖傷害",
+          "value": "40",
+          "icon": "Electric_icon.png"
+        }
+      ],
+      "tags": [
+        "CHAIN"
+      ]
     },
     {
       "id": "3002",
@@ -7247,7 +8222,18 @@
       "dice_awaken": "無關骰點，對骰盤上所有骰子套用<tag>RESONANCE</tag>效果",
       "icon_name": "Dice_Resonance2",
       "icon_file": "sprite_icons/Dice_Resonance2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益量",
+          "value": "4%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "RESONANCE"
+      ]
     },
     {
       "id": "3003",
@@ -7291,7 +8277,29 @@
       "dice_awaken": "<tag>SHURIKEN</tag>只對最前方怪物發射",
       "icon_name": "Dice_shuriken2",
       "icon_file": "sprite_icons/Dice_shuriken2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "需要攻擊次數",
+          "value": "20",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈傷害",
+          "value": "250%",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈發射數量",
+          "value": "2",
+          "icon": "Shuriken_castcnt_icon.png"
+        }
+      ],
+      "tags": [
+        "BULLET",
+        "SHURIKEN"
+      ]
     },
     {
       "id": "3004",
@@ -7335,7 +8343,13 @@
       "dice_awaken": "每60秒召喚隨機1骰點骰子",
       "icon_name": "Dice_summon2",
       "icon_file": "sprite_icons/Dice_summon2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [],
+      "tags": [
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "3005",
@@ -7379,7 +8393,18 @@
       "dice_awaken": "達到7骰點時，<tag>COMBO</tag>計數增加20",
       "icon_name": "Dice_Combo2",
       "icon_file": "sprite_icons/Dice_Combo2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "每次連擊傷害增加",
+          "value": "50",
+          "icon": "Combo_icon.png"
+        }
+      ],
+      "tags": [
+        "COMBO"
+      ]
     },
     {
       "id": "3006",
@@ -7423,7 +8448,16 @@
       "dice_awaken": "無論骰點種類，可與其他骰子合成<br>合成時，骰點更低的骰子骰點+1",
       "icon_name": "Dice_Adjust2",
       "icon_file": "sprite_icons/Dice_Adjust2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "10s",
+          "icon": "AdjustInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "3007",
@@ -7468,7 +8502,24 @@
       "dice_awaken": "達到7骰點時，對骰盤所有骰子賦予<tag>POTION</tag>",
       "icon_name": "Dice_Potion2",
       "icon_file": "sprite_icons/Dice_Potion2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "煉金增益量",
+          "value": "10%",
+          "icon": "Potion_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "POTION",
+        "MERGE"
+      ]
     },
     {
       "id": "3201",
@@ -7616,7 +8667,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Electricity_0",
       "icon_file": "sprite_icons/Runenode_Electricity_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連鎖傷害",
+          "value": "40",
+          "icon": "Electric_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "3301",
@@ -7663,7 +8725,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Electricity_1",
       "icon_file": "sprite_icons/Runenode_Electricity_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連鎖傷害",
+          "value": "40",
+          "icon": "Electric_icon.png"
+        }
+      ],
+      "tags": [
+        "CHAIN"
+      ]
     },
     {
       "id": "3401",
@@ -7710,7 +8785,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Electricity_2",
       "icon_file": "sprite_icons/Runenode_Electricity_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "連鎖傷害",
+          "value": "40",
+          "icon": "Electric_icon.png"
+        }
+      ],
+      "tags": [
+        "CHAIN"
+      ]
     },
     {
       "id": "3202",
@@ -7858,7 +8946,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Resonance_0",
       "icon_file": "sprite_icons/Runenode_Resonance_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益量",
+          "value": "4%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "RESONANCE"
+      ]
     },
     {
       "id": "3302",
@@ -7905,7 +9006,22 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Resonance_1",
       "icon_file": "sprite_icons/Runenode_Resonance_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益量",
+          "value": "4%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "RESONANCE",
+        "BUFF_ATKSPD",
+        "SUMMON"
+      ]
     },
     {
       "id": "3402",
@@ -7952,7 +9068,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Resonance_2",
       "icon_file": "sprite_icons/Runenode_Resonance_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "攻擊速度增益量",
+          "value": "4%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "RESONANCE"
+      ]
     },
     {
       "id": "3203",
@@ -8100,7 +9229,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bullet_0",
       "icon_file": "sprite_icons/Runenode_Bullet_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "需要攻擊次數",
+          "value": "20",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈傷害",
+          "value": "250%",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈發射數量",
+          "value": "2",
+          "icon": "Shuriken_castcnt_icon.png"
+        }
+      ],
+      "tags": [
+        "SHURIKEN"
+      ]
     },
     {
       "id": "3303",
@@ -8147,7 +9299,32 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bullet_1",
       "icon_file": "sprite_icons/Runenode_Bullet_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "需要攻擊次數",
+          "value": "20",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈傷害",
+          "value": "250%",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈發射數量",
+          "value": "2",
+          "icon": "Shuriken_castcnt_icon.png"
+        }
+      ],
+      "tags": [
+        "OVERSHURIKEN",
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "3403",
@@ -8194,7 +9371,32 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bullet_2",
       "icon_file": "sprite_icons/Runenode_Bullet_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "需要攻擊次數",
+          "value": "20",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈傷害",
+          "value": "250%",
+          "icon": "Shuriken_icon.png"
+        },
+        {
+          "label": "魔彈發射數量",
+          "value": "2",
+          "icon": "Shuriken_castcnt_icon.png"
+        }
+      ],
+      "tags": [
+        "MERGE",
+        "SUMMON",
+        "SHURIKEN"
+      ]
     },
     {
       "id": "3204",
@@ -8342,7 +9544,12 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Summon_0",
       "icon_file": "sprite_icons/Runenode_Summon_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [],
+      "tags": []
     },
     {
       "id": "3304",
@@ -8389,7 +9596,15 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Summon_1",
       "icon_file": "sprite_icons/Runenode_Summon_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [],
+      "tags": [
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "3404",
@@ -8436,7 +9651,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Summon_2",
       "icon_file": "sprite_icons/Runenode_Summon_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [],
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "3205",
@@ -8584,7 +9806,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Combo_0",
       "icon_file": "sprite_icons/Runenode_Combo_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "每次連擊傷害增加",
+          "value": "50",
+          "icon": "Combo_icon.png"
+        }
+      ],
+      "tags": [
+        "COMBO"
+      ]
     },
     {
       "id": "3305",
@@ -8631,7 +9866,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Combo_1",
       "icon_file": "sprite_icons/Runenode_Combo_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "每次連擊傷害增加",
+          "value": "50",
+          "icon": "Combo_icon.png"
+        }
+      ],
+      "tags": [
+        "COMBO"
+      ]
     },
     {
       "id": "3405",
@@ -8678,7 +9926,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Combo_2",
       "icon_file": "sprite_icons/Runenode_Combo_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "每次連擊傷害增加",
+          "value": "50",
+          "icon": "Combo_icon.png"
+        }
+      ],
+      "tags": [
+        "COMBO",
+        "MERGE"
+      ]
     },
     {
       "id": "3206",
@@ -8826,7 +10088,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Adjust_0",
       "icon_file": "sprite_icons/Runenode_Adjust_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "10s",
+          "icon": "AdjustInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "3306",
@@ -8873,7 +10146,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Adjust_1",
       "icon_file": "sprite_icons/Runenode_Adjust_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "10s",
+          "icon": "AdjustInfo_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "MERGE"
+      ]
     },
     {
       "id": "3406",
@@ -8920,7 +10206,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Adjust_2",
       "icon_file": "sprite_icons/Runenode_Adjust_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "技能冷卻時間",
+          "value": "10s",
+          "icon": "AdjustInfo_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "3207",
@@ -9068,7 +10365,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Potion_0",
       "icon_file": "sprite_icons/Runenode_Potion_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "煉金增益量",
+          "value": "10%",
+          "icon": "Potion_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "POTION"
+      ]
     },
     {
       "id": "3307",
@@ -9115,7 +10430,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Potion_1",
       "icon_file": "sprite_icons/Runenode_Potion_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "煉金增益量",
+          "value": "10%",
+          "icon": "Potion_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "POTION"
+      ]
     },
     {
       "id": "3407",
@@ -9162,7 +10495,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Potion_2",
       "icon_file": "sprite_icons/Runenode_Potion_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "煉金增益量",
+          "value": "10%",
+          "icon": "Potion_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "POTION"
+      ]
     },
     {
       "id": "3101",
@@ -9304,7 +10655,10 @@
       "passive_rank_add": "1.2",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "3102",
@@ -9386,7 +10740,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "3103",
@@ -9468,7 +10825,10 @@
       "passive_rank_add": "0.5",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "3104",
@@ -9540,7 +10900,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "3105",
@@ -9603,7 +10966,8 @@
       "passive_rank_add": "0.45",
       "icon_name": "PassiveBigIcon_CriticalRate",
       "icon_file": "sprite_icons/PassiveBigIcon_CriticalRate.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "3106",
@@ -9643,7 +11007,10 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Invasion",
       "icon_file": "sprite_icons/PassiveBigIcon_Invasion.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "3107",
@@ -9683,7 +11050,10 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Invasion",
       "icon_file": "sprite_icons/PassiveBigIcon_Invasion.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "3108",
@@ -9723,7 +11093,10 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Invasion",
       "icon_file": "sprite_icons/PassiveBigIcon_Invasion.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "3109",
@@ -9966,7 +11339,10 @@
       "passive_rank_add": "0.6",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "3110",
@@ -10039,7 +11415,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "3111",
@@ -10121,7 +11500,10 @@
       "passive_rank_add": "3",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "3112",
@@ -10163,7 +11545,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Spup",
       "icon_file": "sprite_icons/PassiveBigIcon_Spup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "3113",
@@ -10205,7 +11588,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_HPup",
       "icon_file": "sprite_icons/PassiveBigIcon_HPup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "3114",
@@ -10245,7 +11629,11 @@
       "perk_group": "Magic",
       "icon_name": "Perk_Tsunami_Profile",
       "icon_file": "sprite_icons/Perk_Tsunami_Profile.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "DEATH",
+        "NORMAL_MONSTER"
+      ]
     },
     {
       "id": "3115",
@@ -10287,7 +11675,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Surport_M",
       "icon_file": "sprite_icons/PassiveBigIcon_Surport_M.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4001",
@@ -10331,7 +11720,24 @@
       "dice_awaken": "達到7骰點時，對骰盤所有骰子賦予<tag>BUBBLE</tag>",
       "icon_name": "Dice_BUBBLE2",
       "icon_file": "sprite_icons/Dice_BUBBLE2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "Bubble_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "90s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "BUBBLE",
+        "MERGE"
+      ]
     },
     {
       "id": "4002",
@@ -10376,7 +11782,19 @@
       "dice_awaken": "每20秒對骰盤所有怪物賦予<tag>LOCK</tag>",
       "icon_name": "Dice_Lock2",
       "icon_file": "sprite_icons/Dice_Lock2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Lock_icon.png"
+        }
+      ],
+      "tags": [
+        "LOCK",
+        "MERGE"
+      ]
     },
     {
       "id": "4003",
@@ -10420,7 +11838,28 @@
       "dice_awaken": "以滿能量攻擊時，對所有怪物發動審判，造成各目標失去生命值20%的傷害",
       "icon_name": "Dice_Punch2",
       "icon_file": "sprite_icons/Dice_Punch2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "封印力量",
+          "value": "0.5",
+          "icon": "Punch_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "拳擊最大補充量",
+          "value": "10s",
+          "icon": "Punch_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "CHARGE"
+      ]
     },
     {
       "id": "4004",
@@ -10465,7 +11904,23 @@
       "dice_awaken": "該骰子傷害增加10倍",
       "icon_name": "Dice_BrokenGrowth2",
       "icon_file": "sprite_icons/Dice_BrokenGrowth2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "成長機率",
+          "value": "40%",
+          "icon": "BrokenGrowth_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "20s",
+          "icon": "BrokenGrowth_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "GROWTH"
+      ]
     },
     {
       "id": "4005",
@@ -10510,7 +11965,23 @@
       "dice_awaken": "<tag>EXECUTIONER</tag>發動所需計數減少30",
       "icon_name": "Dice_Executioner2",
       "icon_file": "sprite_icons/Dice_Executioner2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "special_stats": [
+        {
+          "label": "執行劍傷害",
+          "value": "200%",
+          "icon": "Executioner_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "111",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "EXECUTIONER"
+      ]
     },
     {
       "id": "4006",
@@ -10555,7 +12026,13 @@
       "dice_awaken": "每隔一段時間獲得祝福能量",
       "icon_name": "Dice_Blessing2",
       "icon_file": "sprite_icons/Dice_Blessing2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [],
+      "tags": [
+        "BLESS",
+        "MERGE"
+      ]
     },
     {
       "id": "4007",
@@ -10599,7 +12076,20 @@
       "dice_awaken": "召喚時，上下左右4個方向獲得<tag>ALIGNMENT</tag>",
       "icon_name": "Dice_Alignment2",
       "icon_file": "sprite_icons/Dice_Alignment2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "傷害增益量",
+          "value": "20%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "ALIGNMENT",
+        "SPAWN",
+        "SUMMON"
+      ]
     },
     {
       "id": "4008",
@@ -10643,7 +12133,29 @@
       "dice_awaken": "召喚7骰點<tag>TAEGEUK</tag>骰子時，橫排與直排的<br>所有骰子變更為陰陽骰子",
       "icon_name": "Dice_BINGO2",
       "icon_file": "sprite_icons/Dice_BINGO2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "極致和諧傷害",
+          "value": "1000",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "橫排攻擊速度增加量",
+          "value": "50%",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "直排傷害增加量",
+          "value": "50%",
+          "icon": "Bingo02_icon.png"
+        }
+      ],
+      "tags": [
+        "TAEGEUK",
+        "HARMONY"
+      ]
     },
     {
       "id": "4201",
@@ -10693,7 +12205,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bubble_0",
       "icon_file": "sprite_icons/Runenode_Bubble_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "Bubble_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "90s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "BUBBLE"
+      ]
     },
     {
       "id": "4301",
@@ -10838,7 +12368,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bubble_1",
       "icon_file": "sprite_icons/Runenode_Bubble_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "Bubble_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "90s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "BUBBLE"
+      ]
     },
     {
       "id": "4401",
@@ -10885,7 +12433,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bubble_2",
       "icon_file": "sprite_icons/Runenode_Bubble_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "Bubble_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "90s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "BUBBLE"
+      ]
     },
     {
       "id": "4202",
@@ -11033,7 +12599,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Lock_0",
       "icon_file": "sprite_icons/Runenode_Lock_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "30",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Lock_icon.png"
+        }
+      ],
+      "tags": [
+        "LOCK"
+      ]
     },
     {
       "id": "4302",
@@ -11080,7 +12659,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Lock_1",
       "icon_file": "sprite_icons/Runenode_Lock_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "30",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Lock_icon.png"
+        }
+      ],
+      "tags": [
+        "LOCK"
+      ]
     },
     {
       "id": "4402",
@@ -11127,7 +12719,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Lock_2",
       "icon_file": "sprite_icons/Runenode_Lock_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "30",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "持續時間",
+          "value": "3s",
+          "icon": "Lock_icon.png"
+        }
+      ],
+      "tags": [
+        "NORMAL_MONSTER",
+        "LOCK"
+      ]
     },
     {
       "id": "4203",
@@ -11275,7 +12881,28 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Judgement_0",
       "icon_file": "sprite_icons/Runenode_Judgement_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "25",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "封印力量",
+          "value": "0.5",
+          "icon": "Punch_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "拳擊最大補充量",
+          "value": "10s",
+          "icon": "Punch_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "4303",
@@ -11326,7 +12953,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Judgement_1",
       "icon_file": "sprite_icons/Runenode_Judgement_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "25",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "封印力量",
+          "value": "0.5",
+          "icon": "Punch_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "拳擊最大補充量",
+          "value": "10s",
+          "icon": "Punch_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "CHARGE"
+      ]
     },
     {
       "id": "4403",
@@ -11373,7 +13023,28 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Judgement_2",
       "icon_file": "sprite_icons/Runenode_Judgement_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "25",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "封印力量",
+          "value": "0.5",
+          "icon": "Punch_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "1",
+          "icon": "fire_splash_range_icon.png"
+        },
+        {
+          "label": "拳擊最大補充量",
+          "value": "10s",
+          "icon": "Punch_interval_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "4204",
@@ -11521,7 +13192,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Grow_0",
       "icon_file": "sprite_icons/Runenode_Grow_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.3",
+      "special_stats": [
+        {
+          "label": "成長機率",
+          "value": "40%",
+          "icon": "BrokenGrowth_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "20s",
+          "icon": "BrokenGrowth_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "GROWTH"
+      ]
     },
     {
       "id": "4304",
@@ -11568,7 +13257,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Grow_1",
       "icon_file": "sprite_icons/Runenode_Grow_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.3",
+      "special_stats": [
+        {
+          "label": "成長機率",
+          "value": "40%",
+          "icon": "BrokenGrowth_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "20s",
+          "icon": "BrokenGrowth_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "GROWTH"
+      ]
     },
     {
       "id": "4404",
@@ -11615,7 +13322,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Grow_2",
       "icon_file": "sprite_icons/Runenode_Grow_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.3",
+      "special_stats": [
+        {
+          "label": "成長機率",
+          "value": "40%",
+          "icon": "BrokenGrowth_icon.png"
+        },
+        {
+          "label": "技能冷卻時間",
+          "value": "20s",
+          "icon": "BrokenGrowth_interval_icon.png"
+        }
+      ],
+      "tags": [
+        "GROWTH"
+      ]
     },
     {
       "id": "4205",
@@ -11763,7 +13488,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Execution_0",
       "icon_file": "sprite_icons/Runenode_Execution_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "100",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "執行劍傷害",
+          "value": "200%",
+          "icon": "Executioner_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "111",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "EXECUTIONER"
+      ]
     },
     {
       "id": "4305",
@@ -11810,7 +13553,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Execution_1",
       "icon_file": "sprite_icons/Runenode_Execution_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "100",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "執行劍傷害",
+          "value": "200%",
+          "icon": "Executioner_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "111",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "EXECUTIONER"
+      ]
     },
     {
       "id": "4405",
@@ -11857,7 +13618,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Execution_2",
       "icon_file": "sprite_icons/Runenode_Execution_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "-",
+      "dice_attack": "100",
+      "dice_attack_interval": "0",
+      "special_stats": [
+        {
+          "label": "執行劍傷害",
+          "value": "200%",
+          "icon": "Executioner_icon.png"
+        },
+        {
+          "label": "zh-tw",
+          "value": "111",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "EXECUTIONER"
+      ]
     },
     {
       "id": "4206",
@@ -12005,7 +13784,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Blessing_0",
       "icon_file": "sprite_icons/Runenode_Blessing_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "BLESS"
+      ]
     },
     {
       "id": "4306",
@@ -12052,7 +13838,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Blessing_1",
       "icon_file": "sprite_icons/Runenode_Blessing_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "BLESS"
+      ]
     },
     {
       "id": "4406",
@@ -12099,7 +13892,16 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Blessing_2",
       "icon_file": "sprite_icons/Runenode_Blessing_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [],
+      "tags": [
+        "CHARGE",
+        "MERGE",
+        "BLESS"
+      ]
     },
     {
       "id": "4207",
@@ -12247,7 +14049,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Align_0",
       "icon_file": "sprite_icons/Runenode_Align_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增益量",
+          "value": "20%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "ALIGNMENT"
+      ]
     },
     {
       "id": "4307",
@@ -12294,7 +14109,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Align_1",
       "icon_file": "sprite_icons/Runenode_Align_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增益量",
+          "value": "20%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "ALIGNMENT"
+      ]
     },
     {
       "id": "4407",
@@ -12341,7 +14169,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Align_2",
       "icon_file": "sprite_icons/Runenode_Align_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "傷害增益量",
+          "value": "20%",
+          "icon": "NodeAttackIcon.png"
+        }
+      ],
+      "tags": [
+        "ALIGNMENT",
+        "ELITE_MONSTER"
+      ]
     },
     {
       "id": "4208",
@@ -12489,7 +14331,31 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bingo_0",
       "icon_file": "sprite_icons/Runenode_Bingo_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "極致和諧傷害",
+          "value": "1000",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "橫排攻擊速度增加量",
+          "value": "50%",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "直排傷害增加量",
+          "value": "50%",
+          "icon": "Bingo02_icon.png"
+        }
+      ],
+      "tags": [
+        "BUFF_ATKSPD",
+        "TAEGEUK"
+      ]
     },
     {
       "id": "4308",
@@ -12634,7 +14500,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bingo_1",
       "icon_file": "sprite_icons/Runenode_Bingo_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "極致和諧傷害",
+          "value": "1000",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "橫排攻擊速度增加量",
+          "value": "50%",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "直排傷害增加量",
+          "value": "50%",
+          "icon": "Bingo02_icon.png"
+        }
+      ],
+      "tags": [
+        "TAEGEUK"
+      ]
     },
     {
       "id": "4408",
@@ -12779,7 +14668,30 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Bingo_2",
       "icon_file": "sprite_icons/Runenode_Bingo_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "極致和諧傷害",
+          "value": "1000",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "橫排攻擊速度增加量",
+          "value": "50%",
+          "icon": "Bingo_icon.png"
+        },
+        {
+          "label": "直排傷害增加量",
+          "value": "50%",
+          "icon": "Bingo02_icon.png"
+        }
+      ],
+      "tags": [
+        "HARMONY"
+      ]
     },
     {
       "id": "4101",
@@ -12921,7 +14833,10 @@
       "passive_rank_add": "1.2",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "4102",
@@ -13005,7 +14920,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "4103",
@@ -13089,7 +15007,10 @@
       "passive_rank_add": "0.5",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "4104",
@@ -13161,7 +15082,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "4105",
@@ -13224,7 +15148,8 @@
       "passive_rank_add": "0.45",
       "icon_name": "PassiveBigIcon_CriticalRate",
       "icon_file": "sprite_icons/PassiveBigIcon_CriticalRate.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4106",
@@ -13264,7 +15189,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Guardian",
       "icon_file": "sprite_icons/PassiveBigIcon_Guardian.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4107",
@@ -13304,7 +15230,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Guardian",
       "icon_file": "sprite_icons/PassiveBigIcon_Guardian.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4108",
@@ -13344,7 +15271,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Guardian",
       "icon_file": "sprite_icons/PassiveBigIcon_Guardian.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4109",
@@ -13587,7 +15515,10 @@
       "passive_rank_add": "0.6",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "4110",
@@ -13659,7 +15590,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "4111",
@@ -13742,7 +15676,10 @@
       "passive_rank_add": "3",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "4112",
@@ -13784,7 +15721,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Spup",
       "icon_file": "sprite_icons/PassiveBigIcon_Spup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4113",
@@ -13826,7 +15764,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_HPup",
       "icon_file": "sprite_icons/PassiveBigIcon_HPup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4114",
@@ -13866,7 +15805,8 @@
       "perk_group": "Guardian",
       "icon_name": "Perk_Cannon_Profile",
       "icon_file": "sprite_icons/Perk_Cannon_Profile.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "4115",
@@ -13908,7 +15848,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Surport_G",
       "icon_file": "sprite_icons/PassiveBigIcon_Surport_G.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "5001",
@@ -13954,7 +15895,18 @@
       "dice_awaken": "<tag>ALONE</tag>狀態傷害增加2倍",
       "icon_name": "Dice_Solitude_2",
       "icon_file": "sprite_icons/Dice_Solitude_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "孤獨傷害",
+          "value": "250",
+          "icon": "Solitude_icon.png"
+        }
+      ],
+      "tags": [
+        "ALONE"
+      ]
     },
     {
       "id": "5002",
@@ -13997,7 +15949,12 @@
       "dice_awaken": "<tag>STUN</tag>範圍增加2倍",
       "icon_name": "Dice_TRANSFER2",
       "icon_file": "sprite_icons/Dice_TRANSFER2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [],
+      "tags": [
+        "STUN"
+      ]
     },
     {
       "id": "5003",
@@ -14042,7 +15999,25 @@
       "dice_awaken": "達到7骰點時，移除骰盤上其他所有暴君骰子<br>按照移除骰子數量，發動<tag>TYRANT</tag>技能",
       "icon_name": "Dice_Tyrant2",
       "icon_file": "sprite_icons/Dice_Tyrant2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "暴君化傷害",
+          "value": "1000%",
+          "icon": "Tyrant_icon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "10s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "TYRANT",
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "5004",
@@ -14086,7 +16061,23 @@
       "dice_awaken": "召喚7骰點<tag>DOOM</tag>時，使骰盤上所有怪物暴斃<br>冷卻時間過後，再發動一次技能並減少骰點",
       "icon_name": "Dice_Doom2",
       "icon_file": "sprite_icons/Dice_Doom2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "2500",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "爆炸範圍",
+          "value": "2",
+          "icon": "Doom_range.png"
+        }
+      ],
+      "tags": [
+        "DOOM"
+      ]
     },
     {
       "id": "5005",
@@ -14131,7 +16122,24 @@
       "dice_awaken": "7骰點變異體登場時，骰盤上所有<tag>FAILURE</tag>骰子<br>變更為<tag>MUTATION</tag>骰子",
       "icon_name": "Dice_Mutation2",
       "icon_file": "sprite_icons/Dice_Mutation2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "變異傷害",
+          "value": "50",
+          "icon": "Mutation_icon.png"
+        },
+        {
+          "label": "變種登場機率",
+          "value": "25%",
+          "icon": "Mutation_icon.png"
+        }
+      ],
+      "tags": [
+        "MUTATION",
+        "FAILURE"
+      ]
     },
     {
       "id": "5006",
@@ -14176,7 +16184,20 @@
       "dice_awaken": "每隔一段時間召喚<tag>TRANSFER</tag>",
       "icon_name": "Dice_Slow2",
       "icon_file": "sprite_icons/Dice_Slow2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "50",
+          "icon": "Box_icon.png"
+        }
+      ],
+      "tags": [
+        "TRANSFER",
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "5007",
@@ -14221,7 +16242,23 @@
       "dice_awaken": "<tag>PREDATOR</tag>獲得範圍擴增至整個骰盤",
       "icon_name": "Dice_Predator2",
       "icon_file": "sprite_icons/Dice_Predator2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "範圍前",
+      "special_stats": [
+        {
+          "label": "吞噬增加量",
+          "value": "15",
+          "icon": "Predator_icon.png"
+        },
+        {
+          "label": "吞噬範圍",
+          "value": "1.2",
+          "icon": "Predator_splash.png"
+        }
+      ],
+      "tags": [
+        "PREDATOR"
+      ]
     },
     {
       "id": "5008",
@@ -14266,7 +16303,18 @@
       "dice_awaken": "每10秒發射7個可使<tag>NORMAL_MONSTER</tag>暴斃的死神子彈",
       "icon_name": "Dice_SPEEDGUN2",
       "icon_file": "sprite_icons/Dice_SPEEDGUN2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "special_stats": [
+        {
+          "label": "暴斃機率",
+          "value": "5",
+          "icon": "Death_icon.png"
+        }
+      ],
+      "tags": [
+        "NORMAL_MONSTER"
+      ]
     },
     {
       "id": "5009",
@@ -14310,7 +16358,18 @@
       "dice_awaken": "基本攻擊時，額外發射1個<tag>BULLET</tag>",
       "icon_name": "Dice_Crack2",
       "icon_file": "sprite_icons/Dice_Crack2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "special_stats": [
+        {
+          "label": "腐敗增幅量",
+          "value": "5",
+          "icon": "decay_effect_icon.png"
+        }
+      ],
+      "tags": [
+        "DECAY"
+      ]
     },
     {
       "id": "5101",
@@ -14452,7 +16511,10 @@
       "passive_rank_add": "1.2",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "5102",
@@ -14536,7 +16598,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "5103",
@@ -14619,7 +16684,10 @@
       "passive_rank_add": "0.5",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "5104",
@@ -14692,7 +16760,10 @@
       "passive_rank_add": "1",
       "icon_name": "PassiveBigIcon_AttackSpeed",
       "icon_file": "sprite_icons/PassiveBigIcon_AttackSpeed.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "5105",
@@ -14754,7 +16825,8 @@
       "passive_rank_add": "0.45",
       "icon_name": "PassiveBigIcon_CriticalRate",
       "icon_file": "sprite_icons/PassiveBigIcon_CriticalRate.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "5106",
@@ -14796,7 +16868,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_Magic",
       "icon_file": "sprite_icons/PassiveBigIcon_Magic.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "5107",
@@ -14836,7 +16911,10 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Magic",
       "icon_file": "sprite_icons/PassiveBigIcon_Magic.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "5108",
@@ -14876,7 +16954,10 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Magic",
       "icon_file": "sprite_icons/PassiveBigIcon_Magic.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "5109",
@@ -15119,7 +17200,10 @@
       "passive_rank_add": "0.6",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "5110",
@@ -15189,7 +17273,10 @@
       "passive_rank_add": "5",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "5111",
@@ -15271,7 +17358,10 @@
       "passive_rank_add": "3",
       "icon_name": "PassiveBigIcon_BulletDMG",
       "icon_file": "sprite_icons/PassiveBigIcon_BulletDMG.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "BULLET"
+      ]
     },
     {
       "id": "5112",
@@ -15313,7 +17403,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Spup",
       "icon_file": "sprite_icons/PassiveBigIcon_Spup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "5113",
@@ -15355,7 +17446,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_HPup",
       "icon_file": "sprite_icons/PassiveBigIcon_HPup.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "5114",
@@ -15395,7 +17487,10 @@
       "perk_group": "Invader",
       "icon_name": "Perk_Lava_Profile",
       "icon_file": "sprite_icons/Perk_Lava_Profile.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": [
+        "SUMMON"
+      ]
     },
     {
       "id": "5115",
@@ -15437,7 +17532,8 @@
       "passive_rank_add": "",
       "icon_name": "PassiveBigIcon_Surport_I",
       "icon_file": "sprite_icons/PassiveBigIcon_Surport_I.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "tags": []
     },
     {
       "id": "5201",
@@ -15585,7 +17681,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Solitude_0",
       "icon_file": "sprite_icons/Runenode_Solitude_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "孤獨傷害",
+          "value": "250",
+          "icon": "Solitude_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "5301",
@@ -15632,7 +17739,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Solitude_1",
       "icon_file": "sprite_icons/Runenode_Solitude_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "孤獨傷害",
+          "value": "250",
+          "icon": "Solitude_icon.png"
+        }
+      ],
+      "tags": [
+        "ALONE"
+      ]
     },
     {
       "id": "5401",
@@ -15679,7 +17799,18 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Solitude_2",
       "icon_file": "sprite_icons/Runenode_Solitude_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "120",
+      "dice_attack_interval": "0.8",
+      "special_stats": [
+        {
+          "label": "孤獨傷害",
+          "value": "250",
+          "icon": "Solitude_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "5202",
@@ -15827,7 +17958,15 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fear_0",
       "icon_file": "sprite_icons/Runenode_Fear_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.2",
+      "special_stats": [],
+      "tags": [
+        "BULLET",
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "5302",
@@ -15874,7 +18013,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fear_1",
       "icon_file": "sprite_icons/Runenode_Fear_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.2",
+      "special_stats": [],
+      "tags": [
+        "STUN"
+      ]
     },
     {
       "id": "5402",
@@ -15921,7 +18067,14 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Fear_2",
       "icon_file": "sprite_icons/Runenode_Fear_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "50",
+      "dice_attack_interval": "1.2",
+      "special_stats": [],
+      "tags": [
+        "STUN"
+      ]
     },
     {
       "id": "5203",
@@ -16069,7 +18222,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Tyrant_0",
       "icon_file": "sprite_icons/Runenode_Tyrant_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "暴君化傷害",
+          "value": "1000%",
+          "icon": "Tyrant_icon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "10s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "TYRANT"
+      ]
     },
     {
       "id": "5303",
@@ -16116,7 +18287,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Tyrant_1",
       "icon_file": "sprite_icons/Runenode_Tyrant_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "暴君化傷害",
+          "value": "1000%",
+          "icon": "Tyrant_icon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "10s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": [
+        "TYRANT"
+      ]
     },
     {
       "id": "5403",
@@ -16163,7 +18352,23 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Tyrant_2",
       "icon_file": "sprite_icons/Runenode_Tyrant_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "150",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "暴君化傷害",
+          "value": "1000%",
+          "icon": "Tyrant_icon.png"
+        },
+        {
+          "label": "攻擊週期",
+          "value": "10s",
+          "icon": "attackspeed_icon.png"
+        }
+      ],
+      "tags": []
     },
     {
       "id": "5204",
@@ -16311,7 +18516,26 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Doom_0",
       "icon_file": "sprite_icons/Runenode_Doom_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "500",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "2500",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "爆炸範圍",
+          "value": "2",
+          "icon": "Doom_range.png"
+        }
+      ],
+      "tags": [
+        "DOOM",
+        "ELITE_MONSTER"
+      ]
     },
     {
       "id": "5304",
@@ -16358,7 +18582,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Doom_1",
       "icon_file": "sprite_icons/Runenode_Doom_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "500",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "2500",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "爆炸範圍",
+          "value": "2",
+          "icon": "Doom_range.png"
+        }
+      ],
+      "tags": [
+        "DOOM"
+      ]
     },
     {
       "id": "5404",
@@ -16405,7 +18647,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Doom_2",
       "icon_file": "sprite_icons/Runenode_Doom_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "500",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "zh-tw",
+          "value": "2500",
+          "icon": "NodeAttackIcon.png"
+        },
+        {
+          "label": "爆炸範圍",
+          "value": "2",
+          "icon": "Doom_range.png"
+        }
+      ],
+      "tags": [
+        "DOOM"
+      ]
     },
     {
       "id": "5205",
@@ -16553,7 +18813,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mutation_0",
       "icon_file": "sprite_icons/Runenode_Mutation_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "變異傷害",
+          "value": "50",
+          "icon": "Mutation_icon.png"
+        },
+        {
+          "label": "變種登場機率",
+          "value": "25%",
+          "icon": "Mutation_icon.png"
+        }
+      ],
+      "tags": [
+        "MUTATION"
+      ]
     },
     {
       "id": "5305",
@@ -16600,7 +18878,26 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mutation_1",
       "icon_file": "sprite_icons/Runenode_Mutation_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "變異傷害",
+          "value": "50",
+          "icon": "Mutation_icon.png"
+        },
+        {
+          "label": "變種登場機率",
+          "value": "25%",
+          "icon": "Mutation_icon.png"
+        }
+      ],
+      "tags": [
+        "FAILURE",
+        "MUTATION"
+      ]
     },
     {
       "id": "5405",
@@ -16647,7 +18944,26 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Mutation_2",
       "icon_file": "sprite_icons/Runenode_Mutation_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "80",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "變異傷害",
+          "value": "50",
+          "icon": "Mutation_icon.png"
+        },
+        {
+          "label": "變種登場機率",
+          "value": "25%",
+          "icon": "Mutation_icon.png"
+        }
+      ],
+      "tags": [
+        "MUTATION",
+        "FAILURE"
+      ]
     },
     {
       "id": "5206",
@@ -16795,7 +19111,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Box_0",
       "icon_file": "sprite_icons/Runenode_Box_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "50",
+          "icon": "Box_icon.png"
+        }
+      ],
+      "tags": [
+        "TRANSFER"
+      ]
     },
     {
       "id": "5306",
@@ -16842,7 +19171,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Box_1",
       "icon_file": "sprite_icons/Runenode_Box_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "50",
+          "icon": "Box_icon.png"
+        }
+      ],
+      "tags": [
+        "TRANSFER"
+      ]
     },
     {
       "id": "5406",
@@ -16889,7 +19231,22 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Box_2",
       "icon_file": "sprite_icons/Runenode_Box_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "前方",
+      "dice_attack": "100",
+      "dice_attack_interval": "1",
+      "special_stats": [
+        {
+          "label": "SP獲得量",
+          "value": "50",
+          "icon": "Box_icon.png"
+        }
+      ],
+      "tags": [
+        "TRANSFER",
+        "MERGE",
+        "SUMMON"
+      ]
     },
     {
       "id": "5207",
@@ -17037,7 +19394,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Predator_0",
       "icon_file": "sprite_icons/Runenode_Predator_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "範圍前",
+      "dice_attack": "1000",
+      "dice_attack_interval": "2.7",
+      "special_stats": [
+        {
+          "label": "吞噬增加量",
+          "value": "15",
+          "icon": "Predator_icon.png"
+        },
+        {
+          "label": "吞噬範圍",
+          "value": "1.2",
+          "icon": "Predator_splash.png"
+        }
+      ],
+      "tags": [
+        "PREDATOR"
+      ]
     },
     {
       "id": "5307",
@@ -17084,7 +19459,25 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Predator_1",
       "icon_file": "sprite_icons/Runenode_Predator_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "範圍前",
+      "dice_attack": "1000",
+      "dice_attack_interval": "2.7",
+      "special_stats": [
+        {
+          "label": "吞噬增加量",
+          "value": "15",
+          "icon": "Predator_icon.png"
+        },
+        {
+          "label": "吞噬範圍",
+          "value": "1.2",
+          "icon": "Predator_splash.png"
+        }
+      ],
+      "tags": [
+        "PREDATOR"
+      ]
     },
     {
       "id": "5407",
@@ -17131,7 +19524,26 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Predator_2",
       "icon_file": "sprite_icons/Runenode_Predator_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "範圍前",
+      "dice_attack": "1000",
+      "dice_attack_interval": "2.7",
+      "special_stats": [
+        {
+          "label": "吞噬增加量",
+          "value": "15",
+          "icon": "Predator_icon.png"
+        },
+        {
+          "label": "吞噬範圍",
+          "value": "1.2",
+          "icon": "Predator_splash.png"
+        }
+      ],
+      "tags": [
+        "NORMAL_MONSTER",
+        "PREDATOR"
+      ]
     },
     {
       "id": "5208",
@@ -17279,7 +19691,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Death_0",
       "icon_file": "sprite_icons/Runenode_Death_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "暴斃機率",
+          "value": "5",
+          "icon": "Death_icon.png"
+        }
+      ],
+      "tags": [
+        "BULLET",
+        "BUFF_ATKSPD"
+      ]
     },
     {
       "id": "5308",
@@ -17326,7 +19752,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Death_1",
       "icon_file": "sprite_icons/Runenode_Death_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "暴斃機率",
+          "value": "5",
+          "icon": "Death_icon.png"
+        }
+      ],
+      "tags": [
+        "DEATH"
+      ]
     },
     {
       "id": "5408",
@@ -17373,7 +19812,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Death_2",
       "icon_file": "sprite_icons/Runenode_Death_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "60",
+      "dice_attack_interval": "1.2",
+      "special_stats": [
+        {
+          "label": "暴斃機率",
+          "value": "5",
+          "icon": "Death_icon.png"
+        }
+      ],
+      "tags": [
+        "SPEED_MONSTER",
+        "BIG_MONSTER"
+      ]
     },
     {
       "id": "5209",
@@ -17521,7 +19974,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Decay_0",
       "icon_file": "sprite_icons/Runenode_Decay_0.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "腐敗增幅量",
+          "value": "5",
+          "icon": "decay_effect_icon.png"
+        }
+      ],
+      "tags": [
+        "DECAY"
+      ]
     },
     {
       "id": "5309",
@@ -17568,7 +20034,20 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Decay_1",
       "icon_file": "sprite_icons/Runenode_Decay_1.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "腐敗增幅量",
+          "value": "5",
+          "icon": "decay_effect_icon.png"
+        }
+      ],
+      "tags": [
+        "DECAY"
+      ]
     },
     {
       "id": "5409",
@@ -17615,7 +20094,21 @@
       "rune_duration_rank_add": "",
       "icon_name": "Runenode_Decay_2",
       "icon_file": "sprite_icons/Runenode_Decay_2.png",
-      "icon_status": "sprite"
+      "icon_status": "sprite",
+      "dice_target_zh": "隨機",
+      "dice_attack": "20",
+      "dice_attack_interval": "1.5",
+      "special_stats": [
+        {
+          "label": "腐敗增幅量",
+          "value": "5",
+          "icon": "decay_effect_icon.png"
+        }
+      ],
+      "tags": [
+        "BOSS_MONSTER",
+        "DECAY"
+      ]
     }
   ],
   "edges": [
@@ -18611,5 +21104,441 @@
       "from": "5209",
       "to": "5409"
     }
-  ]
+  ],
+  "tag_definitions": {
+    "BULLET": {
+      "key": "BULLET",
+      "name_zh": "子彈",
+      "desc_zh": "基本攻擊，每個骰子骰點發射一個",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "CHAIN": {
+      "key": "CHAIN",
+      "name_zh": "連鎖",
+      "desc_zh": "反彈至其他怪物，造成額外傷害",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "AURA": {
+      "key": "AURA",
+      "name_zh": "光環",
+      "desc_zh": "於周遭範圍內賦予持續效果",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "CHARGE": {
+      "key": "CHARGE",
+      "name_zh": "補充",
+      "desc_zh": "集中一段時間的力量後，發動強大效果",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "AREA_DAMAGE": {
+      "key": "AREA_DAMAGE",
+      "name_zh": "範圍傷害",
+      "desc_zh": "對一定範圍內的所有怪物造成傷害",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "PILLAR": {
+      "key": "PILLAR",
+      "name_zh": "巨石",
+      "desc_zh": "於隨機位置召喚，並阻擋所有怪物移動。BIG_MONSTER、BOSS_MONSTER、GOLEM_MONSTER可摧毀巨石",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "FROZEN": {
+      "key": "FROZEN",
+      "name_zh": "冰凍",
+      "desc_zh": "移動速度減少",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "BURN": {
+      "key": "BURN",
+      "name_zh": "燙傷",
+      "desc_zh": "每1秒失去的生命值等比傷害",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "LOCK": {
+      "key": "LOCK",
+      "name_zh": "封印",
+      "desc_zh": "使怪物暫時停止，每個怪物僅套用1次",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "POISON": {
+      "key": "POISON",
+      "name_zh": "毒素",
+      "desc_zh": "每1秒造成與子彈傷害等比的傷害",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "DECAY": {
+      "key": "DECAY",
+      "name_zh": "腐敗",
+      "desc_zh": "該怪物受到的傷害增加，可疊加至骰子骰點數量",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "SP_GAIN": {
+      "key": "SP_GAIN",
+      "name_zh": "獲得SP",
+      "desc_zh": "每隔一段時間或根據條件獲得SP",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "SP_SCALE": {
+      "key": "SP_SCALE",
+      "name_zh": "SP等比",
+      "desc_zh": "根據目前持有的SP等比增加傷害(達到一定程度以上時，將緩慢增加)",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "SP_BURN": {
+      "key": "SP_BURN",
+      "name_zh": "燒毀",
+      "desc_zh": "根據骰子骰點等比減少對方的SP",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "BUFF_ATKSPD": {
+      "key": "BUFF_ATKSPD",
+      "name_zh": "攻擊速度增加",
+      "desc_zh": "攻擊速度增加",
+      "color": "FFFFFF",
+      "bg_color": "4CD964"
+    },
+    "DEBUFF_ATKSPD": {
+      "key": "DEBUFF_ATKSPD",
+      "name_zh": "攻擊速度減少",
+      "desc_zh": "攻擊速度減少",
+      "color": "FFFFFF",
+      "bg_color": "4CD964"
+    },
+    "BUBBLE": {
+      "key": "BUBBLE",
+      "name_zh": "泡泡",
+      "desc_zh": "防禦骰子套用的減益效果1次",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "MERGE": {
+      "key": "MERGE",
+      "name_zh": "合成時",
+      "desc_zh": "合成骰子時發動",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "SPAWN": {
+      "key": "SPAWN",
+      "name_zh": "召喚時",
+      "desc_zh": "召喚骰子時發動",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "SUMMON": {
+      "key": "SUMMON",
+      "name_zh": "召喚",
+      "desc_zh": "產生物件或骰子",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "COPY": {
+      "key": "COPY",
+      "name_zh": "複製",
+      "desc_zh": "複製或轉換其他骰子",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "SWAP": {
+      "key": "SWAP",
+      "name_zh": "替換",
+      "desc_zh": "與相同條件的骰子變更位置",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "GROWTH": {
+      "key": "GROWTH",
+      "name_zh": "成長",
+      "desc_zh": "根據機率嘗試提升骰點。成功時，變更為增加1骰點的隨機骰子。達到7骰點時，不再嘗試成長",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "POTION": {
+      "key": "POTION",
+      "name_zh": "藥水",
+      "desc_zh": "強化骰子攻擊力。當有藥水增益的骰子互相合成時，發射至隨機骰子上",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "ACTIVATION": {
+      "key": "ACTIVATION",
+      "name_zh": "啟用條件",
+      "desc_zh": "滿足特定條件後，啟用效果",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "CONNECT": {
+      "key": "CONNECT",
+      "name_zh": "連接",
+      "desc_zh": "當相同種類骰子相鄰時，啟用效果",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "ELEMENT": {
+      "key": "ELEMENT",
+      "name_zh": "原子",
+      "desc_zh": "召喚圍繞骰子周遭的原子，原子數量按照骰點等比增加",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "COMBO": {
+      "key": "COMBO",
+      "name_zh": "連擊",
+      "desc_zh": "合成該骰子時，數值提升，使傷害根據提升量增加",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "STONE": {
+      "key": "STONE",
+      "name_zh": "石頭",
+      "desc_zh": "慢慢往入口移動，對碰撞的怪物造成傷害",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "THORN": {
+      "key": "THORN",
+      "name_zh": "尖刺",
+      "desc_zh": "於路徑上隨機位置產生，碰撞時，根據子彈傷害量等比造成傷害後移除",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "SAW": {
+      "key": "SAW",
+      "name_zh": "鋸齒",
+      "desc_zh": "於出入口之間移動，對碰撞的怪物造成傷害",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "THUNDERHAMMER": {
+      "key": "THUNDERHAMMER",
+      "name_zh": "雷錘",
+      "desc_zh": "對隨機怪物發射投射物，於該位置造成與子彈傷害等比範圍傷害與0.5秒僵硬",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "LASER": {
+      "key": "LASER",
+      "name_zh": "光線",
+      "desc_zh": "持續攻擊相同目標時，傷害增加。若變更目標，將重置",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "SHURIKEN": {
+      "key": "SHURIKEN",
+      "name_zh": "魔彈",
+      "desc_zh": "造成該骰子子彈傷害等比傷害的投射物",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "FLOW": {
+      "key": "FLOW",
+      "name_zh": "流動",
+      "desc_zh": "按照骰盤上的流動骰子總骰點，使對方移動速度等比增加",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "SLOW": {
+      "key": "SLOW",
+      "name_zh": "虛脫",
+      "desc_zh": "處於虛脫減益的對方骰子攻擊速度永久減少",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "STUN": {
+      "key": "STUN",
+      "name_zh": "僵硬",
+      "desc_zh": "使怪物暫時停止，可套用多次",
+      "color": "FFFFFF",
+      "bg_color": "9B6BFF"
+    },
+    "BIGTHORN": {
+      "key": "BIGTHORN",
+      "name_zh": "巨型尖刺",
+      "desc_zh": "於路徑上隨機位置產生，碰撞時，根據目前生命值等比造成傷害後移除",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "OVERSHURIKEN": {
+      "key": "OVERSHURIKEN",
+      "name_zh": "強化魔彈",
+      "desc_zh": "造成該骰子子彈傷害等比AREA_DAMAGE的投射物",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "COUNTDOWN": {
+      "key": "COUNTDOWN",
+      "name_zh": "倒數",
+      "desc_zh": "當周遭我方骰子每次攻擊時，扣除的特殊計數。達到0時，將發動強大技能",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "EXECUTIONER": {
+      "key": "EXECUTIONER",
+      "name_zh": "執行劍",
+      "desc_zh": "對隨機怪物造成強大範圍傷害的基本傷害型投射物",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "ALIGNMENT": {
+      "key": "ALIGNMENT",
+      "name_zh": "排序",
+      "desc_zh": "召喚時，決定十字(橫向/縱向)方向。對該方向上的所有骰子賦予傷害增加增益",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "ALONE": {
+      "key": "ALONE",
+      "name_zh": "孤獨",
+      "desc_zh": "若相鄰的下上左右1格為空格時，骰子的基本傷害大幅提升",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "TYRANT": {
+      "key": "TYRANT",
+      "name_zh": "暴君化",
+      "desc_zh": "當該骰子僅存在一個時，每隔一段時間發動對整個骰盤造成傷害的技能",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "PREDATOR": {
+      "key": "PREDATOR",
+      "name_zh": "吞噬",
+      "desc_zh": "根據吞噬的怪物數量，使基本傷害永久等比增加",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "MUTATION": {
+      "key": "MUTATION",
+      "name_zh": "變種",
+      "desc_zh": "根據骰盤上存在的MUTATION總骰點數量，使基本傷害等比增加",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "FAILURE": {
+      "key": "FAILURE",
+      "name_zh": "失敗品",
+      "desc_zh": "總會有用處吧？",
+      "color": "FFFFFF",
+      "bg_color": "4DA3FF"
+    },
+    "RESONANCE": {
+      "key": "RESONANCE",
+      "name_zh": "共鳴",
+      "desc_zh": "對骰盤上持有相同骰點的所有骰子賦予增益 / 增益效果可疊加",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "DOOM": {
+      "key": "DOOM",
+      "name_zh": "破滅",
+      "desc_zh": "範圍內的NORMAL_MONSTER暴斃，對ELITE_MONSTER造成目前生命值等比傷害",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "DEATH": {
+      "key": "DEATH",
+      "name_zh": "暴斃",
+      "desc_zh": "無論生命值，立即使一般怪物暴斃",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "NORMAL_MONSTER": {
+      "key": "NORMAL_MONSTER",
+      "name_zh": "一般怪物",
+      "desc_zh": "最基本的怪物",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "ELITE_MONSTER": {
+      "key": "ELITE_MONSTER",
+      "name_zh": "菁英怪物",
+      "desc_zh": "具備特殊效果的強大怪物， 指一般、快速怪物以外的怪物",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "BLOOM": {
+      "key": "BLOOM",
+      "name_zh": "綻放",
+      "desc_zh": "持續一段時間啟動強力子彈攻擊",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "BLESS": {
+      "key": "BLESS",
+      "name_zh": "祝福",
+      "desc_zh": "將獲得以下1個隨機祝福。  －骰子傷害 / 攻擊速度 / 暴擊傷害 / 暴擊率增加 －擊殺怪物時，額外獲得SP －SP魔像生命值減少 －立即獲得SP －立即強化隨機骰子 ",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "SOW": {
+      "key": "SOW",
+      "name_zh": "果實",
+      "desc_zh": "擊中骰子時，對象骰點+1 擊中空格時，召喚1骰點骰子",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "TRANSFER": {
+      "key": "TRANSFER",
+      "name_zh": "SP怪物",
+      "desc_zh": "裝滿SP的怪異生物 / 擊殺時，可獲得更多SP",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "TAEGEUK": {
+      "key": "TAEGEUK",
+      "name_zh": "陰陽",
+      "desc_zh": "橫排：攻擊速度增加 / 直排：基本傷害增加",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "HARMONY": {
+      "key": "HARMONY",
+      "name_zh": "極致和諧",
+      "desc_zh": "傷害大幅增加",
+      "color": "FFFFFF",
+      "bg_color": "FF8A3D"
+    },
+    "SPEED_MONSTER": {
+      "key": "SPEED_MONSTER",
+      "name_zh": "快速怪物",
+      "desc_zh": "速度極快的怪物",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "BIG_MONSTER": {
+      "key": "BIG_MONSTER",
+      "name_zh": "巨大怪物",
+      "desc_zh": "持有大量生命值的大型怪物",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "BOSS_MONSTER": {
+      "key": "BOSS_MONSTER",
+      "name_zh": "首領怪物",
+      "desc_zh": "怪物們的首領，使用強大技能",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    },
+    "GOLEM_MONSTER": {
+      "key": "GOLEM_MONSTER",
+      "name_zh": "SP魔像",
+      "desc_zh": "持有大量SP的怪物，擊殺後可獲得SP",
+      "color": "FFFFFF",
+      "bg_color": "A0A7B8"
+    }
+  }
 }
