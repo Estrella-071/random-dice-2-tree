@@ -7,9 +7,43 @@
     <meta name="description" content="《Random Dice 2》骰子樹互動攻略與全節點數值資料庫。">
     <title>Random Dice 2｜骰子樹互動資料庫</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body class="show-currency-badges">
+  <body>
+    <!-- 開場載入畫面 -->
+    <div id="loading-screen" class="loading-screen" role="status" aria-label="骰子天賦樹載入中">
+      <div class="loader-backdrop"></div>
+      <div class="loader-content">
+        <div class="loader-dice-stage">
+          <div class="loader-ambient-glow"></div>
+          <div class="loader-energy-rings">
+            <div class="energy-ring ring-1"></div>
+            <div class="energy-ring ring-2"></div>
+          </div>
+          <div class="loader-dice-3d">
+            <div class="dice-face face-front"></div>
+            <div class="dice-face face-back"></div>
+            <div class="dice-face face-right"></div>
+            <div class="dice-face face-left"></div>
+            <div class="dice-face face-top"></div>
+            <div class="dice-face face-bottom"></div>
+            <div class="dice-quantum-core"></div>
+          </div>
+        </div>
+        <div class="loader-info">
+          <div class="loader-brand-title">RANDOM DICE 2</div>
+          <div class="loader-brand-sub">骰子天賦樹</div>
+          <div class="loader-progress-track">
+            <div id="loader-progress-fill" class="loader-progress-fill"></div>
+          </div>
+          <div id="loader-status-label" class="loader-status-label">正在載入天賦資料...</div>
+        </div>
+      </div>
+    </div>
+
     <main class="app-shell" aria-labelledby="page-title">
       <header class="topbar">
         <h1 id="page-title" class="sr-only">Random Dice 2 骰子樹互動資料庫</h1>
@@ -89,7 +123,7 @@
           <span class="hud-feature-label">查看前置節點</span>
         </button>
 
-        <button id="toggle-currency-btn" class="hud-feature-btn is-active" type="button" aria-pressed="true" title="在所有節點上方顯示解鎖消耗">
+        <button id="toggle-currency-btn" class="hud-feature-btn" type="button" aria-pressed="false" title="在所有節點上方顯示解鎖消耗">
           <span class="hud-checkbox-box">
             <svg class="hud-check-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
               <path d="M4 12L9 17L19.5 5.5" fill="none" stroke="#22c55e" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -98,6 +132,65 @@
           <span class="hud-feature-label">查看貨幣</span>
         </button>
       </div>
+
+      <aside id="disclaimer-widget" class="disclaimer-widget" aria-label="免責聲明與版權宣告">
+        <button id="disclaimer-toggle-btn" class="disclaimer-toggle-btn" type="button" aria-expanded="false" aria-controls="disclaimer-card" aria-label="查看專案免責聲明與版權資訊" title="專案聲明與版權資訊">
+          <span class="disclaimer-question-icon" aria-hidden="true">?</span>
+        </button>
+        <div id="disclaimer-card" class="disclaimer-card" role="dialog" aria-modal="false" aria-labelledby="disclaimer-heading" aria-hidden="true">
+          <div class="disclaimer-card-inner">
+            <header class="disclaimer-header">
+              <div class="disclaimer-title-wrap">
+                <span class="disclaimer-badge">FAN-MADE</span>
+                <h2 id="disclaimer-heading" class="disclaimer-title">非官方同人專案聲明</h2>
+              </div>
+              <button id="disclaimer-close-btn" class="disclaimer-close-btn" type="button" aria-label="關閉專案聲明">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </header>
+            <div class="disclaimer-body">
+              <ul class="disclaimer-list">
+                <li>
+                  <span class="disclaimer-bullet" aria-hidden="true">✦</span>
+                  <div class="disclaimer-item-text">
+                    <strong>社群非官方製作</strong>：本站為玩家自發建置之開源攻略資料庫與互動模擬器，與《Random Dice 2》開發商 <strong>111 Percent Inc.</strong> 無任何商業隸屬、官方授權或背書關係。
+                  </div>
+                </li>
+                <li>
+                  <span class="disclaimer-bullet" aria-hidden="true">✦</span>
+                  <div class="disclaimer-item-text">
+                    <strong>著作權歸屬</strong>：遊戲內之美術圖示、音效、數值文案及相關商標著作權，均屬 <strong>111 Percent Inc.</strong> 原權利人所有。
+                  </div>
+                </li>
+                <li>
+                  <span class="disclaimer-bullet" aria-hidden="true">✦</span>
+                  <div class="disclaimer-item-text">
+                    <strong>純非營利原則</strong>：全站無廣告、無內購機制，僅供玩家戰術研討、數值試算與策略參考之用。
+                  </div>
+                </li>
+              </ul>
+              <div class="disclaimer-contact-box">
+                <p class="disclaimer-takedown-notice">
+                  <em>If you are a representative of 111 Percent Inc. and would like any assets removed, please contact <a href="mailto:itsestrella71@gmail.com" class="disclaimer-inline-link">itsestrella71@gmail.com</a> and we will comply immediately.</em>
+                </p>
+                <div class="disclaimer-contact-row">
+                  <span class="disclaimer-contact-label">官方下架聯絡 / 數值回報：</span>
+                  <a href="mailto:itsestrella71@gmail.com" class="disclaimer-email-link" title="寄信給維護者 (Takedown / Contact)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                      <path d="M22 7L12 13L2 7"></path>
+                    </svg>
+                    <span>itsestrella71@gmail.com</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
 
       <nav class="map-toolbar" aria-label="地圖檢視控制">
         <button id="zoom-out" class="toolbar-button" type="button" aria-label="縮小視野">
@@ -114,13 +207,6 @@
         </button>
         <span class="toolbar-divider" aria-hidden="true"></span>
         <button id="zoom-fit" class="toolbar-button toolbar-button-wide" type="button" aria-label="縮放至全圖視野">全景</button>
-        <button id="minimap-toggle" class="toolbar-button toolbar-button-mobile" type="button" aria-label="切換小地圖顯示">
-          <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-            <line x1="8" y1="2" x2="8" y2="18"></line>
-            <line x1="16" y1="6" x2="16" y2="22"></line>
-          </svg>
-        </button>
       </nav>
 
       <footer class="statusbar">
@@ -144,6 +230,14 @@
         </div>
         <div id="tooltip-body" class="tooltip-body"></div>
       </article>
+
+      <!-- 標籤詳細解釋微型浮窗 (Tag Popover) -->
+      <div id="tag-popover" class="tag-popover" role="tooltip" aria-hidden="true" hidden>
+        <div class="tag-popover-header">
+          <span id="tag-popover-badge" class="tag-popover-badge">#標籤</span>
+        </div>
+        <p id="tag-popover-desc" class="tag-popover-desc"></p>
+      </div>
     </main>
     <script src="data/tree_data.js"></script>
     <script src="app.js" defer></script>
