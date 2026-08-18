@@ -29,7 +29,7 @@
     2: { name: "工學", color: "#f5d358", surface: "rgba(245, 211, 88, 0.14)", border: "rgba(245, 211, 88, 0.35)", ink: "#140d02" },
     3: { name: "魔法", color: "#5da0ff", surface: "rgba(93, 160, 255, 0.14)", border: "rgba(93, 160, 255, 0.35)", ink: "#030c18" },
     4: { name: "秩序", color: "#baa6e0", surface: "rgba(186, 166, 224, 0.14)", border: "rgba(186, 166, 224, 0.35)", ink: "#11091a" },
-    5: { name: "混沌", color: "#cb65ff", surface: "rgba(203, 101, 255, 0.14)", border: "rgba(203, 101, 255, 0.35)", ink: "#14031a" },
+    5: { name: "渾沌", color: "#cb65ff", surface: "rgba(203, 101, 255, 0.14)", border: "rgba(203, 101, 255, 0.35)", ink: "#14031a" },
   };
 
   // 五大派系遊戲原版選取框色彩配置（底框與對稱旋轉光芒）
@@ -38,7 +38,7 @@
     2: { name: "工學", base: "#F5DA68", runner: "#FFFFA2" },
     3: { name: "魔法", base: "#4692F1", runner: "#7CFAFD" },
     4: { name: "秩序", base: "#9F95C1", runner: "#FFFEFF" },
-    5: { name: "混沌", base: "#A93BEA", runner: "#EE6CFA" },
+    5: { name: "渾沌", base: "#A93BEA", runner: "#EE6CFA" },
   };
 
   const NODE_TYPE_NAMES = {
@@ -247,11 +247,6 @@
       }
     }
 
-    text = text.replace(/<color=[^>]*>\(\+\s*[%秒]?\)<\/color>|\(\+\s*[%秒]?\)/gi, "");
-
-    // 格式化綠色增量數值
-    text = text.replace(/<color=[^>]*>\(\+([^)]+)\)<\/color>/gi, '<span class="stat-green-add">(+$1)</span>');
-
     text = text
       .replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<")
@@ -260,22 +255,13 @@
       .replace(/&#039;/g, "'")
       .replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => {
         const tagKey = tag.toUpperCase();
-        const tagName = TAG_MAP[tagKey] || tag;
+        const tagDefs = window.TREE_DATA?.tag_definitions || {};
+        const tagName = tagDefs[tagKey]?.name_zh || TAG_MAP[tagKey] || tag;
         return `<u class="tooltip-tag-inline" data-tag-key="${tagKey}" role="button" tabindex="0">${tagName}</u>`;
       })
       .replace(/<color=[^>]*>(.*?)<\/color>/gi, '$1')
       .replace(/<br\s*\/?>/gi, " ")
       .trim();
-
-    // 對未標註 <tag> 但有對應中文標籤名詞的名詞自動包裹白色底線
-    const tagDefs = window.TREE_DATA?.tag_definitions || {};
-    Object.keys(tagDefs).forEach(tagKey => {
-      const tagName = tagDefs[tagKey]?.name_zh;
-      if (tagName && tagName.length >= 2 && text.includes(tagName) && !text.includes(`data-tag-key="${tagKey}"`)) {
-        const reg = new RegExp(`(?<!<[^>]*)${tagName}(?![^<]*>)`, 'g');
-        text = text.replace(reg, `<u class="tooltip-tag-inline" data-tag-key="${tagKey}" role="button" tabindex="0">${tagName}</u>`);
-      }
-    });
 
     return text;
   }
@@ -882,7 +868,7 @@
     Engineering: "工學",
     Magic: "魔法",
     Guardian: "秩序",
-    Invader: "混沌",
+    Invader: "渾沌",
   };
 
   function formatDiceType(val) {
@@ -1002,15 +988,9 @@
       p.innerHTML = descHtml;
       section.append(p);
 
-      // 下方 #標籤 膠囊列
+      // 下方 #標籤 膠囊列（嚴格僅提取說明文案中真正被 <tag> 包裹的標籤機制）
       const tagDefs = window.TREE_DATA?.tag_definitions || {};
       const relevantTags = [];
-      if (Array.isArray(node.tags)) {
-        node.tags.forEach(tKey => {
-          if (tagDefs[tKey] && !relevantTags.includes(tKey)) relevantTags.push(tKey);
-        });
-      }
-      // 從 descHtml 中尋找 data-tag-key
       const tagMatches = descHtml.matchAll(/data-tag-key="([^"]+)"/g);
       for (const match of tagMatches) {
         const tKey = match[1];
@@ -1222,44 +1202,23 @@
         metaBox.append(lineBase);
       }
 
-      // 升階明細表格（多階節點專用，乾淨收納，0值顯示為—）
+      // 升階明細按鈕（多階節點專用，點擊流體展開獨立明細卡片，徹底消除 Tooltip 內部龐大滾動表格）
       if (maxRank > 1) {
-        const tableContainer = document.createElement("div");
-        tableContainer.className = "upgrade-table-container";
-        const table = document.createElement("table");
-        table.className = "upgrade-table";
-        table.innerHTML = `
-          <thead>
-            <tr>
-              <th>階級</th>
-              <th>單階金幣</th>
-              <th>單階核心</th>
-              <th>累計金幣</th>
-              <th>累計核心</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
+        const triggerBtn = document.createElement("button");
+        triggerBtn.type = "button";
+        triggerBtn.className = "growth-curve-trigger-btn";
+        triggerBtn.setAttribute("data-growth-node-id", node.id);
+        triggerBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>查看 1~${maxRank} 階成長消耗</span>
         `;
-        const tbody = table.querySelector("tbody");
-        let cumGold = 0;
-        let cumCore = 0;
-        for (let r = 1; r <= maxRank; r++) {
-          const g = goldCosts[r - 1] || 0;
-          const c = coreCosts[r - 1] || 0;
-          cumGold += g;
-          cumCore += c;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>第 ${r} 階</td>
-            <td>${g > 0 ? `${SVG_ICONS.gold} ${g.toLocaleString()}` : "—"}</td>
-            <td>${c > 0 ? `${SVG_ICONS.core} ${c.toLocaleString()}` : "—"}</td>
-            <td>${cumGold > 0 ? `${SVG_ICONS.gold} ${cumGold.toLocaleString()}` : "—"}</td>
-            <td>${cumCore > 0 ? `${SVG_ICONS.core} ${cumCore.toLocaleString()}` : "—"}</td>
-          `;
-          tbody.append(tr);
-        }
-        tableContainer.append(table);
-        metaBox.append(tableContainer);
+        triggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openGrowthModal(node);
+        });
+        metaBox.append(triggerBtn);
       }
 
       fragment.append(metaBox);
@@ -1339,7 +1298,281 @@
       }
     });
 
+    // 綁定成長明細按鈕事件
+    cloned.querySelectorAll(".growth-curve-trigger-btn").forEach((btn) => {
+      const gId = btn.getAttribute("data-growth-node-id");
+      const targetNode = state.nodeById.get(gId) || node;
+      if (targetNode) {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openGrowthModal(targetNode);
+        });
+      }
+    });
+
     tooltipBody.replaceChildren(cloned);
+  }
+
+  // --- Independent Growth & Rank Simulator Modal System ---
+  const growthModal = document.getElementById("growth-modal");
+  const growthModalTitle = document.getElementById("growth-modal-title");
+  const growthModalBadge = document.getElementById("growth-modal-badge");
+  const growthModalTotalSummary = document.getElementById("growth-modal-total-summary");
+  const growthModalTableWrap = document.getElementById("growth-modal-table-wrap");
+  const growthModalCloseBtn = document.getElementById("growth-modal-close");
+  const growthModalBackdrop = document.getElementById("growth-modal-backdrop");
+
+  const simRankSlider = document.getElementById("sim-rank-slider");
+  const simCurrentRank = document.getElementById("sim-current-rank");
+  const simPreviewDesc = document.getElementById("sim-preview-desc");
+  const simCumCost = document.getElementById("sim-cum-cost");
+  const simNextCost = document.getElementById("sim-next-cost");
+
+  let activeGrowthNode = null;
+
+  function renderSimulatedEffectText(node, rank) {
+    if (!node) return "";
+    let raw = node.description_zh || "";
+    if (!raw) return "";
+
+    const maxRank = Number(node.max_rank) || 1;
+    const currentRank = Math.max(1, Math.min(maxRank, rank));
+
+    // 解析基礎值與每階增量
+    const parseStatVal = (valStr, addStr) => {
+      const baseNum = parseFloat(valStr) || 0;
+      const addNum = parseFloat(addStr) || 0;
+      const cur = baseNum + addNum * (currentRank - 1);
+      // 若有小數保留1位，整數則直接輸出
+      const formattedCur = Number.isInteger(cur) ? String(cur) : cur.toFixed(1);
+      const formattedAdd = Number.isInteger(addNum) ? String(addNum) : addNum.toFixed(1);
+      return { cur: formattedCur, add: formattedAdd };
+    };
+
+    if (node.node_type === "PLAYER_PASSIVE") {
+      const s0 = parseStatVal(node.passive_value1, node.passive_value1_rank_add);
+      const s1 = parseStatVal(node.passive_value2, node.passive_value2_rank_add);
+      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${s0.cur}</span>`)
+               .replace(/\{1\}/g, `<span class="stat-highlight">${s0.add}</span>`)
+               .replace(/\{2\}/g, `<span class="stat-highlight">${s1.cur}</span>`)
+               .replace(/\{3\}/g, `<span class="stat-highlight">${s1.add}</span>`);
+    } else if (node.node_type === "DICE_RUNE") {
+      const s0 = parseStatVal(node.rune_value1, node.rune_value1_rank_add);
+      const s1 = parseStatVal(node.rune_value2, node.rune_value2_rank_add);
+      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${s0.cur}</span>`)
+               .replace(/\{1\}/g, `<span class="stat-highlight">${s0.add}</span>`)
+               .replace(/\{2\}/g, `<span class="stat-highlight">${s1.cur}</span>`)
+               .replace(/\{3\}/g, `<span class="stat-highlight">${s1.add}</span>`);
+    } else {
+      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${node.dice_attack || "0"}</span>`)
+               .replace(/\{1\}/g, `<span class="stat-highlight">${node.dice_attack_interval || "0"}</span>`);
+    }
+
+    // 格式化綠色增量數值與標籤
+    raw = raw.replace(/<color=[^>]*>\(\+\s*[%秒]?\)<\/color>|\(\+\s*[%秒]?\)/gi, "");
+    raw = raw.replace(/<color=[^>]*>\(\+([^)]+)\)<\/color>/gi, '<span class="stat-green-add">(+$1)</span>');
+
+    const tagDefs = window.TREE_DATA?.tag_definitions || {};
+    raw = raw.replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => {
+      const tagKey = tag.toUpperCase();
+      const tagName = tagDefs[tagKey]?.name_zh || TAG_MAP[tagKey] || tag;
+      return `<u class="tooltip-tag-inline" data-tag-key="${tagKey}">${tagName}</u>`;
+    });
+
+    raw = raw.replace(/<color=[^>]*>(.*?)<\/color>/gi, '$1').trim();
+    return raw;
+  }
+
+  function updateSimulatorRank(rank) {
+    if (!activeGrowthNode) return;
+    const maxRank = Number(activeGrowthNode.max_rank) || 1;
+    const currentRank = Math.max(1, Math.min(maxRank, rank));
+    const goldCosts = Array.isArray(activeGrowthNode.gold_costs) ? activeGrowthNode.gold_costs : [];
+    const coreCosts = Array.isArray(activeGrowthNode.core_costs) ? activeGrowthNode.core_costs : [];
+
+    if (simRankSlider) simRankSlider.value = String(currentRank);
+    if (simCurrentRank) {
+      simCurrentRank.textContent = currentRank === maxRank ? `Lv. ${currentRank} (MAX)` : `Lv. ${currentRank}`;
+    }
+
+    if (simPreviewDesc) {
+      simPreviewDesc.innerHTML = renderSimulatedEffectText(activeGrowthNode, currentRank);
+    }
+
+    // 計算 1~currentRank 累計消耗
+    let cumGold = 0;
+    let cumCore = 0;
+    for (let r = 0; r < currentRank; r++) {
+      cumGold += goldCosts[r] || 0;
+      cumCore += coreCosts[r] || 0;
+    }
+
+    if (simCumCost) {
+      const parts = [];
+      if (cumGold > 0) parts.push(`${SVG_ICONS.gold} ${cumGold.toLocaleString()}`);
+      if (cumCore > 0) parts.push(`${SVG_ICONS.core} ${cumCore.toLocaleString()}`);
+      simCumCost.innerHTML = parts.length > 0 ? parts.join(" ") : "—";
+    }
+
+    // 計算升至下階消耗 (currentRank -> currentRank + 1)
+    if (simNextCost) {
+      if (currentRank >= maxRank) {
+        simNextCost.innerHTML = `<span style="color: #4cd964;">已達滿階 MAX</span>`;
+      } else {
+        const nextG = goldCosts[currentRank] || 0;
+        const nextC = coreCosts[currentRank] || 0;
+        const parts = [];
+        if (nextG > 0) parts.push(`${SVG_ICONS.gold} ${nextG.toLocaleString()}`);
+        if (nextC > 0) parts.push(`${SVG_ICONS.core} ${nextC.toLocaleString()}`);
+        simNextCost.innerHTML = parts.length > 0 ? parts.join(" ") : "無消耗";
+      }
+    }
+
+    // 更新 quick chips 狀態
+    document.querySelectorAll(".sim-chip").forEach((chip) => {
+      const cRank = chip.getAttribute("data-rank");
+      const cRatio = parseFloat(chip.getAttribute("data-rank-ratio"));
+      let targetR = 1;
+      if (cRank === "1") targetR = 1;
+      else if (cRank === "max") targetR = maxRank;
+      else if (cRatio) targetR = Math.max(1, Math.round(maxRank * cRatio));
+
+      chip.classList.toggle("is-active", targetR === currentRank);
+    });
+  }
+
+  function openGrowthModal(node) {
+    if (!growthModal || !node) return;
+    activeGrowthNode = node;
+    const maxRank = Number(node.max_rank) || 1;
+    const goldCosts = Array.isArray(node.gold_costs) ? node.gold_costs : [];
+    const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
+    const totalGold = node.total_gold ?? goldCosts.reduce((a, b) => a + b, 0);
+    const totalCore = node.total_core ?? coreCosts.reduce((a, b) => a + b, 0);
+
+    growthModalTitle.textContent = node._nameClean || node.name_zh || "節點成長明細";
+    growthModalBadge.textContent = `1/${maxRank}`;
+    growthModalBadge.className = `badge rank-badge`;
+
+    if (growthModalTotalSummary) {
+      const summaryParts = [];
+      if (totalGold > 0) summaryParts.push(`滿階金幣: ${totalGold.toLocaleString()}`);
+      if (totalCore > 0) summaryParts.push(`滿階核心: ${totalCore.toLocaleString()}`);
+      growthModalTotalSummary.textContent = summaryParts.join(" • ");
+    }
+
+    // 初始化滑桿範圍
+    if (simRankSlider) {
+      simRankSlider.min = "1";
+      simRankSlider.max = String(maxRank);
+      simRankSlider.value = "1";
+      simRankSlider.oninput = (e) => {
+        updateSimulatorRank(Number(e.target.value));
+      };
+    }
+
+    // 綁定快速階級按鈕
+    document.querySelectorAll(".sim-chip").forEach((chip) => {
+      chip.onclick = (e) => {
+        e.stopPropagation();
+        const cRank = chip.getAttribute("data-rank");
+        const cRatio = parseFloat(chip.getAttribute("data-rank-ratio"));
+        let targetR = 1;
+        if (cRank === "1") targetR = 1;
+        else if (cRank === "max") targetR = maxRank;
+        else if (cRatio) targetR = Math.max(1, Math.round(maxRank * cRatio));
+        updateSimulatorRank(targetR);
+      };
+    });
+
+    // 初始渲染第 1 階
+    updateSimulatorRank(1);
+
+    // 計算分段階段里程碑區間 (Phase Intervals)
+    const intervals = [];
+    let currInterval = null;
+    let cumG = 0;
+    let cumC = 0;
+
+    for (let r = 1; r <= maxRank; r++) {
+      const g = goldCosts[r - 1] || 0;
+      const c = coreCosts[r - 1] || 0;
+      cumG += g;
+      cumC += c;
+
+      if (currInterval === null) {
+        currInterval = { start: r, end: r, goldPerRank: g, corePerRank: c, totalG: g, totalC: c, endCumG: cumG, endCumC: cumC };
+      } else if (currInterval.goldPerRank === g && currInterval.corePerRank === c && c === 0 && (r - currInterval.start < 5)) {
+        currInterval.end = r;
+        currInterval.totalG += g;
+        currInterval.totalC += c;
+        currInterval.endCumG = cumG;
+        currInterval.endCumC = cumC;
+      } else {
+        intervals.push(currInterval);
+        currInterval = { start: r, end: r, goldPerRank: g, corePerRank: c, totalG: g, totalC: c, endCumG: cumG, endCumC: cumC };
+      }
+    }
+    if (currInterval) intervals.push(currInterval);
+
+    // 建立分段里程碑表格
+    const table = document.createElement("table");
+    table.className = "phase-table";
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>階段區間</th>
+          <th>單階消耗</th>
+          <th>階段小計</th>
+          <th>累計至此</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    const tbody = table.querySelector("tbody");
+    intervals.forEach((it) => {
+      const tr = document.createElement("tr");
+      const rangeStr = it.start === it.end ? `第 ${it.start} 階` : `第 ${it.start} ~ ${it.end} 階`;
+      
+      const singleParts = [];
+      if (it.goldPerRank > 0) singleParts.push(`${SVG_ICONS.gold} ${it.goldPerRank.toLocaleString()}`);
+      if (it.corePerRank > 0) singleParts.push(`${SVG_ICONS.core} ${it.corePerRank.toLocaleString()}`);
+
+      const stageParts = [];
+      if (it.totalG > 0) stageParts.push(`${SVG_ICONS.gold} ${it.totalG.toLocaleString()}`);
+      if (it.totalC > 0) stageParts.push(`${SVG_ICONS.core} ${it.totalC.toLocaleString()}`);
+
+      const cumParts = [];
+      if (it.endCumG > 0) cumParts.push(`${SVG_ICONS.gold} ${it.endCumG.toLocaleString()}`);
+      if (it.endCumC > 0) cumParts.push(`${SVG_ICONS.core} ${it.endCumC.toLocaleString()}`);
+
+      tr.innerHTML = `
+        <td>${rangeStr}</td>
+        <td>${singleParts.length > 0 ? singleParts.join(" ") : "—"}</td>
+        <td>${stageParts.length > 0 ? stageParts.join(" ") : "—"}</td>
+        <td>${cumParts.length > 0 ? cumParts.join(" ") : "—"}</td>
+      `;
+      tbody.append(tr);
+    });
+
+    growthModalTableWrap.innerHTML = "";
+    growthModalTableWrap.append(table);
+
+    growthModal.hidden = false;
+    growthModal.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => {
+      growthModal.classList.add("is-active");
+    });
+  }
+
+  function closeGrowthModal() {
+    if (!growthModal || growthModal.hidden) return;
+    growthModal.classList.remove("is-active");
+    growthModal.setAttribute("aria-hidden", "true");
+    activeGrowthNode = null;
+    setTimeout(() => {
+      growthModal.hidden = true;
+    }, 180);
   }
 
   // --- Smart Contextual Tooltip Positioning (零 Reflow 純幾何換算，消除逐幀 Layout Thrashing) ---
@@ -1727,7 +1960,7 @@
       else if (d.includes("1840.00") && activeBranches.has(2)) isBranchActive = true; // 工學 (雷)
       else if (d.includes("2160.00") && activeBranches.has(3)) isBranchActive = true; // 魔法 (冰)
       else if (d.includes("1720.00") && activeBranches.has(4)) isBranchActive = true; // 秩序 (風/陰陽/迪奇)
-      else if (d.includes("2280.00") && activeBranches.has(5)) isBranchActive = true; // 混沌 (恐懼/吞噬/貪婪)
+      else if (d.includes("2280.00") && activeBranches.has(5)) isBranchActive = true; // 渾沌 (恐懼/吞噬/貪婪)
 
       linkEl.classList.toggle(edgeClass, isBranchActive);
     });
@@ -3129,6 +3362,16 @@
       }
     });
 
+    growthModalCloseBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeGrowthModal();
+    });
+
+    growthModalBackdrop?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeGrowthModal();
+    });
+
     window.addEventListener("keydown", (event) => {
       const isInput = ["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName);
       if (isInput && event.key !== "Escape") return;
@@ -3137,6 +3380,7 @@
         event.preventDefault();
         searchInput.focus();
       } else if (event.key === "Escape") {
+        closeGrowthModal();
         closeTooltip();
         closeDisclaimer();
         searchResults.hidden = true;
@@ -3184,19 +3428,20 @@
 
   async function loadMap() {
     setLoaderProgress(15, "正在載入天賦資料...");
-    let data = window.__DICE_TREE_DATA__;
-    let svgText = window.__DICE_TREE_SVG__;
+    let data = window.TREE_DATA || window.__DICE_TREE_DATA__;
+    let svgText = window.DICE_TREE_SVG || window.__DICE_TREE_SVG__;
 
     if (!data || !svgText) {
       try {
         setLoaderProgress(30, "讀取節點數據中...");
-        const [dataResponse, svgResponse] = await Promise.all([fetch(DATA_URL), fetch(SVG_URL)]);
-        if (dataResponse.ok && svgResponse.ok) {
-          data = await dataResponse.json();
-          svgText = await svgResponse.text();
-        }
+        const [dataResponse, svgResponse] = await Promise.all([
+          !data ? fetch(DATA_URL) : Promise.resolve({ ok: true, json: () => data }),
+          !svgText ? fetch(SVG_URL) : Promise.resolve({ ok: true, text: () => svgText })
+        ]);
+        if (!data && dataResponse.ok) data = await dataResponse.json();
+        if (!svgText && svgResponse.ok) svgText = await svgResponse.text();
       } catch (err) {
-        console.warn("Dynamic fetch skipped, waiting for bundle.", err);
+        console.warn("Dynamic fetch skipped, using memory bundle.", err);
       }
     }
 

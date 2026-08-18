@@ -47,7 +47,7 @@
   --faction-order-border: rgba(186, 166, 224, 0.35);
   --faction-order-ink: #11091a;
 
-  /* 混沌 (Chaos): Vibrant violet-magenta */
+  /* 渾沌 (Chaos): Vibrant violet-magenta */
   --faction-chaos: oklch(0.70 0.20 325);
   --faction-chaos-surface: rgba(203, 101, 255, 0.14);
   --faction-chaos-border: rgba(203, 101, 255, 0.35);
@@ -84,12 +84,12 @@
     0 28px 64px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
-  /* Concentric Border Radius Tokens: R_outer = R_inner + Padding */
+  /* Concentric Border Radius Tokens: R_outer = R_inner + Padding (統一對齊 Tooltip 16px 系統) */
   --radius-xs: 4px;
   --radius-sm: 6px;     /* Chips, Pills, Kbd */
   --radius-base: 8px;   /* Small cards, list items, buttons */
-  --radius-card: 12px;  /* Field containers, detail panels */
-  --radius-panel: 16px; /* Desktop inspector, minimap card, toolbars */
+  --radius-card: 16px;  /* 統一對齊 Tooltip 弧度：Field containers, detail panels, toolbars */
+  --radius-panel: 16px; /* Desktop inspector, minimap card, floating tooltip */
   --radius-sheet: 20px; /* Mobile bottom sheet top radius */
 
   /* Type Scale Tokens */
@@ -837,7 +837,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 .disclaimer-widget.is-expanded {
   width: min(396px, calc(100vw - 32px));
   height: 345px;
-  border-radius: 14px;
+  border-radius: var(--radius-panel); /* 16px 統一對齊 Tooltip */
   background: rgba(14, 11, 22, 0.92);
   border-color: rgba(255, 255, 255, 0.22);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.12);
@@ -877,7 +877,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: rgba(69, 145, 240, 0.2);
   color: #6bb0ff;
   border: 1px solid rgba(69, 145, 240, 0.4);
@@ -1492,7 +1492,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   z-index: 45;
   background: #181224;
   border: 2px solid #ea7a28;
-  border-radius: 12px;
+  border-radius: var(--radius-panel); /* 16px 統一對齊 Tooltip */
   padding: 12px 14px;
   max-width: 280px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -1523,7 +1523,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   color: #ffffff;
   font-size: 12px;
   font-weight: 800;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 2px 7px;
   display: inline-block;
 }
@@ -1619,7 +1619,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   cursor: pointer;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm); /* 6px 統一對齊篩選與膠囊按鈕弧度 */
   font-size: 15px;
   font-weight: 700;
   transition-property: background-color, color, border-color, transform;
@@ -1636,52 +1636,409 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   transform: scale(0.96);
 }
 
-/* Compact Clean Upgrade Table */
-.upgrade-table-container {
-  max-height: 160px;
+/* Growth Curve Trigger Button in Tooltip */
+.growth-curve-trigger-btn {
+  width: 100%;
   margin-top: 6px;
-  overflow-y: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: #ffffff;
+  cursor: pointer;
+  background: rgba(142, 114, 230, 0.18);
+  border: 1px solid rgba(142, 114, 230, 0.45);
+  border-radius: var(--radius-sm); /* 6px */
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.growth-curve-trigger-btn:hover {
+  background: rgba(142, 114, 230, 0.32);
+  border-color: #a88ef5;
+}
+
+.growth-curve-trigger-btn:active {
+  transform: scale(0.98);
+}
+
+.growth-curve-trigger-btn svg {
+  color: #c4b5fd;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Independent Growth & Upgrade Tier Modal (流體獨立展開浮窗)
+   ========================================================================== */
+.growth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.growth-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.growth-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.growth-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(540px, calc(100vw - 32px));
+  max-height: min(600px, calc(100vh - 60px));
+  background: #1e172e;
+  border: 3px solid #5a3fa2;
+  border-radius: var(--radius-panel); /* 16px 統一對齊 */
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.92);
+  transition: transform 240ms cubic-bezier(0.18, 0.9, 0.3, 1.15);
+}
+
+.growth-modal.is-active .growth-modal-card {
+  transform: scale(1);
+}
+
+.growth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
   background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
+}
+
+.growth-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.growth-modal-icon-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
+  background: rgba(142, 114, 230, 0.25);
+  color: #c4b5fd;
+  border: 1px solid rgba(142, 114, 230, 0.45);
+}
+
+.growth-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.growth-modal-close-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.growth-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.growth-modal-close-btn:active {
+  transform: scale(0.94);
+}
+
+/* ==========================================================================
+   Rank Simulator & Phase Interval Milestones (遊戲原生階級模擬器與分段階段面板)
+   ========================================================================== */
+.rank-simulator-section {
+  padding: 16px 18px 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.simulator-slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.simulator-level-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sim-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.sim-rank-num {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #ffd859;
+}
+
+.simulator-quick-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sim-chip {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.sim-chip:hover {
+  background: rgba(142, 114, 230, 0.3);
+  border-color: #8e72e6;
+  color: #ffffff;
+}
+
+.sim-chip.is-active {
+  background: #6d48c2;
+  border-color: #a88ef5;
+  color: #ffffff;
+}
+
+/* Custom Range Slider (遊戲感高階滑動條) */
+.sim-rank-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #110d1c;
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+}
+
+.sim-rank-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd859, #ea7a28);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(255, 216, 89, 0.5);
+  cursor: grab;
+  transition: transform 100ms ease;
+}
+
+.sim-rank-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.15);
+}
+
+.sim-preview-box {
+  background: #140e21;
+  border: 1.5px solid #5a3fa2;
+  border-radius: var(--radius-card); /* 16px */
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.sim-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sim-preview-tag {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #c4b5fd;
+  text-transform: uppercase;
+}
+
+.sim-preview-desc {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.sim-preview-desc .stat-highlight {
+  color: #ffd859;
+  font-weight: 800;
+}
+
+.sim-preview-desc .stat-green-add {
+  color: #4cd964;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.sim-cost-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sim-cost-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sim-cost-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.sim-cost-val {
+  font-size: 13.5px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Phase Milestones Header */
+.growth-modal-phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #c4b5fd;
+  letter-spacing: 0.3px;
+}
+
+.growth-modal-total-summary {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.growth-modal-table-wrap {
+  flex: 1;
+  max-height: 220px;
+  overflow-y: auto;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   scrollbar-width: thin;
 }
 
-.upgrade-table {
+/* Phase Interval Milestone Table */
+.phase-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 14.5px; /* 放大 50% */
+  font-size: 12px;
   font-weight: 700;
   font-family: var(--font-mono);
   text-align: end;
 }
 
-.upgrade-table th,
-.upgrade-table td {
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+.phase-table th,
+.phase-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
 }
 
-.upgrade-table th {
+.phase-table th {
   position: sticky;
   top: 0;
   z-index: 2;
   color: var(--ink-muted);
   font-weight: 700;
-  font-size: 13.5px;
-  background: #111520;
+  font-size: 11.5px;
+  background: #181224;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.upgrade-table td {
+.phase-table tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.phase-table td {
   color: #e2e5f0;
 }
 
-.upgrade-table td:first-child,
-.upgrade-table th:first-child {
+.phase-table td:nth-child(1),
+.phase-table th:nth-child(1) {
+  width: 20%;
   text-align: start;
   font-weight: 800;
   color: #ffffff;
+  padding-left: 14px;
+}
+
+.phase-table td:nth-child(2),
+.phase-table th:nth-child(2) {
+  width: 24%;
+}
+
+.phase-table td:nth-child(3),
+.phase-table th:nth-child(3) {
+  width: 25%;
+}
+
+.phase-table td:nth-child(4),
+.phase-table th:nth-child(4) {
+  width: 31%;
+  padding-right: 14px;
 }
 
 /* Empty State */
@@ -1964,7 +2321,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
     width: min(290px, calc(100vw - 32px));
     max-height: min(460px, calc(100vh - 120px));
     border-width: 2.5px;
-    border-radius: 12px;
+    border-radius: 16px; /* 統一對齊 16px */
   }
 
   .tooltip-header {
@@ -2103,7 +2460,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   flex-shrink: 0;
   background: rgba(0, 0, 0, 0.65); /* 半透明黑色背景 */
   border: 2px solid #6D48C2;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   box-sizing: border-box;
   overflow: visible; /* 允許大勾超出邊界 */
   transition: transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -2217,7 +2574,7 @@ body.is-minimap-active #minimap-panel,
   padding: 4px 6px;
   background: rgba(0, 0, 0, 0.72); /* 搜尋框一樣的半透明黑色，無毛玻璃 */
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 12px;
+  border-radius: var(--radius-panel); /* 16px 統一對齊 Tooltip */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   flex-wrap: wrap;
 }
