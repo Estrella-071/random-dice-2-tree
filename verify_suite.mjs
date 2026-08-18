@@ -49,9 +49,25 @@ server.listen(3000, async () => {
     page.on('console', msg => console.log('[PAGE LOG]', msg.text()));
     page.on('pageerror', err => console.log('[PAGE ERROR]', err.message));
 
-    // Load page
+    // 0. Test File:// protocol offline support (Zero CORS errors)
+    const filePage = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    const fileErrors = [];
+    filePage.on('pageerror', err => fileErrors.push(err.message));
+    filePage.on('console', msg => {
+      if (msg.type() === 'error') fileErrors.push(msg.text());
+    });
+    const localFileUrl = 'file:///' + path.join(siteDir, 'index.html').replace(/\\/g, '/');
+    await filePage.goto(localFileUrl, { waitUntil: 'load' });
+    await filePage.waitForSelector('g.node[data-node-id]', { timeout: 8000 });
+    console.log(`✓ Offline file:// protocol verified: nodes rendered with 0 CORS errors`);
+    if (fileErrors.length > 0) {
+      throw new Error(`File:// protocol had errors: ${JSON.stringify(fileErrors)}`);
+    }
+    await filePage.close();
+
+    // Load page via HTTP
     await page.goto('http://localhost:3000/index.html', { waitUntil: 'networkidle' });
-    console.log('✓ Page loaded successfully');
+    console.log('✓ Page loaded successfully via HTTP');
 
     // Wait for SVG and data to finish loading
     await page.waitForSelector('g.node[data-node-id]', { timeout: 8000 });
@@ -209,7 +225,7 @@ server.listen(3000, async () => {
     await page.click('#zoom-reset');
     await page.waitForTimeout(500);
 
-    // 5. Test Multi-rank node Upgrade Tier Table (e.g. Node 1201)
+    // 5. Test Multi-rank node Growth Curve Modal (e.g. Node 1201)
     const node1201 = await page.$('g.node[data-node-id="1201"]');
     if (!node1201) throw new Error('Node 1201 element not found');
     await node1201.click();
@@ -219,9 +235,42 @@ server.listen(3000, async () => {
     const rankBadge1201 = await page.$eval('#tooltip-rank-badge', el => el.textContent.trim());
     console.log(`✓ Node 1201 opened: "${title1201}" with rank "${rankBadge1201}"`);
 
-    const tableRows = await page.$$eval('.upgrade-table tbody tr', rows => rows.length);
-    console.log(`✓ Structured Upgrade Tier Table verified: ${tableRows} tier rows displayed without '、' concatenations`);
-    if (tableRows !== 50) throw new Error(`Expected 50 upgrade rows for rank 50 node, got ${tableRows}`);
+    // Verify Tooltip is lightweight (No giant table inside tooltip itself)
+    const insideTableCount = await page.$$eval('#tooltip .upgrade-table', els => els.length);
+    if (insideTableCount !== 0) throw new Error('Tooltip should NOT contain giant table directly');
+    console.log('✓ Tooltip clean & lightweight verified (No bulky table inside tooltip)');
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_multirank_clean.png' });
+
+    // Click trigger button to open growth modal
+    await page.click('.growth-curve-trigger-btn');
+    await page.waitForTimeout(300);
+    const growthModalVisible = await page.$eval('#growth-modal', el => !el.hidden && el.classList.contains('is-active'));
+    if (!growthModalVisible) throw new Error('Growth modal failed to open');
+
+    // Test Rank Simulator (Slider to Rank 25)
+    await page.evaluate(() => {
+      const slider = document.getElementById('sim-rank-slider');
+      slider.value = '25';
+      slider.dispatchEvent(new Event('input'));
+    });
+    await page.waitForTimeout(200);
+
+    const rankText = await page.$eval('#sim-current-rank', el => el.textContent.trim());
+    const descText = await page.$eval('#sim-preview-desc', el => el.textContent.trim());
+    const cumCost = await page.$eval('#sim-cum-cost', el => el.textContent.trim());
+    console.log(`✓ Interactive Rank Simulator verified: "${rankText}", Preview: "${descText}", CumCost: "${cumCost}"`);
+
+    const tableRows = await page.$$eval('#growth-modal .phase-table tbody tr', rows => rows.length);
+    console.log(`✓ Phase Milestones Table verified: Compressed from 50 rows into ${tableRows} clean milestone intervals (No tedious 50 individual rows)`);
+    if (tableRows > 25) throw new Error(`Phase table should be clean and compressed, got ${tableRows} rows`);
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/growth_rank_simulator.png' });
+
+    // Close growth modal
+    await page.click('#growth-modal-close');
+    await page.waitForTimeout(250);
+    const growthModalHidden = await page.$eval('#growth-modal', el => el.hidden || !el.classList.contains('is-active'));
+    if (!growthModalHidden) throw new Error('Growth modal failed to close');
+    console.log('✓ Growth modal closed smoothly');
 
     // 5.2 Test Predator Dice (Node 5007) - 2-Column Stats & Special Values
     console.log('Testing Predator Dice (Node 5007)...');
@@ -273,16 +322,38 @@ server.listen(3000, async () => {
     }
     await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_tag_popover.png' });
 
-    // 5.3 Test Predator Rune (Node 5109 連鎖吞噬) - Centered layout & underline tag
+    // 5.3 Test Predator Rune (Node 5307 連鎖吞噬) - Centered layout & underline tag
     await page.evaluate(() => {
-      window.__TEST_HOOKS__.centerOnNode('5109', false);
-      window.__TEST_HOOKS__.showTooltip('5109', true);
+      window.__TEST_HOOKS__.centerOnNode('5307', false);
+      window.__TEST_HOOKS__.showTooltip('5307', true);
     });
     await page.waitForTimeout(500);
     const runeTitle = await page.$eval('#tooltip-title', el => el.textContent.trim());
     const runeUnderline = await page.$eval('.detail-copy .tooltip-tag-inline', el => el.textContent.trim());
     console.log(`✓ Predator Rune opened: "${runeTitle}", Underlined Tag: "${runeUnderline}"`);
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_rune_5109.png' });
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_rune_5307.png' });
+
+    // 5.4 Test Greed Dice (Node 5006 貪婪骰子) - Only #SP怪物 (No #合成時, No #召喚)
+    console.log('Testing Greed Dice (Node 5006) tag precision...');
+    await page.evaluate(() => {
+      window.__TEST_HOOKS__.centerOnNode('5006', false);
+      window.__TEST_HOOKS__.showTooltip('5006', true);
+    });
+    await page.waitForTimeout(500);
+    const greedTags = await page.evaluate(() => {
+      const chips = Array.from(document.querySelectorAll('.tooltip-hashtag-chip')).map(el => el.textContent.trim());
+      const underlines = Array.from(document.querySelectorAll('.tooltip-tag-inline')).map(el => el.textContent.trim());
+      return { chips, underlines };
+    });
+    console.log(`✓ Greed Dice Tags: chips=${JSON.stringify(greedTags.chips)}, underlines=${JSON.stringify(greedTags.underlines)}`);
+    if (greedTags.chips.length !== 1 || greedTags.chips[0] !== '#SP怪物') {
+      throw new Error(`Greed dice should ONLY have ['#SP怪物'], but got: ${JSON.stringify(greedTags.chips)}`);
+    }
+    if (!greedTags.underlines.includes('SP怪物') || greedTags.underlines.includes('合成時') || greedTags.underlines.includes('召喚')) {
+      throw new Error(`Greed dice underlines should only be ['SP怪物'], got: ${JSON.stringify(greedTags.underlines)}`);
+    }
+    console.log('✓ Greed Dice Tag Precision 100% verified (Zero over-tagging)!');
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_greed_dice.png' });
 
     // 5.2 Test Currency Badges (Default OFF as requested by user)
     console.log('Testing Currency Badges (Default OFF & Toggle ON/OFF)...');

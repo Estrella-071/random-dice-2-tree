@@ -50,7 +50,7 @@ TREE_CENTER_ROOTS = {
     2: "2001",  # Iron / 工學
     3: "3001",  # Electric / 魔法
     4: "4008",  # Bingo / 秩序
-    5: "5002",  # Fear / 混沌
+    5: "5002",  # Fear / 渾沌
 }
 
 # The client draws the group name/colour in the centre card.  The number is
@@ -62,7 +62,7 @@ TREE_CENTER_GROUPS = {
     2: ("工學", "#f9da67"),
     3: ("魔法", "#4591f0"),
     4: ("秩序", "#9c97bc"),
-    5: ("混沌", "#aa3cea"),
+    5: ("渾沌", "#aa3cea"),
 }
 
 # The extracted tree coordinates are rendered at the client node scale.  The
