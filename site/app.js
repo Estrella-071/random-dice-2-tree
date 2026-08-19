@@ -199,41 +199,40 @@
   };
 
   // --- Natural Language Game Text Engine (Clean, High Contrast, No AI Slop) ---
-  function formatGameText(rawText, node) {
+  function formatGameText(rawText, node, currentRank = 1) {
     if (!rawText) return "";
     let text = String(rawText);
 
     if (node) {
       if (node.node_type === "PLAYER_PASSIVE") {
-        const v0 = node.passive_value ?? "0";
-        const v1 = node.passive_rank_add ? `<span class="stat-green-add">(+${node.passive_rank_add}%)</span>` : "";
-        text = text.replace(/\{0\}/g, `<strong>${v0}</strong>`)
-                   .replace(/<color=[^>]*>\(\+\{1\}%?\b[^)]*\)<\/color>|\(\+\{1\}%?\b[^)]*\)/gi, v1)
-                   .replace(/\{1\}/g, node.passive_rank_add || "");
+        const baseVal = parseFloat(node.passive_value ?? 0);
+        const addVal = parseFloat(node.passive_rank_add ?? 0);
+        const currentVal = baseVal + (currentRank - 1) * addVal;
+        const currentValStr = Number.isInteger(currentVal) ? currentVal.toString() : parseFloat(currentVal.toFixed(2)).toString();
+
+        text = text.replace(/\{0\}/g, `<strong>${currentValStr}</strong>`);
+        if (node.passive_rank_add) {
+          text = text.replace(/\{1\}/g, node.passive_rank_add);
+        }
       } else if (node.node_type === "DICE_RUNE") {
-        const v1 = node.rune_value1 ?? "";
-        const v1_add = node.rune_value1_rank_add ? `<span class="stat-green-add">(+${node.rune_value1_rank_add}%)</span>` : "";
-        const v2 = node.rune_value2 ?? "";
-        const v2_add = node.rune_value2_rank_add ? `<span class="stat-green-add">(+${node.rune_value2_rank_add}%)</span>` : "";
+        const base1 = parseFloat(node.rune_value1 ?? 0);
+        const add1 = parseFloat(node.rune_value1_rank_add ?? 0);
+        const curr1 = add1 > 0 ? (base1 + (currentRank - 1) * add1) : (node.rune_value1 ?? "");
+        const curr1Str = typeof curr1 === "number" ? (Number.isInteger(curr1) ? curr1.toString() : parseFloat(curr1.toFixed(2)).toString()) : curr1;
+
+        const base2 = parseFloat(node.rune_value2 ?? 0);
+        const add2 = parseFloat(node.rune_value2_rank_add ?? 0);
+        const curr2 = add2 > 0 ? (base2 + (currentRank - 1) * add2) : (node.rune_value2 ?? "");
+        const curr2Str = typeof curr2 === "number" ? (Number.isInteger(curr2) ? curr2.toString() : parseFloat(curr2.toFixed(2)).toString()) : curr2;
+
         const dur = node.rune_duration ?? "";
-        const dur_add = node.rune_duration_rank_add ? `<span class="stat-green-add">(+${node.rune_duration_rank_add}秒)</span>` : "";
 
-        let p0 = v1 ? `<strong>${v1}</strong>` : "";
-        let p1 = node.rune_value1_rank_add ? `<span class="stat-green-add">(+${node.rune_value1_rank_add})</span>` : (v2 && !text.includes("{2}") ? `<strong>${v2}</strong>` : "");
-        let p2 = v2 ? `<strong>${v2}</strong>` : "";
-        let p3 = node.rune_value2_rank_add ? `<span class="stat-green-add">(+${node.rune_value2_rank_add})</span>` : "";
+        let p0 = curr1Str !== "" ? `<strong>${curr1Str}</strong>` : "";
+        let p1 = node.rune_value1_rank_add || (curr2Str && !text.includes("{2}") ? `<strong>${curr2Str}</strong>` : "");
+        let p2 = curr2Str !== "" ? `<strong>${curr2Str}</strong>` : "";
+        let p3 = node.rune_value2_rank_add || "";
         let p4 = dur ? `<strong>${dur}</strong>` : "";
-        let p5 = node.rune_duration_rank_add ? `<span class="stat-green-add">(+${node.rune_duration_rank_add})</span>` : "";
-
-        if (node.rune_value1_rank_add) {
-          text = text.replace(/<color=[^>]*>\(\+\{1\}(%?|秒?|個?|次?)\)<\/color>|\(\+\{1\}(%?|秒?|個?|次?)\)/gi, (m, u) => `<span class="stat-green-add">(+${node.rune_value1_rank_add}${u || (text.includes("{0}%") ? "%" : "")})</span>`);
-        }
-        if (node.rune_value2_rank_add) {
-          text = text.replace(/<color=[^>]*>\(\+\{3\}(%?|秒?)\)<\/color>|\(\+\{3\}(%?|秒?)\)/gi, v2_add);
-        }
-        if (node.rune_duration_rank_add) {
-          text = text.replace(/<color=[^>]*>\(\+\{5\}(%?|秒?)\)<\/color>|\(\+\{5\}(%?|秒?)\)/gi, dur_add);
-        }
+        let p5 = node.rune_duration_rank_add || "";
 
         text = text.replace(/\{0\}/g, p0)
                    .replace(/\{1\}/g, p1)
@@ -248,18 +247,20 @@
     }
 
     text = text
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"')
-      .replace(/&#039;/g, "'")
+      .replace(/<color=(?:#00ff00|#0f0|green)>(.*?)<\/color>/gi, '<span class="stat-green-add">$1</span>')
       .replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => {
         const tagKey = tag.toUpperCase();
         const tagDefs = window.TREE_DATA?.tag_definitions || {};
         const tagName = tagDefs[tagKey]?.name_zh || TAG_MAP[tagKey] || tag;
         return `<u class="tooltip-tag-inline" data-tag-key="${tagKey}" role="button" tabindex="0">${tagName}</u>`;
       })
+      .replace(/(?<!<span class="stat-green-add">)\(\+([0-9.]+(?:%|秒|個|次)?)\)(?!<\/span>)/g, '<span class="stat-green-add">(+$1)</span>')
       .replace(/<color=[^>]*>(.*?)<\/color>/gi, '$1')
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
       .replace(/<br\s*\/?>/gi, " ")
       .trim();
 
@@ -1151,22 +1152,52 @@
         metaBox.append(lineSpecial);
       } else if (unlockGold > 0 || unlockCore > 0) {
         const lineUnlock = document.createElement("div");
-        lineUnlock.className = "meta-line";
+        lineUnlock.className = "meta-line meta-line-cost";
         const parts = [];
         if (unlockGold > 0) parts.push(`${SVG_ICONS.gold} ${unlockGold.toLocaleString()}`);
         if (unlockCore > 0) parts.push(`${SVG_ICONS.core} ${unlockCore.toLocaleString()}`);
-        lineUnlock.innerHTML = `<span>解鎖消耗</span><span class="meta-cost">${parts.join(" ")}</span>`;
+        lineUnlock.innerHTML = `<span class="cost-label">解鎖消耗</span><span class="meta-cost">${parts.join(" ")}</span>`;
         metaBox.append(lineUnlock);
       }
 
-      if (maxRank > 1 && (totalGold > unlockGold || totalCore > unlockCore)) {
-        const lineTotal = document.createElement("div");
-        lineTotal.className = "meta-line";
-        const parts = [];
-        if (totalGold > 0) parts.push(`${SVG_ICONS.gold} ${totalGold.toLocaleString()}`);
-        if (totalCore > 0) parts.push(`${SVG_ICONS.core} ${totalCore.toLocaleString()}`);
-        lineTotal.innerHTML = `<span>滿階累計</span><span class="meta-cost">${parts.join(" ")}</span>`;
-        metaBox.append(lineTotal);
+      // 階級滑桿（長膠囊滑軌 + 橢圓形微互動滑塊，僅多階節點顯示）
+      if (maxRank > 1) {
+        const sliderWrap = document.createElement("div");
+        sliderWrap.className = "rank-slider-wrap";
+
+        const sliderHeader = document.createElement("div");
+        sliderHeader.className = "slider-header";
+        sliderHeader.innerHTML = `
+          <span class="slider-title">階級調整</span>
+          <span class="slider-rank-display">第 <strong class="slider-rank-current">1</strong> / ${maxRank} 階</span>
+        `;
+
+        const trackWrap = document.createElement("div");
+        trackWrap.className = "slider-track-container";
+
+        const sliderInput = document.createElement("input");
+        sliderInput.type = "range";
+        sliderInput.className = "rank-slider-input";
+        sliderInput.min = "1";
+        sliderInput.max = String(maxRank);
+        sliderInput.value = "1";
+        sliderInput.step = "1";
+        sliderInput.setAttribute("aria-label", "調整階級預覽");
+        sliderInput.style.setProperty("--slider-pct", "0%");
+
+        const sliderCostRow = document.createElement("div");
+        sliderCostRow.className = "slider-cost-row";
+        const initialCostParts = [];
+        if (unlockGold > 0) initialCostParts.push(`${SVG_ICONS.gold} ${unlockGold.toLocaleString()}`);
+        if (unlockCore > 0) initialCostParts.push(`${SVG_ICONS.core} ${unlockCore.toLocaleString()}`);
+        sliderCostRow.innerHTML = `
+          <span class="slider-cost-label">累計消耗</span>
+          <span class="slider-cost-value">${initialCostParts.length > 0 ? initialCostParts.join(" ") : "—"}</span>
+        `;
+
+        trackWrap.append(sliderInput);
+        sliderWrap.append(sliderHeader, trackWrap, sliderCostRow);
+        metaBox.append(sliderWrap);
       }
 
       const incomingIds = node.incoming || [];
@@ -1200,25 +1231,6 @@
         lineBase.className = "meta-line";
         lineBase.innerHTML = `<span>起點</span><span>核心初始節點</span>`;
         metaBox.append(lineBase);
-      }
-
-      // 升階明細按鈕（多階節點專用，點擊流體展開獨立明細卡片，徹底消除 Tooltip 內部龐大滾動表格）
-      if (maxRank > 1) {
-        const triggerBtn = document.createElement("button");
-        triggerBtn.type = "button";
-        triggerBtn.className = "growth-curve-trigger-btn";
-        triggerBtn.setAttribute("data-growth-node-id", node.id);
-        triggerBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          <span>查看 1~${maxRank} 階成長消耗</span>
-        `;
-        triggerBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          openGrowthModal(node);
-        });
-        metaBox.append(triggerBtn);
       }
 
       fragment.append(metaBox);
@@ -1298,281 +1310,162 @@
       }
     });
 
-    // 綁定成長明細按鈕事件
-    cloned.querySelectorAll(".growth-curve-trigger-btn").forEach((btn) => {
-      const gId = btn.getAttribute("data-growth-node-id");
-      const targetNode = state.nodeById.get(gId) || node;
-      if (targetNode) {
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          openGrowthModal(targetNode);
-        });
+    // 綁定階級滑桿即時聯動與邊界阻尼回彈物理引擎 (Elastic Rubber-banding & Spring Engine)
+    const sliderInput = cloned.querySelector(".rank-slider-input");
+    if (sliderInput) {
+      const goldCosts = Array.isArray(node.gold_costs) ? node.gold_costs : [];
+      const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
+      const unlockGold = goldCosts[0] ?? node.unlock_gold ?? 0;
+      const unlockCore = coreCosts[0] ?? node.unlock_core ?? 0;
+
+      let cumGoldArr = [0];
+      let cumCoreArr = [0];
+      let gSum = 0;
+      let cSum = 0;
+      for (let i = 0; i < maxRank; i++) {
+        gSum += goldCosts[i] || 0;
+        cSum += coreCosts[i] || 0;
+        cumGoldArr.push(gSum);
+        cumCoreArr.push(cSum);
       }
-    });
+
+      let isDragging = false;
+      let activePointerId = null;
+
+      function updateSliderUI(rank, pct, overshootX = 0) {
+        sliderInput.value = String(rank);
+        sliderInput.style.setProperty("--slider-pct", `${pct}%`);
+        sliderInput.style.setProperty("--overshoot-x", `${overshootX.toFixed(2)}px`);
+
+        // 1. 更新滑桿標頭階級數與頂部階級徽章
+        const rankCurEl = tooltipBody.querySelector(".slider-rank-current");
+        if (rankCurEl) rankCurEl.textContent = rank;
+        if (tooltipRankBadge) tooltipRankBadge.textContent = `${rank}/${maxRank}`;
+
+        // 2. 即時計算並更新核心描述文案數值
+        const copyEl = tooltipBody.querySelector(".detail-copy");
+        if (copyEl) {
+          copyEl.innerHTML = formatGameText(node.description_zh, node, rank);
+        }
+
+        // 3. 更新累計消耗數值
+        const costValEl = tooltipBody.querySelector(".slider-cost-value");
+        if (costValEl) {
+          const curG = cumGoldArr[rank] || 0;
+          const curC = cumCoreArr[rank] || 0;
+          const parts = [];
+          if (curG > 0) parts.push(`${SVG_ICONS.gold} ${curG.toLocaleString()}`);
+          if (curC > 0) parts.push(`${SVG_ICONS.core} ${curC.toLocaleString()}`);
+          costValEl.innerHTML = parts.length > 0 ? parts.join(" ") : "—";
+        }
+
+        // 4. 動態更新單階消耗（第 1 階顯示「解鎖消耗」，第 2+ 階顯示「升階消耗」及該級單階價格）
+        const costLine = tooltipBody.querySelector(".meta-line-cost");
+        if (costLine) {
+          const costLabelEl = costLine.querySelector(".cost-label");
+          const costValSingleEl = costLine.querySelector(".meta-cost");
+          if (rank === 1) {
+            if (costLabelEl) costLabelEl.textContent = "解鎖消耗";
+            const parts = [];
+            if (unlockGold > 0) parts.push(`${SVG_ICONS.gold} ${unlockGold.toLocaleString()}`);
+            if (unlockCore > 0) parts.push(`${SVG_ICONS.core} ${unlockCore.toLocaleString()}`);
+            if (costValSingleEl) costValSingleEl.innerHTML = parts.length > 0 ? parts.join(" ") : "—";
+          } else {
+            if (costLabelEl) costLabelEl.textContent = "升階消耗";
+            const curRankGold = goldCosts[rank - 1] || 0;
+            const curRankCore = coreCosts[rank - 1] || 0;
+            const parts = [];
+            if (curRankGold > 0) parts.push(`${SVG_ICONS.gold} ${curRankGold.toLocaleString()}`);
+            if (curRankCore > 0) parts.push(`${SVG_ICONS.core} ${curRankCore.toLocaleString()}`);
+            if (costValSingleEl) costValSingleEl.innerHTML = parts.length > 0 ? parts.join(" ") : "—";
+          }
+        }
+      }
+
+      function handlePointerMove(e) {
+        if (!isDragging || e.pointerId !== activePointerId) return;
+        const rect = sliderInput.getBoundingClientRect();
+        if (!rect.width) return;
+
+        const rawOffset = e.clientX - rect.left;
+        const progress = rawOffset / rect.width;
+
+        let rank = 1;
+        let pct = 0;
+        let overshootX = 0;
+
+        if (progress < 0) {
+          // 向左過度拉伸：經典非線性阻尼 (Rubber-band Resistance at 0%)
+          const deltaX = rawOffset; // 負值
+          const k = 48;
+          const maxOvershoot = 26; // 最大拉伸像素
+          overshootX = - (Math.abs(deltaX) * maxOvershoot) / (Math.abs(deltaX) + k);
+          rank = 1;
+          pct = 0;
+        } else if (progress > 1) {
+          // 向右過度拉伸：經典非線性阻尼 (Rubber-band Resistance at 100%)
+          const deltaX = rawOffset - rect.width; // 正值
+          const k = 48;
+          const maxOvershoot = 26;
+          overshootX = (deltaX * maxOvershoot) / (deltaX + k);
+          rank = maxRank;
+          pct = 100;
+        } else {
+          // 正常範圍
+          rank = Math.round(1 + progress * (maxRank - 1));
+          rank = Math.max(1, Math.min(maxRank, rank));
+          pct = maxRank > 1 ? ((rank - 1) / (maxRank - 1)) * 100 : 0;
+          overshootX = 0;
+        }
+
+        updateSliderUI(rank, pct, overshootX);
+      }
+
+      function handlePointerDown(e) {
+        if (e.button !== 0) return;
+        isDragging = true;
+        activePointerId = e.pointerId;
+        sliderInput.classList.add("is-dragging");
+        sliderInput.classList.remove("is-springing");
+        try {
+          sliderInput.setPointerCapture(activePointerId);
+        } catch (_) {}
+        handlePointerMove(e);
+      }
+
+      function handlePointerUp(e) {
+        if (!isDragging || (activePointerId !== null && e.pointerId !== activePointerId)) return;
+        isDragging = false;
+        try {
+          sliderInput.releasePointerCapture(activePointerId);
+        } catch (_) {}
+        activePointerId = null;
+
+        sliderInput.classList.remove("is-dragging");
+        sliderInput.classList.add("is-springing");
+
+        // 觸發物理彈簧回彈 (Spring Bounce Back to 0px)
+        sliderInput.style.setProperty("--overshoot-x", "0px");
+        setTimeout(() => {
+          sliderInput.classList.remove("is-springing");
+        }, 380);
+      }
+
+      sliderInput.addEventListener("pointerdown", handlePointerDown);
+      sliderInput.addEventListener("pointermove", handlePointerMove);
+      sliderInput.addEventListener("pointerup", handlePointerUp);
+      sliderInput.addEventListener("pointercancel", handlePointerUp);
+
+      // 相容鍵盤 / 自動化測試原生 input 事件
+      sliderInput.addEventListener("input", (e) => {
+        if (isDragging) return;
+        const rank = parseInt(e.target.value, 10) || 1;
+        const pct = maxRank > 1 ? ((rank - 1) / (maxRank - 1)) * 100 : 0;
+        updateSliderUI(rank, pct, 0);
+      });
+    }
 
     tooltipBody.replaceChildren(cloned);
-  }
-
-  // --- Independent Growth & Rank Simulator Modal System ---
-  const growthModal = document.getElementById("growth-modal");
-  const growthModalTitle = document.getElementById("growth-modal-title");
-  const growthModalBadge = document.getElementById("growth-modal-badge");
-  const growthModalTotalSummary = document.getElementById("growth-modal-total-summary");
-  const growthModalTableWrap = document.getElementById("growth-modal-table-wrap");
-  const growthModalCloseBtn = document.getElementById("growth-modal-close");
-  const growthModalBackdrop = document.getElementById("growth-modal-backdrop");
-
-  const simRankSlider = document.getElementById("sim-rank-slider");
-  const simCurrentRank = document.getElementById("sim-current-rank");
-  const simPreviewDesc = document.getElementById("sim-preview-desc");
-  const simCumCost = document.getElementById("sim-cum-cost");
-  const simNextCost = document.getElementById("sim-next-cost");
-
-  let activeGrowthNode = null;
-
-  function renderSimulatedEffectText(node, rank) {
-    if (!node) return "";
-    let raw = node.description_zh || "";
-    if (!raw) return "";
-
-    const maxRank = Number(node.max_rank) || 1;
-    const currentRank = Math.max(1, Math.min(maxRank, rank));
-
-    // 解析基礎值與每階增量
-    const parseStatVal = (valStr, addStr) => {
-      const baseNum = parseFloat(valStr) || 0;
-      const addNum = parseFloat(addStr) || 0;
-      const cur = baseNum + addNum * (currentRank - 1);
-      // 若有小數保留1位，整數則直接輸出
-      const formattedCur = Number.isInteger(cur) ? String(cur) : cur.toFixed(1);
-      const formattedAdd = Number.isInteger(addNum) ? String(addNum) : addNum.toFixed(1);
-      return { cur: formattedCur, add: formattedAdd };
-    };
-
-    if (node.node_type === "PLAYER_PASSIVE") {
-      const s0 = parseStatVal(node.passive_value1, node.passive_value1_rank_add);
-      const s1 = parseStatVal(node.passive_value2, node.passive_value2_rank_add);
-      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${s0.cur}</span>`)
-               .replace(/\{1\}/g, `<span class="stat-highlight">${s0.add}</span>`)
-               .replace(/\{2\}/g, `<span class="stat-highlight">${s1.cur}</span>`)
-               .replace(/\{3\}/g, `<span class="stat-highlight">${s1.add}</span>`);
-    } else if (node.node_type === "DICE_RUNE") {
-      const s0 = parseStatVal(node.rune_value1, node.rune_value1_rank_add);
-      const s1 = parseStatVal(node.rune_value2, node.rune_value2_rank_add);
-      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${s0.cur}</span>`)
-               .replace(/\{1\}/g, `<span class="stat-highlight">${s0.add}</span>`)
-               .replace(/\{2\}/g, `<span class="stat-highlight">${s1.cur}</span>`)
-               .replace(/\{3\}/g, `<span class="stat-highlight">${s1.add}</span>`);
-    } else {
-      raw = raw.replace(/\{0\}/g, `<span class="stat-highlight">${node.dice_attack || "0"}</span>`)
-               .replace(/\{1\}/g, `<span class="stat-highlight">${node.dice_attack_interval || "0"}</span>`);
-    }
-
-    // 格式化綠色增量數值與標籤
-    raw = raw.replace(/<color=[^>]*>\(\+\s*[%秒]?\)<\/color>|\(\+\s*[%秒]?\)/gi, "");
-    raw = raw.replace(/<color=[^>]*>\(\+([^)]+)\)<\/color>/gi, '<span class="stat-green-add">(+$1)</span>');
-
-    const tagDefs = window.TREE_DATA?.tag_definitions || {};
-    raw = raw.replace(/<tag>([A-Za-z0-9_]+)<\/tag>/gi, (_, tag) => {
-      const tagKey = tag.toUpperCase();
-      const tagName = tagDefs[tagKey]?.name_zh || TAG_MAP[tagKey] || tag;
-      return `<u class="tooltip-tag-inline" data-tag-key="${tagKey}">${tagName}</u>`;
-    });
-
-    raw = raw.replace(/<color=[^>]*>(.*?)<\/color>/gi, '$1').trim();
-    return raw;
-  }
-
-  function updateSimulatorRank(rank) {
-    if (!activeGrowthNode) return;
-    const maxRank = Number(activeGrowthNode.max_rank) || 1;
-    const currentRank = Math.max(1, Math.min(maxRank, rank));
-    const goldCosts = Array.isArray(activeGrowthNode.gold_costs) ? activeGrowthNode.gold_costs : [];
-    const coreCosts = Array.isArray(activeGrowthNode.core_costs) ? activeGrowthNode.core_costs : [];
-
-    if (simRankSlider) simRankSlider.value = String(currentRank);
-    if (simCurrentRank) {
-      simCurrentRank.textContent = currentRank === maxRank ? `Lv. ${currentRank} (MAX)` : `Lv. ${currentRank}`;
-    }
-
-    if (simPreviewDesc) {
-      simPreviewDesc.innerHTML = renderSimulatedEffectText(activeGrowthNode, currentRank);
-    }
-
-    // 計算 1~currentRank 累計消耗
-    let cumGold = 0;
-    let cumCore = 0;
-    for (let r = 0; r < currentRank; r++) {
-      cumGold += goldCosts[r] || 0;
-      cumCore += coreCosts[r] || 0;
-    }
-
-    if (simCumCost) {
-      const parts = [];
-      if (cumGold > 0) parts.push(`${SVG_ICONS.gold} ${cumGold.toLocaleString()}`);
-      if (cumCore > 0) parts.push(`${SVG_ICONS.core} ${cumCore.toLocaleString()}`);
-      simCumCost.innerHTML = parts.length > 0 ? parts.join(" ") : "—";
-    }
-
-    // 計算升至下階消耗 (currentRank -> currentRank + 1)
-    if (simNextCost) {
-      if (currentRank >= maxRank) {
-        simNextCost.innerHTML = `<span style="color: #4cd964;">已達滿階 MAX</span>`;
-      } else {
-        const nextG = goldCosts[currentRank] || 0;
-        const nextC = coreCosts[currentRank] || 0;
-        const parts = [];
-        if (nextG > 0) parts.push(`${SVG_ICONS.gold} ${nextG.toLocaleString()}`);
-        if (nextC > 0) parts.push(`${SVG_ICONS.core} ${nextC.toLocaleString()}`);
-        simNextCost.innerHTML = parts.length > 0 ? parts.join(" ") : "無消耗";
-      }
-    }
-
-    // 更新 quick chips 狀態
-    document.querySelectorAll(".sim-chip").forEach((chip) => {
-      const cRank = chip.getAttribute("data-rank");
-      const cRatio = parseFloat(chip.getAttribute("data-rank-ratio"));
-      let targetR = 1;
-      if (cRank === "1") targetR = 1;
-      else if (cRank === "max") targetR = maxRank;
-      else if (cRatio) targetR = Math.max(1, Math.round(maxRank * cRatio));
-
-      chip.classList.toggle("is-active", targetR === currentRank);
-    });
-  }
-
-  function openGrowthModal(node) {
-    if (!growthModal || !node) return;
-    activeGrowthNode = node;
-    const maxRank = Number(node.max_rank) || 1;
-    const goldCosts = Array.isArray(node.gold_costs) ? node.gold_costs : [];
-    const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
-    const totalGold = node.total_gold ?? goldCosts.reduce((a, b) => a + b, 0);
-    const totalCore = node.total_core ?? coreCosts.reduce((a, b) => a + b, 0);
-
-    growthModalTitle.textContent = node._nameClean || node.name_zh || "節點成長明細";
-    growthModalBadge.textContent = `1/${maxRank}`;
-    growthModalBadge.className = `badge rank-badge`;
-
-    if (growthModalTotalSummary) {
-      const summaryParts = [];
-      if (totalGold > 0) summaryParts.push(`滿階金幣: ${totalGold.toLocaleString()}`);
-      if (totalCore > 0) summaryParts.push(`滿階核心: ${totalCore.toLocaleString()}`);
-      growthModalTotalSummary.textContent = summaryParts.join(" • ");
-    }
-
-    // 初始化滑桿範圍
-    if (simRankSlider) {
-      simRankSlider.min = "1";
-      simRankSlider.max = String(maxRank);
-      simRankSlider.value = "1";
-      simRankSlider.oninput = (e) => {
-        updateSimulatorRank(Number(e.target.value));
-      };
-    }
-
-    // 綁定快速階級按鈕
-    document.querySelectorAll(".sim-chip").forEach((chip) => {
-      chip.onclick = (e) => {
-        e.stopPropagation();
-        const cRank = chip.getAttribute("data-rank");
-        const cRatio = parseFloat(chip.getAttribute("data-rank-ratio"));
-        let targetR = 1;
-        if (cRank === "1") targetR = 1;
-        else if (cRank === "max") targetR = maxRank;
-        else if (cRatio) targetR = Math.max(1, Math.round(maxRank * cRatio));
-        updateSimulatorRank(targetR);
-      };
-    });
-
-    // 初始渲染第 1 階
-    updateSimulatorRank(1);
-
-    // 計算分段階段里程碑區間 (Phase Intervals)
-    const intervals = [];
-    let currInterval = null;
-    let cumG = 0;
-    let cumC = 0;
-
-    for (let r = 1; r <= maxRank; r++) {
-      const g = goldCosts[r - 1] || 0;
-      const c = coreCosts[r - 1] || 0;
-      cumG += g;
-      cumC += c;
-
-      if (currInterval === null) {
-        currInterval = { start: r, end: r, goldPerRank: g, corePerRank: c, totalG: g, totalC: c, endCumG: cumG, endCumC: cumC };
-      } else if (currInterval.goldPerRank === g && currInterval.corePerRank === c && c === 0 && (r - currInterval.start < 5)) {
-        currInterval.end = r;
-        currInterval.totalG += g;
-        currInterval.totalC += c;
-        currInterval.endCumG = cumG;
-        currInterval.endCumC = cumC;
-      } else {
-        intervals.push(currInterval);
-        currInterval = { start: r, end: r, goldPerRank: g, corePerRank: c, totalG: g, totalC: c, endCumG: cumG, endCumC: cumC };
-      }
-    }
-    if (currInterval) intervals.push(currInterval);
-
-    // 建立分段里程碑表格
-    const table = document.createElement("table");
-    table.className = "phase-table";
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>階段區間</th>
-          <th>單階消耗</th>
-          <th>階段小計</th>
-          <th>累計至此</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    `;
-    const tbody = table.querySelector("tbody");
-    intervals.forEach((it) => {
-      const tr = document.createElement("tr");
-      const rangeStr = it.start === it.end ? `第 ${it.start} 階` : `第 ${it.start} ~ ${it.end} 階`;
-      
-      const singleParts = [];
-      if (it.goldPerRank > 0) singleParts.push(`${SVG_ICONS.gold} ${it.goldPerRank.toLocaleString()}`);
-      if (it.corePerRank > 0) singleParts.push(`${SVG_ICONS.core} ${it.corePerRank.toLocaleString()}`);
-
-      const stageParts = [];
-      if (it.totalG > 0) stageParts.push(`${SVG_ICONS.gold} ${it.totalG.toLocaleString()}`);
-      if (it.totalC > 0) stageParts.push(`${SVG_ICONS.core} ${it.totalC.toLocaleString()}`);
-
-      const cumParts = [];
-      if (it.endCumG > 0) cumParts.push(`${SVG_ICONS.gold} ${it.endCumG.toLocaleString()}`);
-      if (it.endCumC > 0) cumParts.push(`${SVG_ICONS.core} ${it.endCumC.toLocaleString()}`);
-
-      tr.innerHTML = `
-        <td>${rangeStr}</td>
-        <td>${singleParts.length > 0 ? singleParts.join(" ") : "—"}</td>
-        <td>${stageParts.length > 0 ? stageParts.join(" ") : "—"}</td>
-        <td>${cumParts.length > 0 ? cumParts.join(" ") : "—"}</td>
-      `;
-      tbody.append(tr);
-    });
-
-    growthModalTableWrap.innerHTML = "";
-    growthModalTableWrap.append(table);
-
-    growthModal.hidden = false;
-    growthModal.setAttribute("aria-hidden", "false");
-    requestAnimationFrame(() => {
-      growthModal.classList.add("is-active");
-    });
-  }
-
-  function closeGrowthModal() {
-    if (!growthModal || growthModal.hidden) return;
-    growthModal.classList.remove("is-active");
-    growthModal.setAttribute("aria-hidden", "true");
-    activeGrowthNode = null;
-    setTimeout(() => {
-      growthModal.hidden = true;
-    }, 180);
   }
 
   // --- Smart Contextual Tooltip Positioning (零 Reflow 純幾何換算，消除逐幀 Layout Thrashing) ---
@@ -3362,16 +3255,6 @@
       }
     });
 
-    growthModalCloseBtn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeGrowthModal();
-    });
-
-    growthModalBackdrop?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeGrowthModal();
-    });
-
     window.addEventListener("keydown", (event) => {
       const isInput = ["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName);
       if (isInput && event.key !== "Escape") return;
@@ -3380,7 +3263,6 @@
         event.preventDefault();
         searchInput.focus();
       } else if (event.key === "Escape") {
-        closeGrowthModal();
         closeTooltip();
         closeDisclaimer();
         searchResults.hidden = true;
