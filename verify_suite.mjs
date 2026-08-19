@@ -225,7 +225,7 @@ server.listen(3000, async () => {
     await page.click('#zoom-reset');
     await page.waitForTimeout(500);
 
-    // 5. Test Multi-rank node Growth Curve Modal (e.g. Node 1201)
+    // 5. Test Multi-rank node Interactive Rank Slider (Node 1201 子彈傷害%增加)
     const node1201 = await page.$('g.node[data-node-id="1201"]');
     if (!node1201) throw new Error('Node 1201 element not found');
     await node1201.click();
@@ -235,42 +235,103 @@ server.listen(3000, async () => {
     const rankBadge1201 = await page.$eval('#tooltip-rank-badge', el => el.textContent.trim());
     console.log(`✓ Node 1201 opened: "${title1201}" with rank "${rankBadge1201}"`);
 
-    // Verify Tooltip is lightweight (No giant table inside tooltip itself)
-    const insideTableCount = await page.$$eval('#tooltip .upgrade-table', els => els.length);
-    if (insideTableCount !== 0) throw new Error('Tooltip should NOT contain giant table directly');
-    console.log('✓ Tooltip clean & lightweight verified (No bulky table inside tooltip)');
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_multirank_clean.png' });
+    // Verify upgrade table & full cumulative line are completely REMOVED
+    const tableExists = await page.$('.upgrade-table');
+    const tableContainerExists = await page.$('.upgrade-table-container');
+    const fullCumLine = await page.evaluate(() => {
+      const texts = Array.from(document.querySelectorAll('.meta-line span')).map(el => el.textContent.trim());
+      return texts.includes('滿階累計');
+    });
+    if (tableExists || tableContainerExists || fullCumLine) {
+      throw new Error(`Upgrade table or 滿階累計 was not removed! table=${!!tableExists}, cumLine=${fullCumLine}`);
+    }
+    console.log('✓ Upgrade Table & 滿階累計 successfully removed from tooltip');
 
-    // Click trigger button to open growth modal
-    await page.click('.growth-curve-trigger-btn');
-    await page.waitForTimeout(300);
-    const growthModalVisible = await page.$eval('#growth-modal', el => !el.hidden && el.classList.contains('is-active'));
-    if (!growthModalVisible) throw new Error('Growth modal failed to open');
+    // Verify Rank Slider exists
+    const sliderExists = await page.$('.rank-slider-input');
+    if (!sliderExists) throw new Error('Rank slider input not found in tooltip');
+    const sliderMax = await page.$eval('.rank-slider-input', el => el.max);
+    console.log(`✓ Interactive Rank Slider verified: max=${sliderMax}`);
 
-    // Test Rank Simulator (Slider to Rank 25)
+    // Test sliding to rank 25
     await page.evaluate(() => {
-      const slider = document.getElementById('sim-rank-slider');
+      const slider = document.querySelector('.rank-slider-input');
       slider.value = '25';
-      slider.dispatchEvent(new Event('input'));
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
     });
     await page.waitForTimeout(200);
 
-    const rankText = await page.$eval('#sim-current-rank', el => el.textContent.trim());
-    const descText = await page.$eval('#sim-preview-desc', el => el.textContent.trim());
-    const cumCost = await page.$eval('#sim-cum-cost', el => el.textContent.trim());
-    console.log(`✓ Interactive Rank Simulator verified: "${rankText}", Preview: "${descText}", CumCost: "${cumCost}"`);
+    const updatedRankBadge = await page.$eval('#tooltip-rank-badge', el => el.textContent.trim());
+    const updatedSliderRank = await page.$eval('.slider-rank-current', el => el.textContent.trim());
+    const updatedDesc = await page.$eval('.detail-copy', el => el.textContent.trim());
+    const updatedCost = await page.$eval('.slider-cost-value', el => el.textContent.trim());
+    const costLabel25 = await page.$eval('.meta-line-cost .cost-label', el => el.textContent.trim());
+    console.log(`✓ Rank Slider moved to 25: badge="${updatedRankBadge}", display="${updatedSliderRank}", desc="${updatedDesc}", cost="${updatedCost}", costLabel="${costLabel25}"`);
+    if (updatedRankBadge !== '25/50' || updatedSliderRank !== '25' || costLabel25 !== '升階消耗') {
+      throw new Error(`Slider failed to update rank or cost label! Got badge=${updatedRankBadge}, slider=${updatedSliderRank}, label=${costLabel25}`);
+    }
 
-    const tableRows = await page.$$eval('#growth-modal .phase-table tbody tr', rows => rows.length);
-    console.log(`✓ Phase Milestones Table verified: Compressed from 50 rows into ${tableRows} clean milestone intervals (No tedious 50 individual rows)`);
-    if (tableRows > 25) throw new Error(`Phase table should be clean and compressed, got ${tableRows} rows`);
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/growth_rank_simulator.png' });
+    // Test sliding back to rank 1 -> label must become "解鎖消耗"
+    await page.evaluate(() => {
+      const slider = document.querySelector('.rank-slider-input');
+      slider.value = '1';
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await page.waitForTimeout(200);
 
-    // Close growth modal
-    await page.click('#growth-modal-close');
-    await page.waitForTimeout(250);
-    const growthModalHidden = await page.$eval('#growth-modal', el => el.hidden || !el.classList.contains('is-active'));
-    if (!growthModalHidden) throw new Error('Growth modal failed to close');
-    console.log('✓ Growth modal closed smoothly');
+    const costLabel1 = await page.$eval('.meta-line-cost .cost-label', el => el.textContent.trim());
+    console.log(`✓ Rank Slider moved back to 1: costLabel="${costLabel1}"`);
+    if (costLabel1 !== '解鎖消耗') {
+      throw new Error(`Expected cost label to revert to '解鎖消耗', got: ${costLabel1}`);
+    }
+
+    // Test Rubber-banding (Overdrag < 0% with resistance)
+    const overdragLeftResult = await page.evaluate(() => {
+      const slider = document.querySelector('.rank-slider-input');
+      const rect = slider.getBoundingClientRect();
+      slider.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 99, clientX: rect.left + 10, clientY: rect.top + 4, button: 0, bubbles: true }));
+      slider.dispatchEvent(new PointerEvent('pointermove', { pointerId: 99, clientX: rect.left - 50, clientY: rect.top + 4, bubbles: true }));
+      const overshootX = slider.style.getPropertyValue('--overshoot-x');
+      const hasDraggingClass = slider.classList.contains('is-dragging');
+      return { overshootX, hasDraggingClass };
+    });
+    console.log(`✓ Overdrag Left (0% boundary resistance): overshootX=${overdragLeftResult.overshootX}, is-dragging=${overdragLeftResult.hasDraggingClass}`);
+    if (parseFloat(overdragLeftResult.overshootX) >= 0) {
+      throw new Error(`Expected negative overshootX during left overdrag, got: ${overdragLeftResult.overshootX}`);
+    }
+
+    // Release pointer and verify spring bounce back to 0px
+    const bounceBackResult = await page.evaluate(() => {
+      const slider = document.querySelector('.rank-slider-input');
+      slider.dispatchEvent(new PointerEvent('pointerup', { pointerId: 99, bubbles: true }));
+      const isSpringing = slider.classList.contains('is-springing');
+      const overshootAfterUp = slider.style.getPropertyValue('--overshoot-x');
+      return { isSpringing, overshootAfterUp };
+    });
+    console.log(`✓ Spring Bounce Back verified: is-springing=${bounceBackResult.isSpringing}, overshootX=${bounceBackResult.overshootAfterUp}`);
+    if (bounceBackResult.overshootAfterUp !== '0px') {
+      throw new Error(`Expected overshootX to reset to 0px on release, got: ${bounceBackResult.overshootAfterUp}`);
+    }
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_rank_slider.png' });
+
+    // 5.1 Test Player Passive Node (Node 5109 所有骰子傷害) - (+0.6%) green styling verification
+    console.log('Testing Node 5109 (所有骰子傷害)...');
+    await page.evaluate(() => {
+      window.__TEST_HOOKS__.centerOnNode('5109', false);
+      window.__TEST_HOOKS__.showTooltip('5109', true);
+    });
+    await page.waitForTimeout(300);
+
+    const descHtml5109 = await page.$eval('.detail-copy', el => el.innerHTML);
+    const hasGreenAdd5109 = await page.evaluate(() => {
+      const greenEl = document.querySelector('.detail-copy .stat-green-add');
+      return greenEl && greenEl.textContent.trim() === '(+0.6%)';
+    });
+    console.log(`✓ Node 5109 opened, descHtml="${descHtml5109}", hasGreenAdd=${hasGreenAdd5109}`);
+    if (!hasGreenAdd5109) {
+      throw new Error(`Node 5109 (+0.6%) failed to have .stat-green-add green styling! HTML: ${descHtml5109}`);
+    }
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_passive_5109.png' });
 
     // 5.2 Test Predator Dice (Node 5007) - 2-Column Stats & Special Values
     console.log('Testing Predator Dice (Node 5007)...');

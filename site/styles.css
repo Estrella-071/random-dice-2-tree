@@ -1636,409 +1636,176 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   transform: scale(0.96);
 }
 
-/* Growth Curve Trigger Button in Tooltip */
-.growth-curve-trigger-btn {
-  width: 100%;
-  margin-top: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 12px;
-  color: #ffffff;
-  cursor: pointer;
-  background: rgba(142, 114, 230, 0.18);
-  border: 1px solid rgba(142, 114, 230, 0.45);
-  border-radius: var(--radius-sm); /* 6px */
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
-}
-
-.growth-curve-trigger-btn:hover {
-  background: rgba(142, 114, 230, 0.32);
-  border-color: #a88ef5;
-}
-
-.growth-curve-trigger-btn:active {
-  transform: scale(0.98);
-}
-
-.growth-curve-trigger-btn svg {
-  color: #c4b5fd;
-  flex-shrink: 0;
-}
-
 /* ==========================================================================
-   Independent Growth & Upgrade Tier Modal (流體獨立展開浮窗)
+   Rank Slider Widget (長膠囊滑軌 + 橢圓形微互動滑塊，遵循 better-colors 和諧紫金調色)
    ========================================================================== */
-.growth-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
+.rank-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(38, 30, 58, 0.75);
+  border: 1px solid rgba(138, 106, 214, 0.35);
+  border-radius: var(--radius-card); /* 16px 對齊 Tooltip */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 4px;
+}
+
+.slider-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 16px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 180ms ease;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-secondary);
 }
 
-.growth-modal.is-active {
-  opacity: 1;
-  pointer-events: auto;
+.slider-title {
+  color: #9789AE;
+  font-size: 12.5px;
 }
 
-.growth-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+.slider-rank-display {
+  color: #f7f4ff;
+  font-family: var(--font-mono, sans-serif);
+  font-size: 13px;
 }
 
-.growth-modal-card {
+.slider-rank-current {
+  color: #fce38a;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.slider-track-container {
   position: relative;
-  z-index: 1;
-  width: min(540px, calc(100vw - 32px));
-  max-height: min(600px, calc(100vh - 60px));
-  background: #1e172e;
-  border: 3px solid #5a3fa2;
-  border-radius: var(--radius-panel); /* 16px 統一對齊 */
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transform: scale(0.92);
-  transition: transform 240ms cubic-bezier(0.18, 0.9, 0.3, 1.15);
-}
-
-.growth-modal.is-active .growth-modal-card {
-  transform: scale(1);
-}
-
-.growth-modal-header {
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  background: rgba(0, 0, 0, 0.35);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  gap: 12px;
+  height: 28px; /* 寬裕高度容納雙倍大滑塊破格效果 */
 }
 
-.growth-modal-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.growth-modal-icon-badge {
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: rgba(142, 114, 230, 0.25);
-  color: #c4b5fd;
-  border: 1px solid rgba(142, 114, 230, 0.45);
-}
-
-.growth-modal-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.2px;
-}
-
-.growth-modal-close-btn {
-  width: 28px;
-  height: 28px;
-  display: inline-grid;
-  place-items: center;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: var(--radius-sm);
-  color: var(--ink-secondary);
-  cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
-}
-
-.growth-modal-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-}
-
-.growth-modal-close-btn:active {
-  transform: scale(0.94);
-}
-
-/* ==========================================================================
-   Rank Simulator & Phase Interval Milestones (遊戲原生階級模擬器與分段階段面板)
-   ========================================================================== */
-.rank-simulator-section {
-  padding: 16px 18px 14px;
-  background: rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.simulator-slider-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.simulator-level-badge {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.sim-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-muted);
-}
-
-.sim-rank-num {
-  font-size: 20px;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  color: #ffd859;
-}
-
-.simulator-quick-chips {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.sim-chip {
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--ink-secondary);
-  cursor: pointer;
-  transition: all 120ms ease;
-}
-
-.sim-chip:hover {
-  background: rgba(142, 114, 230, 0.3);
-  border-color: #8e72e6;
-  color: #ffffff;
-}
-
-.sim-chip.is-active {
-  background: #6d48c2;
-  border-color: #a88ef5;
-  color: #ffffff;
-}
-
-/* Custom Range Slider (遊戲感高階滑動條) */
-.sim-rank-slider {
+/* 核心 input[type="range"] 跨瀏覽器樣式重置 (長膠囊滑軌 + 微橡皮筋拉伸) */
+.rank-slider-input {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 8px;
-  border-radius: 4px;
-  background: #110d1c;
+  background: linear-gradient(to right, #8c5af2 0%, #ba7eff var(--slider-pct, 0%), rgba(20, 15, 32, 0.88) var(--slider-pct, 0%), rgba(20, 15, 32, 0.88) 100%);
+  border-radius: 9999px; /* 長膠囊型滑軌 */
+  border: 1px solid rgba(186, 126, 255, 0.3);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
   outline: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
+  margin: 0;
+  padding: 0;
+  transform: translateX(calc(var(--overshoot-x, 0px) * 0.25));
+  transition: background 60ms linear, transform 0s;
 }
 
-.sim-rank-slider::-webkit-slider-thumb {
+.rank-slider-input.is-springing {
+  transition: background 60ms linear, transform 380ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Webkit (Chrome, Edge, Safari) 橢圓形滑塊 */
+.rank-slider-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffd859, #ea7a28);
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(255, 216, 89, 0.5);
+  width: 18px;
+  height: 12px;
+  border-radius: 9999px; /* 橫向橢圓形滑塊 */
+  background: #fdfcff;
+  border: 2px solid #7545de;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 8px rgba(186, 126, 255, 0.5);
   cursor: grab;
-  transition: transform 100ms ease;
+  transform-origin: center center;
+  transform: translateX(var(--overshoot-x, 0px)) scale(1.0);
+  transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
 }
 
-.sim-rank-slider::-webkit-slider-thumb:active {
+/* 懸停狀態：滑塊微幅放大 */
+.rank-slider-input:hover::-webkit-slider-thumb {
+  transform: translateX(var(--overshoot-x, 0px)) scale(1.3);
+  background: #ffffff;
+  border-color: #8c5af2;
+  box-shadow: 0 0 12px rgba(203, 145, 255, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* 按住/拖曳狀態：變成 2 倍大 (Scale 2.0) 且無延遲跟隨阻尼拉伸！ */
+.rank-slider-input:active::-webkit-slider-thumb,
+.rank-slider-input.is-dragging::-webkit-slider-thumb {
   cursor: grabbing;
-  transform: scale(1.15);
+  transform: translateX(var(--overshoot-x, 0px)) scale(2.0);
+  background: #ffffff;
+  border-color: #ab6cf7;
+  box-shadow: 0 0 18px rgba(203, 145, 255, 0.95), 0 0 32px rgba(171, 108, 247, 0.6), 0 4px 12px rgba(0, 0, 0, 0.7);
+  transition: transform 0s, box-shadow 160ms ease, background-color 160ms ease;
 }
 
-.sim-preview-box {
-  background: #140e21;
-  border: 1.5px solid #5a3fa2;
-  border-radius: var(--radius-card); /* 16px */
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+/* 釋放回彈彈簧動畫狀態 */
+.rank-slider-input.is-springing::-webkit-slider-thumb {
+  transition: transform 380ms cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 200ms ease;
 }
 
-.sim-preview-header {
+/* Firefox 橢圓形滑塊 */
+.rank-slider-input::-moz-range-thumb {
+  width: 18px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #fdfcff;
+  border: 2px solid #7545de;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 8px rgba(186, 126, 255, 0.5);
+  cursor: grab;
+  transform-origin: center center;
+  transform: translateX(var(--overshoot-x, 0px)) scale(1.0);
+  transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.rank-slider-input:hover::-moz-range-thumb {
+  transform: translateX(var(--overshoot-x, 0px)) scale(1.3);
+  background: #ffffff;
+  border-color: #8c5af2;
+  box-shadow: 0 0 12px rgba(203, 145, 255, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.rank-slider-input:active::-moz-range-thumb,
+.rank-slider-input.is-dragging::-moz-range-thumb {
+  cursor: grabbing;
+  transform: translateX(var(--overshoot-x, 0px)) scale(2.0);
+  background: #ffffff;
+  border-color: #ab6cf7;
+  box-shadow: 0 0 18px rgba(203, 145, 255, 0.95), 0 0 32px rgba(171, 108, 247, 0.6), 0 4px 12px rgba(0, 0, 0, 0.7);
+  transition: transform 0s, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.rank-slider-input.is-springing::-moz-range-thumb {
+  transition: transform 380ms cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 200ms ease;
+}
+
+.rank-slider-input::-moz-range-track {
+  height: 8px;
+  background: transparent;
+  border: none;
+}
+
+.slider-cost-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.sim-preview-tag {
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #c4b5fd;
-  text-transform: uppercase;
-}
-
-.sim-preview-desc {
-  margin: 0;
-  font-size: 15px;
+  font-size: 12.5px;
   font-weight: 700;
-  line-height: 1.5;
-  color: #ffffff;
 }
 
-.sim-preview-desc .stat-highlight {
-  color: #ffd859;
-  font-weight: 800;
+.slider-cost-label {
+  color: #9789AE;
 }
 
-.sim-preview-desc .stat-green-add {
-  color: #4cd964;
-  font-weight: 700;
-  margin-left: 4px;
-}
-
-.sim-cost-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sim-cost-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sim-cost-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-muted);
-}
-
-.sim-cost-val {
-  font-size: 13.5px;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  color: #ffffff;
+.slider-cost-value {
+  color: #f7f4ff;
+  font-family: var(--font-mono, sans-serif);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-}
-
-/* Phase Milestones Header */
-.growth-modal-phase-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 18px 8px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 12.5px;
-  font-weight: 800;
-  color: #c4b5fd;
-  letter-spacing: 0.3px;
-}
-
-.growth-modal-total-summary {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-muted);
-}
-
-.growth-modal-table-wrap {
-  flex: 1;
-  max-height: 220px;
-  overflow-y: auto;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  scrollbar-width: thin;
-}
-
-/* Phase Interval Milestone Table */
-.phase-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  text-align: end;
-}
-
-.phase-table th,
-.phase-table td {
-  padding: 8px 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  white-space: nowrap;
-}
-
-.phase-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  color: var(--ink-muted);
-  font-weight: 700;
-  font-size: 11.5px;
-  background: #181224;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.phase-table tr:hover td {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.phase-table td {
-  color: #e2e5f0;
-}
-
-.phase-table td:nth-child(1),
-.phase-table th:nth-child(1) {
-  width: 20%;
-  text-align: start;
-  font-weight: 800;
-  color: #ffffff;
-  padding-left: 14px;
-}
-
-.phase-table td:nth-child(2),
-.phase-table th:nth-child(2) {
-  width: 24%;
-}
-
-.phase-table td:nth-child(3),
-.phase-table th:nth-child(3) {
-  width: 25%;
-}
-
-.phase-table td:nth-child(4),
-.phase-table th:nth-child(4) {
-  width: 31%;
-  padding-right: 14px;
 }
 
 /* Empty State */
@@ -2383,12 +2150,6 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 
   .stat-pill-value {
     font-size: 13.5px;
-  }
-
-  .upgrade-table th,
-  .upgrade-table td {
-    padding: 3px 6px;
-    font-size: 11px;
   }
 }
 
