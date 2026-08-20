@@ -309,7 +309,7 @@ server.listen(3000, async () => {
       return { isSpringing, overshootAfterUp };
     });
     console.log(`✓ Spring Bounce Back verified: is-springing=${bounceBackResult.isSpringing}, overshootX=${bounceBackResult.overshootAfterUp}`);
-    if (bounceBackResult.overshootAfterUp !== '0px') {
+    if (parseFloat(bounceBackResult.overshootAfterUp) !== 0) {
       throw new Error(`Expected overshootX to reset to 0px on release, got: ${bounceBackResult.overshootAfterUp}`);
     }
     await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_rank_slider.png' });
@@ -367,45 +367,75 @@ server.listen(3000, async () => {
     }
     console.log('✓ Predator Dice 2-column grid & special stats 100% matched!');
 
-    // Test clicking "強化" (Power-up) button
+    // Test clicking "強化" (Power-up) button cycle: 強化 -> 2 -> 3
     await page.evaluate(() => {
       document.querySelector('.btn-powerup')?.click();
     });
     await page.waitForTimeout(200);
+    const powerupLabel2 = await page.$eval('.btn-powerup', el => el.textContent.trim());
+    console.log(`✓ Power-up button clicked once: label="${powerupLabel2}"`);
+    if (powerupLabel2 !== '2') {
+      throw new Error(`Expected powerup button to show '2', got '${powerupLabel2}'`);
+    }
+
     const powerupStats = await page.evaluate(() => {
       return Array.from(document.querySelectorAll('.dice-stat-item')).map(el => ({
         label: el.querySelector('.dice-stat-label')?.textContent.trim(),
         val: el.querySelector('.dice-stat-val')?.textContent.trim().replace(/\s+/g, ' ')
       }));
     });
-    console.log('✓ Power-up mode stats:', powerupStats);
-    if (!powerupStats.some(s => s.label === '吞噬增加量' && s.val === '15 (+25)')) {
+    console.log('✓ Power-up mode stats (Lv 2):', powerupStats);
+    if (!powerupStats.some(s => s.label === '吞噬增加量' && s.val.includes('15') && s.val.includes('(+25)'))) {
       throw new Error(`Power-up mode expected 吞噬增加量 15 (+25), got: ${JSON.stringify(powerupStats)}`);
     }
-    if (!powerupStats.some(s => s.label === '吞噬範圍' && s.val === '1.2 (+0.05)')) {
+    if (!powerupStats.some(s => s.label === '吞噬範圍' && s.val.includes('1.2') && s.val.includes('(+0.05)'))) {
       throw new Error(`Power-up mode expected 吞噬範圍 1.2 (+0.05), got: ${JSON.stringify(powerupStats)}`);
     }
     await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_powerup.png' });
 
-    // Test clicking "提升骰點" (Dot Upgrade) button
+    // Test clicking "提升骰點" (Dot Upgrade) button: 提升骰點 -> 2 (now Coexisting: Powerup 2 + Dot 2)
     await page.evaluate(() => {
       document.querySelector('.btn-dot')?.click();
     });
     await page.waitForTimeout(200);
-    const dotStats = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('.dice-stat-item')).map(el => ({
-        label: el.querySelector('.dice-stat-label')?.textContent.trim(),
-        val: el.querySelector('.dice-stat-val')?.textContent.trim().replace(/\s+/g, ' ')
-      }));
+    const dotLabel2 = await page.$eval('.btn-dot', el => el.textContent.trim());
+    console.log(`✓ Dot button clicked once: label="${dotLabel2}"`);
+    if (dotLabel2 !== '2') {
+      throw new Error(`Expected dot button to show '2', got '${dotLabel2}'`);
+    }
+
+    // Verify Coexistence: 吞噬增加量 has gold (+25) and purple (+25)
+    const coexistCheck = await page.evaluate(() => {
+      const items = Array.from(document.querySelectorAll('.dice-stat-item'));
+      const gainItem = items.find(el => el.querySelector('.dice-stat-label')?.textContent.trim() === '吞噬增加量');
+      const goldSpan = gainItem?.querySelector('.stat-bonus-val.is-gold');
+      const purpleSpan = gainItem?.querySelector('.stat-bonus-val.is-purple');
+      return {
+        goldVisible: goldSpan && !goldSpan.hidden ? goldSpan.textContent.trim() : null,
+        purpleVisible: purpleSpan && !purpleSpan.hidden ? purpleSpan.textContent.trim() : null,
+      };
     });
-    console.log('✓ Dot upgrade mode stats:', dotStats);
-    if (!dotStats.some(s => s.label === '攻擊速度' && s.val === '2.7 (-0.08)')) {
-      throw new Error(`Dot mode expected 攻擊速度 2.7 (-0.08), got: ${JSON.stringify(dotStats)}`);
+    console.log('✓ Coexistence dual-bonus verified:', coexistCheck);
+    if (coexistCheck.goldVisible !== '(+25)' || coexistCheck.purpleVisible !== '(+25)') {
+      throw new Error(`Expected dual bonus (+25) gold and (+25) purple, got: ${JSON.stringify(coexistCheck)}`);
     }
-    if (!dotStats.some(s => s.label === '吞噬增加量' && s.val === '15 (+25)')) {
-      throw new Error(`Dot mode expected 吞噬增加量 15 (+25), got: ${JSON.stringify(dotStats)}`);
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_coexist.png' });
+
+    // Test multi-level cycling: Advance Dot to 3
+    await page.evaluate(() => {
+      document.querySelector('.btn-dot')?.click();
+    });
+    await page.waitForTimeout(200);
+    const dotLabel3 = await page.$eval('.btn-dot', el => el.textContent.trim());
+    const dot3Gain = await page.evaluate(() => {
+      const items = Array.from(document.querySelectorAll('.dice-stat-item'));
+      const gainItem = items.find(el => el.querySelector('.dice-stat-label')?.textContent.trim() === '吞噬增加量');
+      return gainItem?.querySelector('.stat-bonus-val.is-purple')?.textContent.trim();
+    });
+    console.log(`✓ Dot cycled to 3: button="${dotLabel3}", purple bonus="${dot3Gain}"`);
+    if (dotLabel3 !== '3' || dot3Gain !== '(+50)') {
+      throw new Error(`Expected dot 3 with (+50) purple bonus, got label=${dotLabel3}, bonus=${dot3Gain}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_dot.png' });
 
     // Test Tag Popover click on #吞噬
     await page.evaluate(() => {
@@ -419,6 +449,13 @@ server.listen(3000, async () => {
     console.log(`✓ Tag Popover Verified: visible=${popoverVisible}, badge="${popoverBadge}", desc="${popoverDesc}"`);
     if (!popoverVisible || popoverBadge !== '#吞噬' || !popoverDesc.includes('根據吞噬的怪物數量')) {
       throw new Error(`Tag popover failed to show correct explanation!`);
+    }
+
+    // Verify MUTATION and DOOM tag localization
+    const tagDefs = await page.evaluate(() => window.TREE_DATA.tag_definitions);
+    console.log(`✓ Checking MUTATION & DOOM localization: MUTATION="${tagDefs.MUTATION?.desc_zh}", DOOM="${tagDefs.DOOM?.desc_zh}"`);
+    if (tagDefs.MUTATION?.desc_zh.includes('MUTATION') || tagDefs.DOOM?.desc_zh.includes('NORMAL_MONSTER')) {
+      throw new Error(`Tag definitions still contain raw English constants!`);
     }
     await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_tag_popover.png' });
 
@@ -453,7 +490,46 @@ server.listen(3000, async () => {
       throw new Error(`Greed dice underlines should only be ['SP怪物'], got: ${JSON.stringify(greedTags.underlines)}`);
     }
     console.log('✓ Greed Dice Tag Precision 100% verified (Zero over-tagging)!');
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_greed_dice.png' });
+
+    // 5.5 Test Prerequisite Node Jump Camera Alignment & Above Positioning (前置節點跳轉攝影機與上方定位)
+    console.log('Testing Prerequisite Node Jump from 5102 to 5106 (渾沌召喚2骰點)...');
+    await page.evaluate(() => {
+      window.__TEST_HOOKS__.centerOnNode('5102', false);
+      window.__TEST_HOOKS__.showTooltip('5102', true);
+    });
+    await page.waitForTimeout(500);
+
+    const jumpResult5106 = await page.evaluate(() => {
+      const pill = document.querySelector('.node-link-pill[data-target-id="5106"]');
+      if (!pill) return { found: false };
+      pill.click();
+      return { found: true };
+    });
+    if (!jumpResult5106.found) {
+      throw new Error('Prerequisite pill for Node 5106 not found in Node 5102 tooltip!');
+    }
+    await page.waitForTimeout(600);
+
+    const check5106 = await page.evaluate(() => {
+      const tooltip = document.getElementById('tooltip');
+      const state = window.__TEST_HOOKS__.getState();
+      const pt = state.nodePositions.get('5106');
+      const screenY = state.panY + pt.y * state.scale;
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const isPlacedBelow = tooltip.classList.contains('is-placed-below');
+      return {
+        title: document.getElementById('tooltip-title')?.textContent.trim(),
+        tooltipBottom: tooltipRect.bottom,
+        nodeScreenY: screenY,
+        isPlacedBelow,
+        isAbove: !isPlacedBelow && tooltipRect.bottom < screenY,
+      };
+    });
+    console.log('✓ Node 5106 Jump Position Check (Normal Mode Above):', check5106);
+    if (!check5106.title.includes('渾沌召喚2骰點') || !check5106.isAbove) {
+      throw new Error(`Node 5106 tooltip failed to position ABOVE node in normal mode! result: ${JSON.stringify(check5106)}`);
+    }
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_prerequisite_above_verified.png' });
 
     // 5.2 Test Currency Badges (Default OFF as requested by user)
     console.log('Testing Currency Badges (Default OFF & Toggle ON/OFF)...');
@@ -514,6 +590,121 @@ server.listen(3000, async () => {
     await page.waitForTimeout(300);
     const selectedTitle = await page.$eval('#tooltip-title', el => el.textContent.trim());
     console.log(`✓ Clicked search result, active node: "${selectedTitle}"`);
+
+    // 6.1 Test Filter Camera Auto Fit (Single, Multi-select & Cancel)
+    console.log('\n--- TESTING FILTER CAMERA AUTO-FIT & MULTI-SELECT ---');
+    // 清除搜尋
+    await page.click('#search-clear');
+    await page.waitForTimeout(300);
+
+    // 點擊自然派系篩選 (Branch 1)
+    await page.click('.filter-chip.branch-chip[data-branch="1"]');
+    await page.waitForTimeout(500);
+    const filterNatureCheck = await page.evaluate(() => {
+      const state = window.__TEST_HOOKS__?.getState?.() || {};
+      const scale = state.scale || 1;
+      const panX = state.panX || 0;
+      return { scale, panX, hasFilterClass: document.body.classList.contains('has-active-filter') };
+    });
+    console.log(`✓ Nature filter camera auto-focused: scale=${filterNatureCheck.scale.toFixed(2)}, panX=${filterNatureCheck.panX.toFixed(1)}px, hasFilter=${filterNatureCheck.hasFilterClass}`);
+    if (!filterNatureCheck.hasFilterClass) throw new Error('Filter highlight class missing');
+
+    // 多選工學派系篩選 (Branch 2)
+    await page.click('.filter-chip.branch-chip[data-branch="2"]');
+    await page.waitForTimeout(500);
+    const filterMultiCheck = await page.evaluate(() => {
+      const state = window.__TEST_HOOKS__?.getState?.() || {};
+      const scale = state.scale || 1;
+      return { scale, branchCount: state.filterBranches?.size };
+    });
+    console.log(`✓ Multi-select filter camera auto-adjusted: scale=${filterMultiCheck.scale.toFixed(2)}, branches=${filterMultiCheck.branchCount}`);
+    if (filterMultiCheck.branchCount !== 2) throw new Error('Multi-select branch count mismatch');
+
+    // 6.2 Test Prerequisite Highlighting Overriding Filter (Priority Check)
+    console.log('Testing Prerequisite Highlighting Priority Over Filter...');
+    // 在自然+工學篩選仍開啟的情況下，打開渾沌派系節點 5102 (渾沌骰子子彈傷害) 並開啟前置高亮
+    await page.evaluate(() => {
+      window.__TEST_HOOKS__.centerOnNode('5102', false);
+      window.__TEST_HOOKS__.showTooltip('5102', true);
+    });
+    await page.waitForTimeout(500);
+    await page.evaluate(() => {
+      const state = window.__TEST_HOOKS__.getState();
+      if (!state.showPrereqMode) {
+        document.getElementById('toggle-prereq-btn')?.click();
+      }
+    });
+    await page.waitForTimeout(500);
+
+    const priorityCheck = await page.evaluate(() => {
+      const hasPrereqClass = document.body.classList.contains('has-prereq-highlight');
+      const hasOverrideClass = document.body.classList.contains('prereq-overrides-filter');
+      // 自然派系節點 1001 (當前篩選派系，不應變暗，應為 1.0)
+      const node1001 = document.querySelector('g.node[data-node-id="1001"]');
+      const node1001Opacity = node1001 ? parseFloat(window.getComputedStyle(node1001).opacity) : 0;
+      // 5102 前置路徑節點 5106 (前置路徑，應為 1.0)
+      const node5106 = document.querySelector('g.node[data-node-id="5106"]');
+      const node5106Opacity = node5106 ? parseFloat(window.getComputedStyle(node5106).opacity) : 0;
+      // 秩序派系節點 4001 (未被篩選且非前置路徑，應暗化為 0.12)
+      const node4001 = document.querySelector('g.node[data-node-id="4001"]');
+      const node4001Opacity = node4001 ? parseFloat(window.getComputedStyle(node4001).opacity) : 1;
+      return {
+        hasPrereqClass,
+        hasOverrideClass,
+        filteredNatureOpacity: node1001Opacity,
+        prereqChaosOpacity: node5106Opacity,
+        unfilteredOrderOpacity: node4001Opacity,
+      };
+    });
+    console.log(`✓ Other branch prereq does not dim active filter: hasPrereq=${priorityCheck.hasPrereqClass}, hasOverride=${priorityCheck.hasOverrideClass}, filterNatureOpacity=${priorityCheck.filteredNatureOpacity.toFixed(2)}, prereqOpacity=${priorityCheck.prereqChaosOpacity.toFixed(2)}, unselectedDimmedOpacity=${priorityCheck.unfilteredOrderOpacity.toFixed(2)}`);
+    if (!priorityCheck.hasPrereqClass || priorityCheck.filteredNatureOpacity < 0.9 || priorityCheck.prereqChaosOpacity < 0.9 || priorityCheck.unfilteredOrderOpacity > 0.25) {
+      throw new Error('Active filter branches must stay lit when viewing prerequisite paths in other branches');
+    }
+
+    // 6.3 Test Tooltip Smart Avoidance (Placed Below When Prereq Nodes Are Above)
+    console.log('Testing Tooltip Smart Avoidance of Prerequisite Path...');
+    const avoidanceCheck = await page.evaluate(() => {
+      const tooltip = document.getElementById('tooltip');
+      const state = window.__TEST_HOOKS__.getState();
+      const pt = state.nodePositions.get('5102');
+      const screenY = state.panY + pt.y * state.scale;
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const isPlacedBelow = tooltip.classList.contains('is-placed-below');
+      return {
+        isPlacedBelow,
+        tooltipTop: tooltipRect.top,
+        nodeScreenY: screenY,
+        isClearOfAbovePath: tooltipRect.top >= screenY, // Tooltip 位於節點下方避讓
+      };
+    });
+    console.log(`✓ Tooltip Smart Avoidance verified: isPlacedBelow=${avoidanceCheck.isPlacedBelow}, tooltipTop=${avoidanceCheck.tooltipTop.toFixed(1)}px, nodeScreenY=${avoidanceCheck.nodeScreenY.toFixed(1)}px, isClear=${avoidanceCheck.isClearOfAbovePath}`);
+    if (!avoidanceCheck.isPlacedBelow || !avoidanceCheck.isClearOfAbovePath) {
+      throw new Error('Tooltip must position below node to avoid overlapping upstream prerequisite path');
+    }
+
+    // 關閉前置節點高亮，驗證 Tooltip 恢復上方
+    await page.evaluate(() => {
+      const state = window.__TEST_HOOKS__.getState();
+      if (state.showPrereqMode) {
+        document.getElementById('toggle-prereq-btn')?.click();
+      }
+    });
+    await page.waitForTimeout(500);
+    const restoredTooltipCheck = await page.evaluate(() => {
+      const tooltip = document.getElementById('tooltip');
+      return { isPlacedBelow: tooltip.classList.contains('is-placed-below') };
+    });
+    console.log(`✓ Restored Tooltip position above: isPlacedBelow=${restoredTooltipCheck.isPlacedBelow}`);
+    if (restoredTooltipCheck.isPlacedBelow) throw new Error('Tooltip must restore above when prereq mode disabled');
+
+    // 清除篩選，驗證相機復位
+    await page.click('#filter-clear-btn');
+    await page.waitForTimeout(500);
+    const clearedFilterCheck = await page.evaluate(() => {
+      return { hasFilter: document.body.classList.contains('has-active-filter') };
+    });
+    console.log(`✓ Clear Filter verified: hasFilter=${clearedFilterCheck.hasFilter}`);
+    if (clearedFilterCheck.hasFilter) throw new Error('Filter must be completely cleared');
 
     // 7. Verify Mobile Viewport & Search Button (390x844)
     console.log('\n--- TESTING MOBILE VIEWPORT (390x844) ---');

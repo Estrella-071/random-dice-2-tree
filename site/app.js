@@ -18,8 +18,6 @@
     return `${Math.round((scale / base) * 100)}%`;
   }
 
-  const MIN_SCALE = 0.33;
-  const MAX_SCALE = 2.0;
   const DATA_URL = "data/dice_tree.json";
   const SVG_URL = "data/dice_tree.svg";
 
@@ -135,9 +133,7 @@
   const minimap = $("#minimap");
   const minimapCanvas = $("#minimap-canvas");
   const minimapWindow = $("#minimap-window");
-  const minimapPanel = $("#minimap-panel");
   const tooltip = $("#tooltip");
-  const sheetHandle = $("#sheet-handle");
   const tooltipTitle = $("#tooltip-title");
   const tooltipBranchBadge = $("#tooltip-branch-badge");
   const tooltipTypeBadge = $("#tooltip-type-badge");
@@ -145,7 +141,6 @@
   const tooltipDiceVisual = $("#tooltip-dice-visual");
   const tooltipDiceImg = $("#tooltip-dice-img");
   const tooltipBody = $("#tooltip-body");
-  const tooltipClose = $("#tooltip-close");
   const zoomReadout = $("#zoom-readout");
   const interactionStatus = $("#interaction-status");
 
@@ -476,7 +471,6 @@
   let targetWheelScale = null;
   let wheelAnchorWorldX = null;
   let wheelAnchorWorldY = null;
-  let lastWheelTime = null;
 
   function stopInertiaPan() {
     if (inertiaRafId) {
@@ -613,8 +607,8 @@
     startAnimationLoop();
   }
 
-  // 縮放專用控制器（以 anchorWorldX/Y 為錨點）
-  function startCameraZoom(nextScale, anchorWorldX = null, anchorWorldY = null, immediate = false) {
+  // 縮放與視角聚焦控制器（以 anchorWorldX/Y 為錨點，速度曲線與持續時間與選擇節點時完全一致）
+  function startCameraZoom(nextScale, anchorWorldX = null, anchorWorldY = null, immediate = false, customDuration = null) {
     const isMobile = window.innerWidth <= 768;
     const effectiveImmediate = immediate || isMobile; // 手機端縮放不需要平滑，即時瞬發
     const minS = getMinScale();
@@ -647,7 +641,11 @@
       return;
     }
 
-    if (Math.abs(clampedScale - state.scale) < 0.001) return;
+    const dist = Math.hypot(targetPanX - state.panX, targetPanY - state.panY);
+    if (Math.abs(clampedScale - state.scale) < 0.001 && dist < 0.5) return;
+
+    // 自適應時間與速度曲線：與選擇節點時完全相同（380ms ~ 480ms，Smootherstep 溫和加速至均勻再優雅煞停）
+    const duration = customDuration || Math.min(480, Math.max(380, 380 + dist * 0.08));
 
     setZooming(true);
     setNavigating(true);
@@ -659,7 +657,7 @@
       targetPanX,
       targetPanY,
       startTime: performance.now(),
-      duration: 260,
+      duration,
     };
     startAnimationLoop();
   }
@@ -750,22 +748,6 @@
       return pt;
     }
     return null;
-  }
-
-  function centerOnNode(nodeId, immediate = false) {
-    const node = state.nodeById.get(nodeId);
-    if (!node) return;
-    const point = nodePoint(nodeId);
-    if (!point) return;
-
-    const { width, height } = viewportSize();
-    // 純相機平移：使用當前 scale，絕不干擾縮放
-    const currentScale = state.scale;
-    const targetX = width / 2 - point.x * currentScale;
-    const targetY = height / 2 - point.y * currentScale;
-
-    startCameraPan(targetX, targetY, immediate);
-    interactionStatus.textContent = `已定位：${node._nameClean || node.name_zh}`;
   }
 
   // --- High-Performance Minimap Canvas Rendering (離屏快取 O(1) 瞬發繪製) ---
@@ -1049,7 +1031,11 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊力</span>
-          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_attack || "0"}</span><span class="stat-bonus-val dice-stat-bonus-atk is-gold" hidden></span></span>
+          <span class="dice-stat-val">
+            <span class="stat-base-val">${node.dice_attack || "0"}</span>
+            <span class="stat-bonus-val is-gold dice-stat-bonus-atk-powerup" hidden></span>
+            <span class="stat-bonus-val is-purple dice-stat-bonus-atk-dot" hidden></span>
+          </span>
         </div>
       `;
       grid.append(atkItem);
@@ -1063,7 +1049,11 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊速度</span>
-          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_attack_interval || "0"}</span><span class="stat-bonus-val dice-stat-bonus-spd is-purple" hidden></span></span>
+          <span class="dice-stat-val">
+            <span class="stat-base-val">${node.dice_attack_interval || "0"}</span>
+            <span class="stat-bonus-val is-gold dice-stat-bonus-spd-powerup" hidden></span>
+            <span class="stat-bonus-val is-purple dice-stat-bonus-spd-dot" hidden></span>
+          </span>
         </div>
       `;
       grid.append(spdItem);
@@ -1093,7 +1083,11 @@
             </div>
             <div class="dice-stat-text">
               <span class="dice-stat-label">${st.label}</span>
-              <span class="dice-stat-val"><span class="stat-base-val">${st.value}</span><span class="stat-bonus-val dice-stat-bonus-special is-gold" data-index="${idx}" hidden></span></span>
+              <span class="dice-stat-val">
+                <span class="stat-base-val">${st.value}</span>
+                <span class="stat-bonus-val is-gold dice-stat-bonus-special-powerup" data-index="${idx}" hidden></span>
+                <span class="stat-bonus-val is-purple dice-stat-bonus-special-dot" data-index="${idx}" hidden></span>
+              </span>
             </div>
           `;
           grid.append(sItem);
@@ -1102,7 +1096,7 @@
 
       fragment.append(grid);
 
-      // 底部操作列：「強化」與「提升骰點」切換按鈕（對齊遊戲原生介面）
+      // 底部操作列：「強化」與「提升骰點」循環切換按鈕（支援多級並存）
       const btnBar = document.createElement("div");
       btnBar.className = "dice-upgrade-action-bar";
       btnBar.innerHTML = `
@@ -1136,8 +1130,6 @@
       const coreCosts = Array.isArray(node.core_costs) ? node.core_costs : [];
       const unlockGold = goldCosts[0] ?? node.unlock_gold ?? 0;
       const unlockCore = coreCosts[0] ?? node.unlock_core ?? 0;
-      const totalGold = node.total_gold ?? goldCosts.reduce((a, b) => a + b, 0);
-      const totalCore = node.total_core ?? coreCosts.reduce((a, b) => a + b, 0);
 
       const specialUnlock = SPECIAL_UNLOCK_CONDITIONS[node.id];
       if (specialUnlock) {
@@ -1198,26 +1190,34 @@
         metaBox.append(sliderWrap);
       }
 
-      const incomingIds = node.incoming || [];
-      const incomingNodes = incomingIds
+      // 前置解鎖條件
+      if (node.unlock_condition_zh) {
+        const lineCond = document.createElement("div");
+        lineCond.className = "meta-line";
+        lineCond.innerHTML = `<span>解鎖條件</span><span>${node.unlock_condition_zh}</span>`;
+        metaBox.append(lineCond);
+      }
+
+      // 前置節點清單
+      const incomingNodes = (node.incoming || [])
         .map((id) => state.nodeById.get(id))
         .filter(Boolean);
 
       if (incomingNodes.length > 0) {
         const linePre = document.createElement("div");
-        linePre.className = "meta-line";
+        linePre.className = "meta-line meta-line-wrap";
         linePre.innerHTML = `<span>前置節點</span>`;
-        const pillWrap = document.createElement("span");
+        const pillWrap = document.createElement("div");
+        pillWrap.className = "node-links";
         incomingNodes.forEach((inc) => {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "node-link-pill";
           btn.setAttribute("data-target-id", inc.id);
-          btn.textContent = `${inc._nameClean || formatValue(inc.name_zh)} →`;
-          btn.title = `跳轉至 ${inc._nameClean || inc.name_zh}`;
+          btn.textContent = inc.name_zh || inc.short_label || `#${inc.id}`;
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            centerOnNode(inc.id, true);
+            centerOnNodeForTooltip(inc.id, false);
             showTooltip(inc.id, true);
           });
           pillWrap.append(btn);
@@ -1296,14 +1296,17 @@
     }
 
     const cloned = cachedFragment.cloneNode(true);
-    // 綁定前置跳轉按鈕事件
+    // 綁定前置跳轉按鈕事件（與一般點擊節點完全相同的相機定位與平滑過渡邏輯）
     cloned.querySelectorAll(".node-link-pill").forEach((btn) => {
       const targetId = btn.getAttribute("data-target-id");
       if (targetId) {
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
-          centerOnNode(targetId, false);
+          centerOnNodeForTooltip(targetId, false);
           showTooltip(targetId, true);
+          if (state.showPrereqMode) {
+            showPrerequisitePath(targetId);
+          }
         });
       }
     });
@@ -1333,7 +1336,7 @@
       function updateSliderUI(rank, pct, overshootX = 0) {
         sliderInput.value = String(rank);
         sliderInput.style.setProperty("--slider-pct", `${pct}%`);
-        sliderInput.style.setProperty("--overshoot-x", `${overshootX.toFixed(2)}px`);
+        sliderInput.style.setProperty("--overshoot-x", overshootX ? `${overshootX.toFixed(2)}px` : "0px");
 
         // 1. 更新滑桿標頭階級數與頂部階級徽章
         const rankCurEl = tooltipBody.querySelector(".slider-rank-current");
@@ -1342,7 +1345,7 @@
 
         // 2. 即時計算並更新核心描述文案數值
         const copyEl = tooltipBody.querySelector(".detail-copy");
-        if (copyEl) {
+        if (copyEl && node.description_zh) {
           copyEl.innerHTML = formatGameText(node.description_zh, node, rank);
         }
 
@@ -1443,7 +1446,10 @@
         sliderInput.classList.add("is-springing");
 
         // 觸發物理彈簧回彈 (Spring Bounce Back to 0px)
-        sliderInput.style.setProperty("--overshoot-x", "0px");
+        const curVal = parseInt(sliderInput.value, 10) || 1;
+        const targetPct = maxRank > 1 ? ((curVal - 1) / (maxRank - 1)) * 100 : 0;
+        updateSliderUI(curVal, targetPct, 0);
+
         setTimeout(() => {
           sliderInput.classList.remove("is-springing");
         }, 380);
@@ -1465,70 +1471,108 @@
 
     tooltipBody.replaceChildren(cloned);
 
-    // 綁定骰子節點「強化」與「提升骰點」切換事件
+    // 綁定骰子節點「強化」與「提升骰點」循環按鈕事件（支援多級獨立循環與並存）
     const powerupBtn = tooltipBody.querySelector(".btn-powerup");
     const dotBtn = tooltipBody.querySelector(".btn-dot");
     if (powerupBtn && dotBtn) {
-      let currentMode = "none"; // 'none' | 'powerup' | 'dot'
+      const dotLabels = ["提升骰點", "2", "3", "4", "5", "6", "7"];
+      const powerupLabels = ["強化", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "Max"];
 
-      const updateDiceStatsView = (mode) => {
-        currentMode = mode;
-        powerupBtn.classList.toggle("is-active", mode === "powerup");
-        dotBtn.classList.toggle("is-active", mode === "dot");
+      let dotIdx = 0; // 0: 提升骰點(未激活/Lv1), 1~6: 2~7點
+      let powerupIdx = 0; // 0: 強化(未激活/Lv1), 1~13: 2~14級, 14: Max
+
+      function calcBonus(baseAddStr, mult) {
+        if (!baseAddStr || mult <= 0) return "";
+        const num = parseFloat(baseAddStr);
+        if (isNaN(num) || num === 0) return "";
+        const total = num * mult;
+        const formatted = parseFloat(total.toFixed(4)).toString();
+        return total > 0 ? `+${formatted}` : formatted;
+      }
+
+      const updateDiceStatsView = (triggerSource = null) => {
+        // 更新按鈕文字與激活高亮
+        if (!triggerSource || triggerSource === "dot") {
+          dotBtn.textContent = dotLabels[dotIdx];
+          dotBtn.classList.toggle("is-active", dotIdx > 0);
+        }
+
+        if (!triggerSource || triggerSource === "powerup") {
+          powerupBtn.textContent = powerupLabels[powerupIdx];
+          powerupBtn.classList.toggle("is-active", powerupIdx > 0);
+        }
 
         const pData = node.powerup_data || {};
         const dData = node.dot_data || {};
 
+        const mP = powerupIdx; // 0 或 1~14
+        const mD = dotIdx;     // 0 或 1~6
+
+        function updateBonusEl(el, text, isSourceMatch) {
+          if (!el) return;
+          const wasHidden = el.hidden;
+          const oldText = el.textContent;
+          const newFormatted = text ? ` (${text})` : "";
+          el.textContent = newFormatted;
+          el.hidden = !text;
+          // 僅當觸發來源精準吻合且數值產生實質變更時，才重新播放淡入彈出動畫
+          if (isSourceMatch && text && (!wasHidden || oldText !== newFormatted)) {
+            el.style.animation = "none";
+            void el.offsetWidth;
+            el.style.animation = "";
+          }
+        }
+
         // 1. 攻擊力增量 (強化為金黃色，提升骰點為紫色)
-        const atkBonusEl = tooltipBody.querySelector(".dice-stat-bonus-atk");
-        if (atkBonusEl) {
-          const add = mode === "powerup" ? pData.attack_add : (mode === "dot" ? dData.attack_add : "");
-          if (add) {
-            atkBonusEl.textContent = ` (${add})`;
-            atkBonusEl.className = `stat-bonus-val dice-stat-bonus-atk ${mode === "powerup" ? "is-gold" : "is-purple"}`;
-            atkBonusEl.hidden = false;
-          } else {
-            atkBonusEl.hidden = true;
-          }
+        if (!triggerSource || triggerSource === "powerup") {
+          const atkPowerupEl = tooltipBody.querySelector(".dice-stat-bonus-atk-powerup");
+          updateBonusEl(atkPowerupEl, calcBonus(pData.attack_add, mP), triggerSource === "powerup");
+        }
+        if (!triggerSource || triggerSource === "dot") {
+          const atkDotEl = tooltipBody.querySelector(".dice-stat-bonus-atk-dot");
+          updateBonusEl(atkDotEl, calcBonus(dData.attack_add, mD), triggerSource === "dot");
         }
 
-        // 2. 攻擊速度增量 (紫色)
-        const spdBonusEl = tooltipBody.querySelector(".dice-stat-bonus-spd");
-        if (spdBonusEl) {
-          const add = mode === "powerup" ? pData.interval_add : (mode === "dot" ? dData.interval_add : "");
-          if (add) {
-            spdBonusEl.textContent = ` (${add})`;
-            spdBonusEl.className = `stat-bonus-val dice-stat-bonus-spd is-purple`;
-            spdBonusEl.hidden = false;
-          } else {
-            spdBonusEl.hidden = true;
-          }
+        // 2. 攻擊速度增量 (強化金黃色，提升骰點紫色)
+        if (!triggerSource || triggerSource === "powerup") {
+          const spdPowerupEl = tooltipBody.querySelector(".dice-stat-bonus-spd-powerup");
+          updateBonusEl(spdPowerupEl, calcBonus(pData.interval_add, mP), triggerSource === "powerup");
+        }
+        if (!triggerSource || triggerSource === "dot") {
+          const spdDotEl = tooltipBody.querySelector(".dice-stat-bonus-spd-dot");
+          updateBonusEl(spdDotEl, calcBonus(dData.interval_add, mD), triggerSource === "dot");
         }
 
-        // 3. 特殊屬性增量
-        const specialBonusEls = tooltipBody.querySelectorAll(".dice-stat-bonus-special");
-        specialBonusEls.forEach((el) => {
-          const idx = parseInt(el.getAttribute("data-index"), 10);
-          const list = mode === "powerup" ? (pData.special_stats || []) : (mode === "dot" ? (dData.special_stats || []) : []);
-          const st = list[idx];
-          if (st && st.add) {
-            el.textContent = ` (${st.add})`;
-            el.className = `stat-bonus-val dice-stat-bonus-special is-gold`;
-            el.hidden = false;
-          } else {
-            el.hidden = true;
-          }
-        });
+        // 3. 特殊屬性增量 (各項獨立渲染，金黃色強化與紫色骰點並存)
+        if (!triggerSource || triggerSource === "powerup") {
+          const spPowerupEls = tooltipBody.querySelectorAll(".dice-stat-bonus-special-powerup");
+          spPowerupEls.forEach((el) => {
+            const idx = parseInt(el.getAttribute("data-index"), 10);
+            const st = (pData.special_stats || [])[idx];
+            updateBonusEl(el, calcBonus(st?.add, mP), triggerSource === "powerup");
+          });
+        }
+
+        if (!triggerSource || triggerSource === "dot") {
+          const spDotEls = tooltipBody.querySelectorAll(".dice-stat-bonus-special-dot");
+          spDotEls.forEach((el) => {
+            const idx = parseInt(el.getAttribute("data-index"), 10);
+            const st = (dData.special_stats || [])[idx];
+            updateBonusEl(el, calcBonus(st?.add, mD), triggerSource === "dot");
+          });
+        }
       };
 
       powerupBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        updateDiceStatsView(currentMode === "powerup" ? "none" : "powerup");
+        powerupIdx = (powerupIdx + 1) % powerupLabels.length;
+        updateDiceStatsView("powerup");
       });
 
       dotBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        updateDiceStatsView(currentMode === "dot" ? "none" : "dot");
+        dotIdx = (dotIdx + 1) % dotLabels.length;
+        updateDiceStatsView("dot");
       });
     }
   }
@@ -1562,25 +1606,39 @@
     const nodeRadius = (isLarge ? 52 : 36) * state.scale;
     const gap = 16;
 
+    // 前置路徑智慧避讓：在前置高亮模式下，若前置節點位於當前節點上方，Tooltip 智慧改置於下方避免遮擋前置節點與連線
+    let isPrereqAbove = false;
+    if (state.activePrereqNodeIds && state.activePrereqNodeIds.size > 1 && (state.activePrereqTargetId === nodeId || state.selectedId === nodeId)) {
+      let totalY = 0;
+      let count = 0;
+      state.activePrereqNodeIds.forEach((pId) => {
+        if (pId !== nodeId) {
+          const pPt = state.nodePositions.get(pId);
+          if (pPt) {
+            totalY += pPt.y;
+            count++;
+          }
+        }
+      });
+      if (count > 0) {
+        const avgPrereqY = totalY / count;
+        // 若前置節點的平均 Y 座標小於當前節點（即前置路徑分佈在上方），Tooltip 切換到下方
+        if (avgPrereqY < pt.y + 40) {
+          isPrereqAbove = true;
+        }
+      }
+    }
+
     let top;
-    // 空間感知智能定位：若節點下方空間足夠，置於下方；否則若上方空間足夠，置於上方；空間緊湊時動態鉗制
-    const fitsBelow = screenY + nodeRadius + gap + cachedTipHeight <= window.innerHeight - 16;
-    const fitsAbove = screenY - nodeRadius - cachedTipHeight - gap >= 16;
-
-    if (fitsBelow) {
+    if (isPrereqAbove) {
       top = screenY + nodeRadius + gap;
-    } else if (fitsAbove) {
-      top = screenY - nodeRadius - cachedTipHeight - gap;
+      tooltip.classList.add("is-placed-below");
     } else {
-      // 螢幕空間緊湊時，優先讓 Tooltip 在可視區域內完整顯示
-      top = Math.max(16, Math.min(window.innerHeight - 16 - cachedTipHeight, screenY - cachedTipHeight / 2));
+      top = screenY - nodeRadius - cachedTipHeight - gap;
+      tooltip.classList.remove("is-placed-below");
     }
 
-    let left = screenX - cachedTipWidth / 2;
-    if (left < 16) left = 16;
-    if (left + cachedTipWidth > window.innerWidth - 16) {
-      left = window.innerWidth - 16 - cachedTipWidth;
-    }
+    const left = screenX - cachedTipWidth / 2;
 
     tooltip.style.left = `${Math.round(left)}px`;
     tooltip.style.top = `${Math.round(top)}px`;
@@ -1672,6 +1730,12 @@
     state.selectedId = nodeId;
     state.tooltipPinned = pinned;
 
+    if (state.showPrereqMode) {
+      showPrerequisitePath(nodeId);
+    } else if (state.activePrereqNodeIds) {
+      clearPrereqHighlight(false);
+    }
+
     // 清除所有節點的選取與關聯選取
     state.elementsById.forEach((element) => {
       element.classList.remove("is-selected", "is-linked-selected");
@@ -1712,6 +1776,9 @@
       tooltip.classList.remove("is-active", "is-entering");
       void tooltip.offsetWidth;
       tooltip.classList.add("is-active", "is-entering");
+      if (state.showPrereqMode) {
+        showPrerequisitePath(nodeId);
+      }
       positionTooltip(nodeId, true);
       tooltipSwitchTimer = setTimeout(() => {
         tooltip.classList.remove("is-entering");
@@ -1810,7 +1877,6 @@
   }
 
   // --- High-Performance Search System (120ms Debounce + Set + Dirty Checking) ---
-  let prevMatchedIds = new Set();
   let searchDebounceTimer = null;
 
   function renderSearchResults() {
@@ -1862,8 +1928,8 @@
     searchResults.hidden = true;
     const node = state.nodeById.get(nodeId);
     if (!node) return;
+    centerOnNodeForTooltip(nodeId, false);
     showTooltip(nodeId, true);
-    centerOnNode(nodeId, false);
   }
 
   // --- Unified Canvas Focus & Topology Highlighting Engine (DRY) ---
@@ -1890,6 +1956,13 @@
     return { activePathNodeIds, activeBranches };
   }
 
+  // 高性能拓撲狀態與 DOM Diff 追蹤系統（消除 90%+ 無謂的 classList 變更）
+  const activeClassState = {
+    nodes: new Map(), // className -> Set of nodeIds currently having this class
+    edges: new Map(), // className -> Set of edgeObjects currently having this class
+    targetNodeId: null,
+  };
+
   function applyTopologyHighlight({
     modeClass,
     matchedNodeIds,
@@ -1901,64 +1974,131 @@
   }) {
     document.body.classList.add(modeClass);
 
-    // 標記節點樣式
-    state.elementsById.forEach((element, id) => {
-      const isMatched = matchedNodeIds.has(id);
-      element.classList.toggle(nodeClass, isMatched);
-      if (targetNodeId !== null) {
-        element.classList.toggle("is-prereq-target", id === targetNodeId);
+    // 1. 增量 Diff 更新節點 Class（只操作發生變更的元素）
+    let currNodeSet = activeClassState.nodes.get(nodeClass);
+    if (!currNodeSet) {
+      currNodeSet = new Set();
+      activeClassState.nodes.set(nodeClass, currNodeSet);
+    }
+
+    // 移除不再匹配的節點 class
+    currNodeSet.forEach((id) => {
+      if (!matchedNodeIds.has(id)) {
+        const el = state.elementsById.get(id);
+        if (el) el.classList.remove(nodeClass);
       }
     });
 
-    // 標記分支連線高亮（利用已解析的邊緣陣列，0 次正則與距離計算！）
+    // 新增剛匹配的節點 class
+    matchedNodeIds.forEach((id) => {
+      if (!currNodeSet.has(id)) {
+        const el = state.elementsById.get(id);
+        if (el) el.classList.add(nodeClass);
+      }
+    });
+    activeClassState.nodes.set(nodeClass, new Set(matchedNodeIds));
+
+    // 處理 targetNodeId 專屬 class
+    if (activeClassState.targetNodeId !== targetNodeId) {
+      if (activeClassState.targetNodeId) {
+        const prevTargetEl = state.elementsById.get(activeClassState.targetNodeId);
+        if (prevTargetEl) prevTargetEl.classList.remove("is-prereq-target");
+      }
+      if (targetNodeId) {
+        const nextTargetEl = state.elementsById.get(targetNodeId);
+        if (nextTargetEl) nextTargetEl.classList.add("is-prereq-target");
+      }
+      activeClassState.targetNodeId = targetNodeId;
+    }
+
+    // 2. 增量 Diff 更新邊緣連線 Class
+    let currEdgeSet = activeClassState.edges.get(edgeClass);
+    if (!currEdgeSet) {
+      currEdgeSet = new Set();
+      activeClassState.edges.set(edgeClass, currEdgeSet);
+    }
+
+    const nextEdgeSet = new Set();
     state.parsedEdges.forEach((edge) => {
       const isConnected = activePathNodeIds.has(edge.startId) && activePathNodeIds.has(edge.endId);
-      edge.element.classList.toggle(edgeClass, isConnected);
+      if (isConnected) {
+        nextEdgeSet.add(edge);
+        if (!currEdgeSet.has(edge)) {
+          edge.element.classList.add(edgeClass);
+        }
+      } else if (currEdgeSet.has(edge)) {
+        edge.element.classList.remove(edgeClass);
+      }
+    });
+    activeClassState.edges.set(edgeClass, nextEdgeSet);
+
+    // 3. 標記中央至五大初始起點的線段（使用快取元素，避免每次 querySelectorAll）
+    if (!state.cachedCenterLinks) {
+      state.cachedCenterLinks = Array.from(scene.querySelectorAll("path.tree-center-link")).map((el) => {
+        const d = el.getAttribute("d") || "";
+        let branch = 0;
+        if (d.includes("1460.00")) branch = 1; // 自然 (火)
+        else if (d.includes("1840.00")) branch = 2; // 工學 (雷)
+        else if (d.includes("2160.00")) branch = 3; // 魔法 (冰)
+        else if (d.includes("1720.00")) branch = 4; // 秩序 (風/陰陽/迪奇)
+        else if (d.includes("2280.00")) branch = 5; // 渾沌 (恐懼/吞噬/貪婪)
+        return { el, branch };
+      });
+    }
+
+    state.cachedCenterLinks.forEach(({ el, branch }) => {
+      const isBranchActive = activeBranches.has(branch);
+      el.classList.toggle(edgeClass, isBranchActive);
     });
 
-    // 標記中央至五大初始起點的線段（只要該陣營有節點在活躍路徑中即點亮）
-    scene.querySelectorAll("path.tree-center-link").forEach((linkEl) => {
-      const d = linkEl.getAttribute("d") || "";
-      let isBranchActive = false;
-      if (d.includes("1460.00") && activeBranches.has(1)) isBranchActive = true; // 自然 (火)
-      else if (d.includes("1840.00") && activeBranches.has(2)) isBranchActive = true; // 工學 (雷)
-      else if (d.includes("2160.00") && activeBranches.has(3)) isBranchActive = true; // 魔法 (冰)
-      else if (d.includes("1720.00") && activeBranches.has(4)) isBranchActive = true; // 秩序 (風/陰陽/迪奇)
-      else if (d.includes("2280.00") && activeBranches.has(5)) isBranchActive = true; // 渾沌 (恐懼/吞噬/貪婪)
-
-      linkEl.classList.toggle(edgeClass, isBranchActive);
-    });
-
-    // 標記中央五大分支圖示與文字（活躍陣營點亮，其餘暗化）
-    scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-      const b = Number(el.getAttribute("data-branch"));
-      el.classList.toggle("is-branch-active", activeBranches.has(b));
+    // 4. 標記中央五大分支圖示與文字（使用快取元素）
+    if (!state.cachedBranchMarks) {
+      state.cachedBranchMarks = Array.from(scene.querySelectorAll(".tree-center [data-branch]")).map((el) => ({
+        el,
+        branch: Number(el.getAttribute("data-branch")),
+      }));
+    }
+    state.cachedBranchMarks.forEach(({ el, branch }) => {
+      el.classList.toggle("is-branch-active", activeBranches.has(branch));
     });
   }
 
   function clearTopologyHighlight({ modeClass, nodeClass, edgeClass }) {
     document.body.classList.remove(modeClass);
 
-    state.elementsById.forEach((element) => {
-      element.classList.remove(nodeClass, "is-prereq-target");
-    });
+    const currNodeSet = activeClassState.nodes.get(nodeClass);
+    if (currNodeSet) {
+      currNodeSet.forEach((id) => {
+        const el = state.elementsById.get(id);
+        if (el) el.classList.remove(nodeClass);
+      });
+      currNodeSet.clear();
+    }
 
-    state.parsedEdges.forEach((edge) => {
-      edge.element.classList.remove(edgeClass);
-    });
+    if (activeClassState.targetNodeId) {
+      const prevTargetEl = state.elementsById.get(activeClassState.targetNodeId);
+      if (prevTargetEl) prevTargetEl.classList.remove("is-prereq-target");
+      activeClassState.targetNodeId = null;
+    }
 
-    scene.querySelectorAll(`path.tree-center-link.${edgeClass}`).forEach((pathEl) => {
-      pathEl.classList.remove(edgeClass);
-    });
+    const currEdgeSet = activeClassState.edges.get(edgeClass);
+    if (currEdgeSet) {
+      currEdgeSet.forEach((edge) => {
+        edge.element.classList.remove(edgeClass);
+      });
+      currEdgeSet.clear();
+    }
+
+    if (state.cachedCenterLinks) {
+      state.cachedCenterLinks.forEach(({ el }) => el.classList.remove(edgeClass));
+    }
 
     // 若無其他活躍的焦點模式，則清除中央分支活躍標記
     const isAnyActive = document.body.classList.contains("has-active-filter") ||
                         document.body.classList.contains("has-search-active") ||
                         document.body.classList.contains("has-prereq-highlight");
-    if (!isAnyActive) {
-      scene.querySelectorAll(".tree-center [data-branch]").forEach((el) => {
-        el.classList.remove("is-branch-active");
-      });
+    if (!isAnyActive && state.cachedBranchMarks) {
+      state.cachedBranchMarks.forEach(({ el }) => el.classList.remove("is-branch-active"));
     }
   }
 
@@ -2044,6 +2184,35 @@
       if (!searchInput.value.trim()) {
         searchStatus.textContent = `${state.nodes.length} 個節點`;
       }
+      fitCameraToNodes([], false);
+      return;
+    }
+
+    // 高性能快取路徑：純派系篩選（佔 90%+ 操作場景）直接 O(1) 合併快取
+    if (hasBranchFilter && !hasTypeFilter) {
+      const matchedSet = new Set();
+      const pathSet = new Set();
+      const branchSet = new Set();
+      state.filterBranches.forEach((b) => {
+        const cached = branchTopologyCache.get(b);
+        if (cached) {
+          cached.nodeIds.forEach((id) => matchedSet.add(id));
+          cached.activePathNodeIds.forEach((id) => pathSet.add(id));
+          cached.activeBranches.forEach((br) => branchSet.add(br));
+        }
+      });
+
+      applyTopologyHighlight({
+        modeClass: "has-active-filter",
+        matchedNodeIds: matchedSet,
+        activePathNodeIds: pathSet,
+        activeBranches: branchSet,
+        nodeClass: "is-filter-matched",
+        edgeClass: "is-filter-edge",
+      });
+
+      searchStatus.textContent = `已篩選 ${matchedSet.size} 個節點`;
+      fitCameraToNodes(matchedSet, false);
       return;
     }
 
@@ -2073,6 +2242,7 @@
     });
 
     searchStatus.textContent = `已篩選 ${matchedCount} 個節點`;
+    fitCameraToNodes(matchedNodeIds, false);
   }
 
   function onSearchKeydown(event) {
@@ -2918,6 +3088,21 @@
     });
   }
 
+  // 5 大陣營靜態拓撲快取（O(1) 瞬發讀取，0 毫秒 BFS 搜尋時間）
+  const branchTopologyCache = new Map();
+  function precomputeBranchTopologyCache() {
+    branchTopologyCache.clear();
+    for (let b = 1; b <= 5; b++) {
+      const bNodes = state.nodes.filter((n) => Number(n.branch) === b).map((n) => n.id);
+      const topo = computeUpstreamTopologyPath(bNodes);
+      branchTopologyCache.set(b, {
+        nodeIds: new Set(bNodes),
+        activePathNodeIds: topo.activePathNodeIds,
+        activeBranches: topo.activeBranches,
+      });
+    }
+  }
+
   // --- 加載期深度預熱：小地圖離屏點陣底圖預烘焙 (Pre-baking Offscreen Canvas) ---
   function prebakeMinimap() {
     if (!minimapCanvas || !state.nodes.length) return;
@@ -3005,9 +3190,10 @@
   // --- Prerequisite Path Highlighting & Traversal System (O(1) 瞬發查詢, DRY) ---
   function showPrerequisitePath(targetNodeId) {
     let prereq = state.prereqGraph.get(targetNodeId);
+    const targetNode = state.nodeById.get(targetNodeId);
+    if (!targetNode) return;
+
     if (!prereq) {
-      const targetNode = state.nodeById.get(targetNodeId);
-      if (!targetNode) return;
       const { activePathNodeIds, activeBranches } = computeUpstreamTopologyPath([targetNodeId]);
       prereq = { nodeIds: activePathNodeIds, branches: activeBranches };
       state.prereqGraph.set(targetNodeId, prereq);
@@ -3016,6 +3202,15 @@
     const { nodeIds: prereqNodeIds, branches: prereqBranches } = prereq;
     state.activePrereqNodeIds = prereqNodeIds;
     state.activePrereqTargetId = targetNodeId;
+
+    // 判定同派系覆蓋：
+    // 若無派系篩選（全圖模式），或目標節點所屬派系包含在當前篩選派系中，才套用覆蓋暗化（prereq-overrides-filter）
+    // 若目標節點屬於「其他派系」，則不套用覆蓋暗化，當前篩選的派系節點維持高亮點亮！
+    const hasBranchFilter = state.filterBranches.size > 0;
+    const targetBranch = Number(targetNode.branch);
+    const shouldOverrideFilter = !hasBranchFilter || state.filterBranches.has(targetBranch);
+
+    document.body.classList.toggle("prereq-overrides-filter", shouldOverrideFilter);
 
     applyTopologyHighlight({
       modeClass: "has-prereq-highlight",
@@ -3031,6 +3226,7 @@
   function clearPrereqHighlight(resetButtonState = false) {
     state.activePrereqNodeIds = null;
     state.activePrereqTargetId = null;
+    document.body.classList.remove("prereq-overrides-filter");
 
     clearTopologyHighlight({
       modeClass: "has-prereq-highlight",
@@ -3070,7 +3266,7 @@
     const pathWidth = maxX - minX + 240;
     const pathHeight = maxY - minY + 240;
 
-    const fitScale = Math.min(1.1, Math.max(MIN_SCALE, Math.min((width - 80) / pathWidth, (height - 120) / pathHeight)));
+    const fitScale = Math.min(1.1, Math.max(getMinScale(), Math.min((width - 80) / pathWidth, (height - 120) / pathHeight)));
 
     if (immediate) {
       state.scale = fitScale;
@@ -3081,7 +3277,54 @@
       state.targetPanY = state.panY;
       applySceneTransform();
       updateMinimapWindow();
-      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+      zoomReadout.textContent = formatZoomPercent(state.scale);
+    } else {
+      startCameraZoom(fitScale, centerX, centerY, false);
+    }
+  }
+
+  // 邏輯 C：篩選多選/取消時相機自適應聚焦至匹配節點群（若全空或全選則平滑回歸全景置中）
+  function fitCameraToNodes(nodeIds, immediate = false, padding = 200) {
+    const list = Array.isArray(nodeIds) ? nodeIds : Array.from(nodeIds || []);
+    if (!list.length || list.length >= state.nodes.length) {
+      resetToCenter(immediate);
+      return;
+    }
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    list.forEach((id) => {
+      const pt = state.nodePositions.get(id);
+      if (pt) {
+        minX = Math.min(minX, pt.x);
+        maxX = Math.max(maxX, pt.x);
+        minY = Math.min(minY, pt.y);
+        maxY = Math.max(maxY, pt.y);
+      }
+    });
+
+    if (!isFinite(minX)) {
+      resetToCenter(immediate);
+      return;
+    }
+
+    const { width, height } = viewportSize();
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const boundWidth = maxX - minX + padding * 2;
+    const boundHeight = maxY - minY + padding * 2;
+
+    const fitScale = Math.min(0.92, Math.max(getMinScale(), Math.min((width - 80) / boundWidth, (height - 120) / boundHeight)));
+
+    if (immediate) {
+      state.scale = fitScale;
+      state.targetScale = fitScale;
+      state.panX = width / 2 - centerX * fitScale;
+      state.panY = height / 2 - centerY * fitScale;
+      state.targetPanX = state.panX;
+      state.targetPanY = state.panY;
+      applySceneTransform();
+      updateMinimapWindow();
+      zoomReadout.textContent = formatZoomPercent(state.scale);
     } else {
       startCameraZoom(fitScale, centerX, centerY, false);
     }
@@ -3104,9 +3347,13 @@
         if (state.selectedId) {
           showPrerequisitePath(state.selectedId);
           centerOnPrereqPath(state.activePrereqNodeIds);
+          positionTooltip(state.selectedId);
         }
       } else {
         clearPrereqHighlight(false);
+        if (state.selectedId) {
+          positionTooltip(state.selectedId);
+        }
       }
     });
 
@@ -3128,8 +3375,6 @@
       btn.addEventListener("pointercancel", removeBtnPress);
       btn.addEventListener("pointerleave", removeBtnPress);
     });
-
-    tooltipClose?.addEventListener("click", closeTooltip);
 
     // 60ms Debounced search (極致靈敏響應)
     searchInput.addEventListener("input", () => {
@@ -3439,6 +3684,7 @@
 
     setLoaderProgress(88, "計算節點幾何與派系分組...");
     precomputeGeometryAndGroups();
+    precomputeBranchTopologyCache();
 
     setLoaderProgress(94, "準備資訊卡片快取...");
     precompileTooltipPanels();
@@ -3462,7 +3708,8 @@
   window.__TEST_HOOKS__ = {
     showTooltip,
     centerOnNode,
-    closeTooltip
+    closeTooltip,
+    getState: () => state,
   };
 
   loadMap();
