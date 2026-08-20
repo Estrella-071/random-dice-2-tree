@@ -22310,7 +22310,7 @@
     "PILLAR": {
       "key": "PILLAR",
       "name_zh": "巨石",
-      "desc_zh": "於隨機位置召喚，並阻擋所有怪物移動。BIG_MONSTER、BOSS_MONSTER、GOLEM_MONSTER可摧毀巨石",
+      "desc_zh": "於隨機位置召喚，並阻擋所有怪物移動。大型怪物、首領怪物、魔像怪物可摧毀巨石",
       "color": "FFFFFF",
       "bg_color": "4DA3FF"
     },
@@ -22541,7 +22541,7 @@
     "OVERSHURIKEN": {
       "key": "OVERSHURIKEN",
       "name_zh": "強化魔彈",
-      "desc_zh": "造成該骰子子彈傷害等比AREA_DAMAGE的投射物",
+      "desc_zh": "造成該骰子子彈傷害等比範圍傷害的投射物",
       "color": "FFFFFF",
       "bg_color": "4DA3FF"
     },
@@ -22590,7 +22590,7 @@
     "MUTATION": {
       "key": "MUTATION",
       "name_zh": "變種",
-      "desc_zh": "根據骰盤上存在的MUTATION總骰點數量，使基本傷害等比增加",
+      "desc_zh": "根據骰盤上存在的變種總骰點數量，使基本傷害等比增加",
       "color": "FFFFFF",
       "bg_color": "4DA3FF"
     },
@@ -22611,7 +22611,7 @@
     "DOOM": {
       "key": "DOOM",
       "name_zh": "破滅",
-      "desc_zh": "範圍內的NORMAL_MONSTER暴斃，對ELITE_MONSTER造成目前生命值等比傷害",
+      "desc_zh": "範圍內的普通怪物暴斃，對菁英怪物造成目前生命值等比傷害",
       "color": "FFFFFF",
       "bg_color": "FF8A3D"
     },

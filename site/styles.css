@@ -94,6 +94,7 @@
 
   /* Type Scale Tokens */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro TC", "PingFang TC", "Hiragino Sans TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif;
+  --font-numeric: "SF Pro Rounded", "Arial Rounded MT Bold", "Google Sans", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
 }
 
@@ -506,6 +507,22 @@ body.is-low-lod .map-scene .tree-center-tree-icon {
   filter: none !important;
 }
 
+/* 運動期間（平移、縮放）與拖曳時：關閉全圖 500+ 元素的 CSS 過渡動畫，釋放主線程與 GPU 頻寬，由 GPU 直接進行 60fps 紋理矩陣變換 */
+body.is-navigating .map-scene g.node,
+body.is-navigating .map-scene path.edge,
+body.is-navigating .map-scene line.edge,
+body.is-navigating .map-scene path.tree-center-link,
+body.is-zooming .map-scene g.node,
+body.is-zooming .map-scene path.edge,
+body.is-zooming .map-scene line.edge,
+body.is-zooming .map-scene path.tree-center-link,
+.map-viewport.is-dragging .map-scene g.node,
+.map-viewport.is-dragging .map-scene path.edge,
+.map-viewport.is-dragging .map-scene line.edge,
+.map-viewport.is-dragging .map-scene path.tree-center-link {
+  transition: none !important;
+}
+
 /* 確保骰子陰影在任何模式與運動中均維持純黑剪影，絕不消失或變白 */
 .map-scene .dice-shadow,
 body.is-low-lod .map-scene .dice-shadow {
@@ -539,6 +556,14 @@ body.is-low-lod .map-scene g.node.is-prereq-active {
   cursor: pointer;
   outline: none;
   pointer-events: all;
+  transition: opacity 140ms ease-out, filter 140ms ease-out;
+}
+
+.map-scene path.edge,
+.map-scene line.edge,
+.map-scene path.tree-center-link {
+  transition: opacity 280ms cubic-bezier(0.2, 0, 0, 1), stroke 280ms ease, stroke-width 280ms ease;
+  will-change: opacity, stroke, stroke-width;
 }
 
 .map-scene .node .node-body {
@@ -662,9 +687,10 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 
 .zoom-readout {
   color: var(--ink-primary);
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-family: var(--font-numeric);
+  font-weight: 750;
   font-size: 11px;
+  letter-spacing: -0.01em;
 }
 
 .minimap {
@@ -1190,6 +1216,22 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   animation: tooltip-scale-exit 140ms cubic-bezier(0.4, 0, 0.9, 0.4) forwards;
 }
 
+/* Tooltip 智慧避讓：置於下方時（小三角形位於頂部朝上，由頂部展開） */
+.node-tooltip.is-placed-below::after {
+  top: auto;
+  bottom: calc(100% + 3px);
+  border-top: none;
+  border-bottom: 10px solid #5a3fa2;
+}
+
+.node-tooltip.is-placed-below.is-entering {
+  transform-origin: 50% 0%;
+}
+
+.node-tooltip.is-placed-below.is-closing {
+  transform-origin: 50% 15%;
+}
+
 /* Tooltip Header */
 .tooltip-header {
   position: relative;
@@ -1261,8 +1303,8 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   font-weight: 800 !important;
   border: none !important;
   border-radius: 6px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
+  font-family: var(--font-numeric);
+  letter-spacing: -0.01em;
 }
 
 /* Tooltip 3 系列 PNG 圖示 */
@@ -1354,7 +1396,8 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 .stat-green-add {
   color: #4cd964;
   font-weight: 800;
-  font-family: var(--font-mono, sans-serif);
+  font-family: var(--font-numeric);
+  letter-spacing: -0.01em;
 }
 
 /* 下方 #標籤 晶片列 */
@@ -1410,21 +1453,22 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 .dice-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px 14px;
+  gap: 10px 12px;
 }
 
 .dice-stat-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .dice-stat-icon-box {
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
   background: #362c4b;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1432,8 +1476,8 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 }
 
 .dice-stat-icon-box img {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
@@ -1442,6 +1486,7 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   display: flex;
   flex-direction: column;
   min-width: 0;
+  justify-content: center;
 }
 
 .dice-stat-label {
@@ -1452,26 +1497,51 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 }
 
 .dice-stat-val {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.2;
-  margin-top: 2px;
-  font-family: var(--font-mono, sans-serif);
+  margin-top: 1px;
+  font-family: var(--font-numeric);
+  letter-spacing: -0.01em;
+  font-variant-numeric: proportional-nums;
   display: inline-flex;
   align-items: baseline;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   gap: 3px;
 }
 
 .stat-base-val {
   color: #ffffff;
+  white-space: nowrap;
 }
 
 .stat-bonus-val {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
-  font-family: var(--font-mono, sans-serif);
+  font-family: var(--font-numeric);
+  letter-spacing: -0.01em;
+  font-variant-numeric: proportional-nums;
+  display: inline-block;
+  white-space: nowrap;
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+
+.stat-bonus-val:not([hidden]) {
+  animation: bonus-pop-fade 220ms cubic-bezier(0.18, 0.9, 0.3, 1.15) forwards;
+}
+
+@keyframes bonus-pop-fade {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.82) translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .stat-bonus-val.is-gold {
@@ -1706,14 +1776,16 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 
 .slider-rank-display {
   color: #f7f4ff;
-  font-family: var(--font-mono, sans-serif);
+  font-family: var(--font-numeric);
   font-size: 13px;
+  letter-spacing: -0.01em;
 }
 
 .slider-rank-current {
   color: #fce38a;
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 800;
+  font-family: var(--font-numeric);
 }
 
 .slider-track-container {
@@ -1841,10 +1913,20 @@ g[transform^="scale(0.56)"] .sel-box-runner,
 
 .slider-cost-value {
   color: #f7f4ff;
-  font-family: var(--font-mono, sans-serif);
+  font-family: var(--font-numeric);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  font-variant-numeric: proportional-nums;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.slider-rank-current {
+  color: #fce38a;
+  font-size: 15px;
+  font-weight: 800;
+  display: inline-block;
 }
 
 /* Empty State */
@@ -2179,16 +2261,20 @@ g[transform^="scale(0.56)"] .sel-box-runner,
     gap: 5px;
   }
 
-  .stat-pill {
-    padding: 3px 7px;
+  .dice-stat-grid {
+    gap: 8px 8px;
   }
 
-  .stat-pill-label {
-    font-size: 10.5px;
+  .dice-stat-icon-box {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 6px;
   }
 
-  .stat-pill-value {
-    font-size: 13.5px;
+  .dice-stat-icon-box img {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -2458,7 +2544,7 @@ body.has-active-filter .map-scene g.node,
 body.has-search-active .map-scene g.node,
 body.has-prereq-highlight .map-scene g.node {
   opacity: 0.12;
-  transition: opacity 200ms ease;
+  transition: opacity 140ms ease-out;
 }
 
 /* 2. 匹配/目標節點高亮：純淨白光/陣營光暈，透明度 1.0 */
@@ -2468,6 +2554,12 @@ body.has-prereq-highlight .map-scene g.node.is-prereq-active,
 body.has-prereq-highlight .map-scene g.node.is-prereq-target {
   opacity: 1 !important;
   filter: drop-shadow(0 0 12px var(--node-hover-color, #ffffff)) !important;
+}
+
+/* 2.1 前置節點模式覆蓋：僅在同派系（或無篩選模式）時，非前置路徑上的節點才強制暗化；若顯示其他派系的前置節點，當前篩選派系保持點亮 */
+body.has-prereq-highlight.prereq-overrides-filter .map-scene g.node:not(.is-prereq-active):not(.is-prereq-target) {
+  opacity: 0.12 !important;
+  filter: none !important;
 }
 
 /* 3. 畫布連線暗化：非匹配/非活躍連線平滑暗化為 0.08 */
@@ -2481,7 +2573,7 @@ body.has-prereq-highlight .map-scene path.edge,
 body.has-prereq-highlight .map-scene line.edge,
 body.has-prereq-highlight .map-scene path.tree-center-link {
   opacity: 0.08;
-  transition: opacity 200ms ease;
+  transition: opacity 140ms ease-out;
 }
 
 /* 4. 活躍分支/前置連線高亮：乾淨清晰的白銀光澤 (2.2px, 0.8 opacity) */
@@ -2497,6 +2589,15 @@ body.has-prereq-highlight .map-scene path.tree-center-link.is-prereq-edge {
   opacity: 0.8 !important;
   stroke: rgba(255, 255, 255, 0.75) !important;
   stroke-width: 2.2px !important;
+  filter: none !important;
+}
+
+/* 4.1 前置連線覆蓋：僅在同派系（或無篩選模式）時，非前置連線才強制暗化 */
+body.has-prereq-highlight.prereq-overrides-filter .map-scene path.edge:not(.is-prereq-edge),
+body.has-prereq-highlight.prereq-overrides-filter .map-scene line.edge:not(.is-prereq-edge),
+body.has-prereq-highlight.prereq-overrides-filter .map-scene path.tree-center-link:not(.is-prereq-edge) {
+  opacity: 0.08 !important;
+  stroke-width: 1.2px !important;
   filter: none !important;
 }
 
