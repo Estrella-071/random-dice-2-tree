@@ -27,11 +27,11 @@ NODE_TYPE_ZH = {
 }
 
 BRANCH_ZH = {
-    1: "初始樹",
-    2: "工程分支",
-    3: "魔法分支",
-    4: "守護分支",
-    5: "入侵分支",
+    1: "自然",
+    2: "工學",
+    3: "魔法",
+    4: "秩序",
+    5: "渾沌",
 }
 
 BRANCH_COLOR = {
@@ -703,7 +703,7 @@ def assign_icons(root: Path, nodes: list[dict[str, object]]) -> int:
             icon = icon_lookup(manifest, [perk_aliases.get(str(node.get("perk_type", "")), "")])
         if icon:
             node["icon_name"] = icon["name"]
-            node["icon_file"] = icon["file"]
+            node["icon_file"] = public_icon_path(icon["file"])
             node["icon_status"] = "sprite"
             matched += 1
         else:
@@ -718,6 +718,8 @@ def file_data_uri(root: Path, relative_file: str) -> str:
     if not relative_file:
         return ""
     path = root / relative_file
+    if not path.is_file() and relative_file.startswith("icons/"):
+        path = root / "sprite_icons" / relative_file.removeprefix("icons/")
     if not path.is_file():
         return ""
     try:
@@ -730,6 +732,12 @@ def file_data_uri(root: Path, relative_file: str) -> str:
 def icon_data_uri(root: Path, node: dict[str, object]) -> str:
     """Return an embedded PNG URI for a node's extracted sprite, if present."""
     return file_data_uri(root, str(node.get("icon_file", "")))
+
+
+def public_icon_path(relative_file: object) -> str:
+    """Expose one repository-relative icon contract for generated consumers."""
+    value = str(relative_file or "").replace("\\", "/")
+    return value.replace("sprite_icons/", "icons/", 1)
 
 
 def sprite_file_lookup(root: Path) -> dict[str, str]:
@@ -985,7 +993,7 @@ def load_rune_catalog(root: Path, nodes: list[dict[str, object]]) -> list[dict[s
             "max_rank": int(row.get("MaxRank", "0") or 0),
             "in_tree": rune_id in tree_ids,
             "icon_name": icon.get("name", "") if icon else "",
-            "icon_file": icon.get("file", "") if icon else "",
+            "icon_file": public_icon_path(icon.get("file", "")) if icon else "",
             "icon_status": icon_status,
         })
     return catalog

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Estrella-071/random-dice-2-tree/schema/dice-tree.schema.json",
+  "title": "Random Dice 2 dice tree snapshot",
+  "type": "object",
+  "required": ["summary", "nodes"],
+  "properties": {
+    "summary": {
+      "type": "object",
+      "required": ["node_count", "edge_count", "nodes_by_type", "nodes_by_branch"],
+      "properties": {
+        "node_count": { "type": "integer", "minimum": 0 },
+        "edge_count": { "type": "integer", "minimum": 0 },
+        "nodes_by_type": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "nodes_by_branch": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+      },
+      "additionalProperties": true
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "branch", "branch_zh", "node_type", "name_zh", "incoming", "next_nodes", "icon_file"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "branch": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+          "branch_zh": { "type": "string", "enum": ["自然", "工學", "魔法", "秩序", "渾沌"] },
+          "node_type": { "type": "string", "enum": ["DICE", "DICE_RUNE", "PLAYER_PASSIVE", "PERK"] },
+          "name_zh": { "type": "string" },
+          "incoming": { "type": "array", "items": { "type": "string" } },
+          "next_nodes": { "type": "array", "items": { "type": "string" } },
+          "icon_file": { "type": "string", "pattern": "^icons/[A-Za-z0-9._/-]+$" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

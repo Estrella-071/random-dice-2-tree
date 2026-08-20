@@ -10,7 +10,8 @@ Usage (PowerShell):
       --app-dir "Random Dice 2 1.0.0\Payload\RandomDice2.app" `
       --out-dir research\random-dice-2-1.0.0
 
-UnityPy is required (``python -m pip install --user UnityPy``).
+Create a Python 3.12 environment and install the pinned dependencies first:
+    python -m pip install -r research/requirements.txt
 """
 
 from __future__ import annotations

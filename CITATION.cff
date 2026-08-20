@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: Random Dice 2 Dice Tree
+message: Cite the repository commit and the documented client snapshot when using the data.
+type: software
+authors:
+  - family-names: Estrella
+    given-names: Random Dice 2 Community Contributors
+repository-code: https://github.com/Estrella-071/random-dice-2-tree
+license: MIT
+version: 0.1.0

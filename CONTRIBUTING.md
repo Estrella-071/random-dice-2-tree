@@ -1,61 +1,58 @@
-# 專案貢獻指南 (Contributing Guide)
+# 貢獻指南
 
-本專案為開源專案，收錄《Random Dice 2》天賦樹拓撲關係與各階升級數值。歡迎透過問題回報（Issue）或拉取請求（Pull Request）協助修正數據與改進功能。
+本專案維護一個有版本邊界的 Random Dice 2 client 1.0.0 資料快照與靜態網站。貢獻的價值取決於可驗證證據、可重現命令與清楚的授權範圍，而不是宣稱「最新」或「完整」。
 
----
+開始前請閱讀 [AGENTS.md](AGENTS.md)、[DATA_MODEL.md](DATA_MODEL.md)、[TESTING.md](TESTING.md) 與 [NOTICE.md](NOTICE.md)。
 
-## 貢獻範疇
+## 可接受的貢獻
 
-1. **數值與描述勘誤**：修正因官方版本更新導致之效果數值、升級消耗、佔位符描述或解鎖條件。
-2. **圖示對應修正**：修正節點與符文對應之圖示檔案名稱。
-3. **功能改進**：包含效能最佳化、檢索體驗、配點計算等工具性功能。
-4. **問題回報**：跨平台相容性異常、手勢行為失效或介面渲染問題。
+- 有來源與版本證據的數值、文字、圖示勘誤。
+- 可由測試或人工步驟驗證的 UI、手機 viewport、效能或可及性改進。
+- 資料 schema、生成流程、研究可重現性與治理文件改善。
+- 不擴大未確認第三方素材散布範圍的網站功能。
 
----
+不要提交 IPA、原始解包輸出、私人 artifact、個人絕對路徑、秘密或未確認授權的第三方素材。[NOTICE.md](NOTICE.md) 說明程式碼與遊戲衍生資料的授權邊界。
 
-## 數值與文字勘誤流程
+## 資料修正
 
-若在遊戲中發現天賦描述、升級金幣、核心消耗或階級有誤：
+Issue 或 PR 必須提供：
 
-1. 前往 GitHub 的 [Issues 頁面](https://github.com/Estrella-071/random-dice-2-tree/issues)。
-2. 點擊 **New Issue** 並選擇 **[數值/文字/圖示錯誤回報]** 模板。
-3. 提供以下資訊：
-   - 節點 ID 或名稱（例如：`1201 子彈傷害%增加`）
-   - 目前站上顯示數值
-   - 遊戲內實際正確數值
-   - 遊戲截圖或官方公告佐證
+- 節點 ID、名稱、目前值與建議值，包含單位與階級。
+- client 版本、平台、區域、語言與觀察日期。
+- 截圖、官方公告、遊戲內證據或可重現計算。
+- 影響範圍與信心等級；無法證明的內容標為未驗證。
 
----
+canonical 資料在 `site/data/dice_tree.json`。修改後不可直接手改生成檔：
 
-## 程式碼與資料 PR 流程
-
-### 1. 建立分支
 ```bash
-git clone https://github.com/<您的使用者名稱>/random-dice-2-tree.git
-cd random-dice-2-tree
-git checkout -b fix/node-balance-update
+npm run generate:data
+npm run validate
+npm run build:pages
 ```
 
-### 2. 檔案位置
-- **資料檔案**：[`site/data/dice_tree.json`](site/data/dice_tree.json)
-- **邏輯檔案**：[`site/app.js`](site/app.js)
-- **樣式檔案**：[`site/styles.css`](site/styles.css)
+## 程式碼與文件 PR
 
-### 3. 本地測試
-提交前請務必執行端到端自動化測試：
 ```bash
-node verify_suite.mjs
+git checkout -b fix/short-description
+npm ci
+npm run validate
+npm run build:pages
+npm run setup:browser
+npm run test:browser
 ```
 
-### 4. 提交規範 (Conventional Commits)
-請使用標準 Commit 格式，例如：
-- `fix(data): update 4307 tier cost to 50k gold and 10 cores`
-- `feat(ui): optimize tooltip rendering performance`
-- `docs: update contributing guidelines`
+PR 描述請填寫模板中的影響範圍、證據、命令與未覆蓋 gate。UI 變更至少說明桌面與 390×844 mobile viewport；資料變更必須說明 snapshot 版本。研究腳本若無法從 clean clone 執行，應放在研究範圍並在文件中標示依賴與輸入限制。
 
----
+## Review gate
 
-## 程式碼規範
+Reviewer 會確認：
 
-- **零冗餘**：保持核心代碼精簡，禁止在程式庫中殘留一次性除錯腳本。
-- **效能優先**：所有畫布操作需維持 GPU 硬體加速，避免引入造成 Layout 重排之高昂運算。
+1. `npm run validate` 與 `npm run build:pages` 通過。
+2. 生成檔與 canonical source 沒有漂移。
+3. 變更沒有引入 dead link、未列入 allowlist 的部署檔或個人路徑。
+4. 資料來源、版本、授權與安全影響可追溯。
+5. UI 變更沒有明顯鍵盤、手機、效能或既有互動回歸。
+
+## Commit
+
+建議使用 Conventional Commits，例如 `fix(data): correct node 4307 cost`、`feat(ui): improve tooltip navigation`、`docs: clarify snapshot provenance`。commit 訊息不能取代 PR 證據與測試結果。

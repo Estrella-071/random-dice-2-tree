@@ -1,11 +1,20 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
+import { chromium } from 'playwright';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const siteDir = path.join(__dirname, 'site');
+const siteDir = path.resolve(process.env.VERIFY_SITE_DIR || path.join(__dirname, 'site'));
+const artifactDir = path.resolve(process.env.VERIFY_ARTIFACT_DIR || path.join(__dirname, 'artifacts', 'verify-suite'));
+const requestedPort = Number.parseInt(process.env.VERIFY_PORT || '0', 10);
+
+fs.mkdirSync(artifactDir, { recursive: true });
+
+function screenshotPath(filename) {
+  return path.join(artifactDir, filename);
+}
 
 // 1. Create static HTTP server
 const mimeTypes = {
@@ -18,8 +27,21 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = new URL(req.url, 'http://localhost:3000');
-  let filePath = path.join(siteDir, parsedUrl.pathname === '/' ? 'index.html' : parsedUrl.pathname);
+  const parsedUrl = new URL(req.url, 'http://127.0.0.1');
+  let relativePath;
+  try {
+    relativePath = decodeURIComponent(parsedUrl.pathname === '/' ? '/index.html' : parsedUrl.pathname);
+  } catch {
+    res.writeHead(400);
+    res.end('Bad Request');
+    return;
+  }
+  const filePath = path.resolve(siteDir, `.${relativePath}`);
+  if (filePath !== siteDir && !filePath.startsWith(`${siteDir}${path.sep}`)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
 
   if (!fs.existsSync(filePath)) {
     res.writeHead(404);
@@ -31,16 +53,17 @@ const server = http.createServer((req, res) => {
   const contentType = mimeTypes[ext] || 'application/octet-stream';
 
   const stream = fs.createReadStream(filePath);
-  res.writeHead(200, { 'Content-Type': contentType, 'Access-Control-Allow-Origin': '*' });
+  res.writeHead(200, { 'Content-Type': contentType });
   stream.pipe(res);
 });
 
-server.listen(3000, async () => {
-  console.log('Test HTTP server listening on http://localhost:3000');
+server.listen(Number.isNaN(requestedPort) ? 0 : requestedPort, '127.0.0.1', async () => {
+  const address = server.address();
+  const port = typeof address === 'object' && address ? address.port : requestedPort;
+  const baseUrl = `http://127.0.0.1:${port}`;
+  console.log(`Test HTTP server listening on ${baseUrl}`);
 
   try {
-    const playwrightPath = pathToFileURL(path.join(__dirname, 'xlsx_build/node_modules/playwright/index.mjs')).href;
-    const { chromium } = await import(playwrightPath);
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 
@@ -66,7 +89,7 @@ server.listen(3000, async () => {
     await filePage.close();
 
     // Load page via HTTP
-    await page.goto('http://localhost:3000/index.html', { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
     console.log('✓ Page loaded successfully via HTTP');
 
     // Wait for SVG and data to finish loading
@@ -178,7 +201,7 @@ server.listen(3000, async () => {
     }
 
     // 截取火骰子 Tooltip
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_fire_dice.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_fire_dice.png') });
 
     // 4.2 Verify Zoom Behavior (頂部欄淡出，小地圖僅在運動時淡入顯示)
     await page.evaluate(() => {
@@ -312,7 +335,7 @@ server.listen(3000, async () => {
     if (parseFloat(bounceBackResult.overshootAfterUp) !== 0) {
       throw new Error(`Expected overshootX to reset to 0px on release, got: ${bounceBackResult.overshootAfterUp}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_rank_slider.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_rank_slider.png') });
 
     // 5.1 Test Player Passive Node (Node 5109 所有骰子傷害) - (+0.6%) green styling verification
     console.log('Testing Node 5109 (所有骰子傷害)...');
@@ -331,7 +354,7 @@ server.listen(3000, async () => {
     if (!hasGreenAdd5109) {
       throw new Error(`Node 5109 (+0.6%) failed to have .stat-green-add green styling! HTML: ${descHtml5109}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_passive_5109.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_passive_5109.png') });
 
     // 5.2 Test Predator Dice (Node 5007) - 2-Column Stats & Special Values
     console.log('Testing Predator Dice (Node 5007)...');
@@ -391,7 +414,7 @@ server.listen(3000, async () => {
     if (!powerupStats.some(s => s.label === '吞噬範圍' && s.val.includes('1.2') && s.val.includes('(+0.05)'))) {
       throw new Error(`Power-up mode expected 吞噬範圍 1.2 (+0.05), got: ${JSON.stringify(powerupStats)}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_powerup.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_predator_powerup.png') });
 
     // Test clicking "提升骰點" (Dot Upgrade) button: 提升骰點 -> 2 (now Coexisting: Powerup 2 + Dot 2)
     await page.evaluate(() => {
@@ -419,7 +442,7 @@ server.listen(3000, async () => {
     if (coexistCheck.goldVisible !== '(+25)' || coexistCheck.purpleVisible !== '(+25)') {
       throw new Error(`Expected dual bonus (+25) gold and (+25) purple, got: ${JSON.stringify(coexistCheck)}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_coexist.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_predator_coexist.png') });
 
     // Test multi-level cycling: Advance Dot to 3
     await page.evaluate(() => {
@@ -457,7 +480,7 @@ server.listen(3000, async () => {
     if (tagDefs.MUTATION?.desc_zh.includes('MUTATION') || tagDefs.DOOM?.desc_zh.includes('NORMAL_MONSTER')) {
       throw new Error(`Tag definitions still contain raw English constants!`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_tag_popover.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_tag_popover.png') });
 
     // 5.3 Test Predator Rune (Node 5307 連鎖吞噬) - Centered layout & underline tag
     await page.evaluate(() => {
@@ -468,7 +491,7 @@ server.listen(3000, async () => {
     const runeTitle = await page.$eval('#tooltip-title', el => el.textContent.trim());
     const runeUnderline = await page.$eval('.detail-copy .tooltip-tag-inline', el => el.textContent.trim());
     console.log(`✓ Predator Rune opened: "${runeTitle}", Underlined Tag: "${runeUnderline}"`);
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_rune_5307.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_predator_rune_5307.png') });
 
     // 5.4 Test Greed Dice (Node 5006 貪婪骰子) - Only #SP怪物 (No #合成時, No #召喚)
     console.log('Testing Greed Dice (Node 5006) tag precision...');
@@ -529,7 +552,7 @@ server.listen(3000, async () => {
     if (!check5106.title.includes('渾沌召喚2骰點') || !check5106.isAbove) {
       throw new Error(`Node 5106 tooltip failed to position ABOVE node in normal mode! result: ${JSON.stringify(check5106)}`);
     }
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_prerequisite_above_verified.png' });
+    await page.screenshot({ path: screenshotPath('tooltip_prerequisite_above_verified.png') });
 
     // 5.2 Test Currency Badges (Default OFF as requested by user)
     console.log('Testing Currency Badges (Default OFF & Toggle ON/OFF)...');
@@ -832,7 +855,7 @@ server.listen(3000, async () => {
       throw new Error('Disclaimer must include standard DMCA takedown notice in English');
     }
 
-    const artifactPathDesktop = 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/disclaimer_expanded_desktop.png';
+    const artifactPathDesktop = screenshotPath('disclaimer_expanded_desktop.png');
     await page.screenshot({ path: artifactPathDesktop });
 
     // Click close button to shrink back to circle
@@ -868,7 +891,7 @@ server.listen(3000, async () => {
       throw new Error('Mobile disclaimer card must adapt cleanly and show email');
     }
 
-    const artifactPathMobile = 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/disclaimer_expanded_mobile.png';
+    const artifactPathMobile = screenshotPath('disclaimer_expanded_mobile.png');
     await page.screenshot({ path: artifactPathMobile });
 
     await page.click('#disclaimer-close-btn');
@@ -879,9 +902,9 @@ server.listen(3000, async () => {
     await loadingTestPage.addInitScript(() => {
       window.__BLOCK_DISMISS_LOADER__ = true;
     });
-    await loadingTestPage.goto('http://localhost:3000/index.html');
+    await loadingTestPage.goto(`${baseUrl}/index.html`);
     await loadingTestPage.waitForSelector('#loading-screen', { timeout: 3000 });
-    const loaderArtifactPath = 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/loading_screen_preview.png';
+    const loaderArtifactPath = screenshotPath('loading_screen_preview.png');
     await loadingTestPage.screenshot({ path: loaderArtifactPath });
     await loadingTestPage.close();
     console.log('✓ Loading screen clean typography & visual preview verified');

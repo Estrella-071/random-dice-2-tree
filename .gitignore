@@ -2,6 +2,13 @@
 node_modules/
 xlsx_build/node_modules/
 
+# Local validation and Pages staging artifacts
+artifacts/
+.pages/
+.playwright/
+playwright-report/
+test-results/
+
 # Big Binary & Archives
 *.ipa
 *.zip
@@ -14,11 +21,13 @@ outputs/
 research/random-dice-2-1.0.0/
 research/string_literals.txt
 research/*.txt
+!research/requirements.txt
 research/*.png
 
 # Python Cache
 __pycache__/
 *.pyc
+.venv/
 
 # OS & Temp
 .DS_Store

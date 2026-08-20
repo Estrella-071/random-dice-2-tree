@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "snapshotId": "random-dice-2-ios-1.0.0",
+  "source": {
+    "artifactName": "Random Dice 2 1.0.0.ipa",
+    "sha256": "966325827D2B27431FA393AA780FBE7AFB9E50592738F0CBE44D9CB01745AE47",
+    "published": false,
+    "note": "The source artifact is not redistributed by this repository. The hash identifies the local extraction input recorded for this snapshot."
+  },
+  "tooling": {
+    "python": "3.12",
+    "UnityPy": "1.25.3",
+    "requirements": "research/requirements.txt"
+  },
+  "publishedData": {
+    "json": {
+      "path": "site/data/dice_tree.json",
+      "sha256": "AADAF5C4799E3946AD24DE3B1C6E1D303CC06F88DA84942C6559A4D65E684E59"
+    },
+    "svg": {
+      "path": "site/data/dice_tree.svg",
+      "sha256": "288062193426548100FC8A596961D8DC6B01F23CE71A125FF6AE9E9D072CA485"
+    },
+    "nodeCount": 239,
+    "edgeCount": 248,
+    "clientVersion": "iOS 1.0.0"
+  },
+  "limitations": [
+    "This is a version-specific client snapshot, not proof of current live balance.",
+    "The repository does not redistribute the source IPA or ignored extraction output.",
+    "Third-party game assets and trademarks remain subject to their rights holders."
+  ]
+}
