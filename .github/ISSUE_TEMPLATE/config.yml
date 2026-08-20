@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/Estrella-071/random-dice-2-tree/security/advisories/new
+    about: Do not disclose exploitable security issues in a public issue.
+  - name: Documentation and contribution guide
+    url: https://github.com/Estrella-071/random-dice-2-tree/blob/main/CONTRIBUTING.md
+    about: Read the contribution and evidence requirements first.

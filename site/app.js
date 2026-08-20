@@ -194,6 +194,48 @@
   };
 
   // --- Natural Language Game Text Engine (Clean, High Contrast, No AI Slop) ---
+  const HTML_ESCAPE_MAP = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => HTML_ESCAPE_MAP[character]);
+  }
+
+  function sanitizeGameMarkup(markup) {
+    const template = document.createElement('template');
+    template.innerHTML = String(markup ?? '');
+    const allowedTags = new Set(['STRONG', 'SPAN', 'U']);
+    const allowedClasses = new Set(['stat-green-add', 'tooltip-tag-inline']);
+
+    const visit = (parent) => {
+      for (const child of [...parent.childNodes]) {
+        if (child.nodeType !== Node.ELEMENT_NODE) continue;
+        const element = /** @type {HTMLElement} */ (child);
+        if (!allowedTags.has(element.tagName)) {
+          child.replaceWith(document.createTextNode(element.textContent || ''));
+          continue;
+        }
+        for (const attribute of [...element.attributes]) {
+          const allowed = attribute.name === 'class'
+            ? allowedClasses.has(attribute.value)
+            : element.tagName === 'U' && attribute.name === 'data-tag-key' && /^[A-Z0-9_]+$/.test(attribute.value)
+              ? true
+              : element.tagName === 'U' && (attribute.name === 'role' || attribute.name === 'tabindex');
+          if (!allowed) element.removeAttribute(attribute.name);
+        }
+        visit(element);
+      }
+    };
+
+    visit(template.content);
+    return template.innerHTML;
+  }
+
   function formatGameText(rawText, node, currentRank = 1) {
     if (!rawText) return "";
     let text = String(rawText);
@@ -259,7 +301,7 @@
       .replace(/<br\s*\/?>/gi, " ")
       .trim();
 
-    return text;
+    return sanitizeGameMarkup(text);
   }
 
   // Plaintext version for search indexing & labels
@@ -1032,7 +1074,7 @@
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊力</span>
           <span class="dice-stat-val">
-            <span class="stat-base-val">${node.dice_attack || "0"}</span>
+            <span class="stat-base-val">${escapeHtml(node.dice_attack || "0")}</span>
             <span class="stat-bonus-val is-gold dice-stat-bonus-atk-powerup" hidden></span>
             <span class="stat-bonus-val is-purple dice-stat-bonus-atk-dot" hidden></span>
           </span>
@@ -1050,7 +1092,7 @@
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊速度</span>
           <span class="dice-stat-val">
-            <span class="stat-base-val">${node.dice_attack_interval || "0"}</span>
+            <span class="stat-base-val">${escapeHtml(node.dice_attack_interval || "0")}</span>
             <span class="stat-bonus-val is-gold dice-stat-bonus-spd-powerup" hidden></span>
             <span class="stat-bonus-val is-purple dice-stat-bonus-spd-dot" hidden></span>
           </span>
@@ -1067,7 +1109,7 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">目標</span>
-          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_target_zh || "前方"}</span></span>
+          <span class="dice-stat-val"><span class="stat-base-val">${escapeHtml(node.dice_target_zh || "前方")}</span></span>
         </div>
       `;
       grid.append(targetItem);
@@ -1077,14 +1119,15 @@
         node.special_stats.forEach((st, idx) => {
           const sItem = document.createElement("div");
           sItem.className = "dice-stat-item";
+          const iconName = /^[A-Za-z0-9_.-]+\.png$/.test(st.icon || '') ? st.icon : 'NodeAttackIcon.png';
           sItem.innerHTML = `
             <div class="dice-stat-icon-box">
-              <img src="icons/${st.icon || "NodeAttackIcon.png"}" alt="${st.label}" onerror="this.src='icons/Attack_Icon.png'" />
+              <img src="icons/${iconName}" alt="${escapeHtml(st.label)}" onerror="this.src='icons/Attack_Icon.png'" />
             </div>
             <div class="dice-stat-text">
-              <span class="dice-stat-label">${st.label}</span>
+              <span class="dice-stat-label">${escapeHtml(st.label)}</span>
               <span class="dice-stat-val">
-                <span class="stat-base-val">${st.value}</span>
+                <span class="stat-base-val">${escapeHtml(st.value)}</span>
                 <span class="stat-bonus-val is-gold dice-stat-bonus-special-powerup" data-index="${idx}" hidden></span>
                 <span class="stat-bonus-val is-purple dice-stat-bonus-special-dot" data-index="${idx}" hidden></span>
               </span>
@@ -1116,7 +1159,7 @@
         statItems.forEach(([l, v]) => {
           const li = document.createElement("li");
           li.className = "stat-compact-item";
-          li.innerHTML = `<span class="stat-label">${l}</span><span class="stat-value">${v}</span>`;
+          li.innerHTML = `<span class="stat-label">${escapeHtml(l)}</span><span class="stat-value">${escapeHtml(v)}</span>`;
           ul.append(li);
         });
         fragment.append(ul);
@@ -1137,7 +1180,7 @@
         lineSpecial.className = "meta-line";
         lineSpecial.innerHTML = `
           <span>解鎖途徑</span>
-          <span class="meta-cost" style="color: #ffd859; font-weight: 700;">${specialUnlock.label}</span>
+          <span class="meta-cost" style="color: #ffd859; font-weight: 700;">${escapeHtml(specialUnlock.label)}</span>
         `;
         metaBox.append(lineSpecial);
       } else if (unlockGold > 0 || unlockCore > 0) {
@@ -1194,7 +1237,7 @@
       if (node.unlock_condition_zh) {
         const lineCond = document.createElement("div");
         lineCond.className = "meta-line";
-        lineCond.innerHTML = `<span>解鎖條件</span><span>${node.unlock_condition_zh}</span>`;
+        lineCond.innerHTML = `<span>解鎖條件</span><span>${escapeHtml(node.unlock_condition_zh)}</span>`;
         metaBox.append(lineCond);
       }
 

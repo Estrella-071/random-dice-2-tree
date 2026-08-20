@@ -1,0 +1,28 @@
+{
+  "name": "random-dice-2-tree",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Random Dice 2 community dice tree reference site and research tooling.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate:data": "node scripts/validate_data.mjs",
+    "check:provenance": "node scripts/check_provenance.mjs",
+    "check:generated": "node scripts/sync_site_data.mjs --check",
+    "generate:data": "node scripts/sync_site_data.mjs",
+    "audit:assets": "node scripts/check_assets.mjs",
+    "check:assets": "node scripts/check_assets.mjs --check",
+    "audit:deps": "npm audit --omit=optional --audit-level=high",
+    "build:pages": "node scripts/build_pages.mjs",
+    "check:docs": "node scripts/check_docs.mjs",
+    "validate": "npm run validate:data && npm run check:provenance && npm run check:generated && npm run check:assets && npm run check:docs",
+    "setup:browser": "playwright install chromium",
+    "test:browser": "node verify_suite.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "playwright": "1.62.1"
+  }
+}
