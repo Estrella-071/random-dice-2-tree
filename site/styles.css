@@ -1458,32 +1458,71 @@ g[transform^="scale(0.56)"] .sel-box-runner,
   line-height: 1.2;
   margin-top: 2px;
   font-family: var(--font-mono, sans-serif);
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px;
 }
 
-/* 立即前往按鈕 */
-.dice-goto-btn {
-  width: 100%;
-  margin-top: 12px;
-  background: #6b3fe3;
-  border: 2px solid #8e62ff;
-  border-radius: 10px;
+.stat-base-val {
   color: #ffffff;
-  font-size: 16px;
+}
+
+.stat-bonus-val {
+  font-size: 17px;
   font-weight: 800;
-  padding: 10px 0;
-  text-align: center;
+  font-family: var(--font-mono, sans-serif);
+}
+
+.stat-bonus-val.is-gold {
+  color: #ffd859;
+}
+
+.stat-bonus-val.is-purple {
+  color: #a875ff;
+}
+
+/* 骰子底部切換操作列（強化 / 提升骰點） */
+.dice-upgrade-action-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.dice-upgrade-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  background: rgba(43, 33, 66, 0.9);
+  border: 1.5px solid rgba(138, 106, 214, 0.45);
+  border-radius: var(--radius-sm); /* 6px 對齊專案規範 */
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(107, 63, 227, 0.45);
-  transition: background 120ms ease, transform 120ms ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  transition: all 140ms ease;
+  user-select: none;
 }
 
-.dice-goto-btn:hover {
-  background: #7c4dff;
-  transform: scale(1.015);
+.dice-upgrade-btn:hover {
+  background: rgba(65, 48, 102, 0.95);
+  border-color: rgba(186, 126, 255, 0.7);
+  transform: translateY(-1px);
 }
 
-.dice-goto-btn:active {
-  transform: scale(0.98);
+.dice-upgrade-btn:active {
+  transform: scale(0.97);
+}
+
+.dice-upgrade-btn.is-active {
+  background: #6c42db;
+  border-color: #ba7eff;
+  box-shadow: 0 0 14px rgba(168, 109, 245, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 /* 標籤詳細解釋微型浮窗 (Tag Popover) */

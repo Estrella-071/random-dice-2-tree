@@ -1049,7 +1049,7 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊力</span>
-          <span class="dice-stat-val">${node.dice_attack || "0"}</span>
+          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_attack || "0"}</span><span class="stat-bonus-val dice-stat-bonus-atk is-gold" hidden></span></span>
         </div>
       `;
       grid.append(atkItem);
@@ -1063,7 +1063,7 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">攻擊速度</span>
-          <span class="dice-stat-val">${node.dice_attack_interval || "0"}</span>
+          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_attack_interval || "0"}</span><span class="stat-bonus-val dice-stat-bonus-spd is-purple" hidden></span></span>
         </div>
       `;
       grid.append(spdItem);
@@ -1077,14 +1077,14 @@
         </div>
         <div class="dice-stat-text">
           <span class="dice-stat-label">目標</span>
-          <span class="dice-stat-val">${node.dice_target_zh || "前方"}</span>
+          <span class="dice-stat-val"><span class="stat-base-val">${node.dice_target_zh || "前方"}</span></span>
         </div>
       `;
       grid.append(targetItem);
 
       // 項目 4+: 特殊數值（從解包數據取出）
       if (Array.isArray(node.special_stats)) {
-        node.special_stats.forEach(st => {
+        node.special_stats.forEach((st, idx) => {
           const sItem = document.createElement("div");
           sItem.className = "dice-stat-item";
           sItem.innerHTML = `
@@ -1093,7 +1093,7 @@
             </div>
             <div class="dice-stat-text">
               <span class="dice-stat-label">${st.label}</span>
-              <span class="dice-stat-val">${st.value}</span>
+              <span class="dice-stat-val"><span class="stat-base-val">${st.value}</span><span class="stat-bonus-val dice-stat-bonus-special is-gold" data-index="${idx}" hidden></span></span>
             </div>
           `;
           grid.append(sItem);
@@ -1102,16 +1102,14 @@
 
       fragment.append(grid);
 
-      // 底部「立即前往」按鈕
-      const gotoBtn = document.createElement("button");
-      gotoBtn.type = "button";
-      gotoBtn.className = "dice-goto-btn";
-      gotoBtn.textContent = "立即前往";
-      gotoBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeTooltip();
-      });
-      fragment.append(gotoBtn);
+      // 底部操作列：「強化」與「提升骰點」切換按鈕（對齊遊戲原生介面）
+      const btnBar = document.createElement("div");
+      btnBar.className = "dice-upgrade-action-bar";
+      btnBar.innerHTML = `
+        <button type="button" class="dice-upgrade-btn btn-powerup" data-mode="powerup">強化</button>
+        <button type="button" class="dice-upgrade-btn btn-dot" data-mode="dot">提升骰點</button>
+      `;
+      fragment.append(btnBar);
     } else {
       // 非骰子節點（符文、被動、支援）：若有持續時間等屬性，以精簡標籤呈現
       const statItems = [];
@@ -1466,6 +1464,73 @@
     }
 
     tooltipBody.replaceChildren(cloned);
+
+    // 綁定骰子節點「強化」與「提升骰點」切換事件
+    const powerupBtn = tooltipBody.querySelector(".btn-powerup");
+    const dotBtn = tooltipBody.querySelector(".btn-dot");
+    if (powerupBtn && dotBtn) {
+      let currentMode = "none"; // 'none' | 'powerup' | 'dot'
+
+      const updateDiceStatsView = (mode) => {
+        currentMode = mode;
+        powerupBtn.classList.toggle("is-active", mode === "powerup");
+        dotBtn.classList.toggle("is-active", mode === "dot");
+
+        const pData = node.powerup_data || {};
+        const dData = node.dot_data || {};
+
+        // 1. 攻擊力增量 (強化為金黃色，提升骰點為紫色)
+        const atkBonusEl = tooltipBody.querySelector(".dice-stat-bonus-atk");
+        if (atkBonusEl) {
+          const add = mode === "powerup" ? pData.attack_add : (mode === "dot" ? dData.attack_add : "");
+          if (add) {
+            atkBonusEl.textContent = ` (${add})`;
+            atkBonusEl.className = `stat-bonus-val dice-stat-bonus-atk ${mode === "powerup" ? "is-gold" : "is-purple"}`;
+            atkBonusEl.hidden = false;
+          } else {
+            atkBonusEl.hidden = true;
+          }
+        }
+
+        // 2. 攻擊速度增量 (紫色)
+        const spdBonusEl = tooltipBody.querySelector(".dice-stat-bonus-spd");
+        if (spdBonusEl) {
+          const add = mode === "powerup" ? pData.interval_add : (mode === "dot" ? dData.interval_add : "");
+          if (add) {
+            spdBonusEl.textContent = ` (${add})`;
+            spdBonusEl.className = `stat-bonus-val dice-stat-bonus-spd is-purple`;
+            spdBonusEl.hidden = false;
+          } else {
+            spdBonusEl.hidden = true;
+          }
+        }
+
+        // 3. 特殊屬性增量
+        const specialBonusEls = tooltipBody.querySelectorAll(".dice-stat-bonus-special");
+        specialBonusEls.forEach((el) => {
+          const idx = parseInt(el.getAttribute("data-index"), 10);
+          const list = mode === "powerup" ? (pData.special_stats || []) : (mode === "dot" ? (dData.special_stats || []) : []);
+          const st = list[idx];
+          if (st && st.add) {
+            el.textContent = ` (${st.add})`;
+            el.className = `stat-bonus-val dice-stat-bonus-special is-gold`;
+            el.hidden = false;
+          } else {
+            el.hidden = true;
+          }
+        });
+      };
+
+      powerupBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        updateDiceStatsView(currentMode === "powerup" ? "none" : "powerup");
+      });
+
+      dotBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        updateDiceStatsView(currentMode === "dot" ? "none" : "dot");
+      });
+    }
   }
 
   // --- Smart Contextual Tooltip Positioning (零 Reflow 純幾何換算，消除逐幀 Layout Thrashing) ---
@@ -1498,11 +1563,17 @@
     const gap = 16;
 
     let top;
-    // 空間感知智能定位：若節點上方空間不足容納 Tooltip，自動置於節點下方
-    if (screenY - nodeRadius - cachedTipHeight - gap < 16) {
+    // 空間感知智能定位：若節點下方空間足夠，置於下方；否則若上方空間足夠，置於上方；空間緊湊時動態鉗制
+    const fitsBelow = screenY + nodeRadius + gap + cachedTipHeight <= window.innerHeight - 16;
+    const fitsAbove = screenY - nodeRadius - cachedTipHeight - gap >= 16;
+
+    if (fitsBelow) {
       top = screenY + nodeRadius + gap;
-    } else {
+    } else if (fitsAbove) {
       top = screenY - nodeRadius - cachedTipHeight - gap;
+    } else {
+      // 螢幕空間緊湊時，優先讓 Tooltip 在可視區域內完整顯示
+      top = Math.max(16, Math.min(window.innerHeight - 16 - cachedTipHeight, screenY - cachedTipHeight / 2));
     }
 
     let left = screenX - cachedTipWidth / 2;

@@ -89,7 +89,31 @@
           "icon": "Fire_icon.png"
         }
       ],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "+150",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "範圍傷害",
+            "value": "50",
+            "add": "",
+            "icon": "Fire_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "範圍傷害",
+            "value": "50",
+            "add": "",
+            "icon": "Fire_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1002",
@@ -155,7 +179,55 @@
       ],
       "tags": [
         "THORN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+750",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "尖刺持續時間",
+            "value": "5s",
+            "add": "+2.25",
+            "icon": "Trap_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "+2.25",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "7s",
+            "add": "",
+            "icon": "Trap_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+750",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "尖刺持續時間",
+            "value": "5s",
+            "add": "+2",
+            "icon": "Trap_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "+2",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "7s",
+            "add": "",
+            "icon": "Trap_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1003",
@@ -206,7 +278,17 @@
       "special_stats": [],
       "tags": [
         "BLOOM"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+5000",
+        "interval_add": "",
+        "special_stats": []
+      },
+      "dot_data": {
+        "attack_add": "+5000",
+        "interval_add": "",
+        "special_stats": []
+      }
     },
     {
       "id": "1004",
@@ -271,7 +353,55 @@
       "tags": [
         "PILLAR",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "持續時間",
+            "value": "3s",
+            "add": "+0.5",
+            "icon": "Pillar_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "0.5",
+            "add": "+0.5",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "15s",
+            "add": "",
+            "icon": "Pillar_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "持續時間",
+            "value": "3s",
+            "add": "",
+            "icon": "Pillar_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "0.5",
+            "add": "",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "15s",
+            "add": "-0.5",
+            "icon": "Pillar_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1005",
@@ -318,7 +448,17 @@
       "icon_status": "sprite",
       "dice_target_zh": "前方",
       "special_stats": [],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": []
+      },
+      "dot_data": {
+        "attack_add": "+100",
+        "interval_add": "-0.025",
+        "special_stats": []
+      }
     },
     {
       "id": "1006",
@@ -374,7 +514,31 @@
       ],
       "tags": [
         "BUFF_ATKSPD"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "攻擊速度增益",
+            "value": "6%",
+            "add": "+1",
+            "icon": "LightBoardEffect_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+10",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "攻擊速度增益",
+            "value": "6%",
+            "add": "+3",
+            "icon": "LightBoardEffect_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1007",
@@ -430,7 +594,31 @@
       ],
       "tags": [
         "FROZEN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+120",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "冰凍",
+            "value": "5",
+            "add": "",
+            "icon": "Ice_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+60",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "冰凍",
+            "value": "5",
+            "add": "+2",
+            "icon": "Ice_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1008",
@@ -487,7 +675,31 @@
       ],
       "tags": [
         "POISON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "中毒傷害",
+            "value": "30",
+            "add": "+60",
+            "icon": "Poison_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "中毒傷害",
+            "value": "30",
+            "add": "+60",
+            "icon": "Poison_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "1201",
@@ -3957,7 +4169,31 @@
       ],
       "tags": [
         "BOSS_MONSTER"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+150",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "首領額外傷害",
+            "value": "200%",
+            "add": "",
+            "icon": "IronInfo_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+240",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "首領額外傷害",
+            "value": "200%",
+            "add": "+50",
+            "icon": "IronInfo_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2002",
@@ -4011,7 +4247,31 @@
           "icon": "SwitchInfo_interval_icon.png"
         }
       ],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "+75",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "技能冷卻時間",
+            "value": "25s",
+            "add": "",
+            "icon": "SwitchInfo_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "技能冷卻時間",
+            "value": "25s",
+            "add": "-2",
+            "icon": "SwitchInfo_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2003",
@@ -4065,7 +4325,31 @@
           "icon": "gear_value_icon.png"
         }
       ],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "連接額外傷害",
+            "value": "50",
+            "add": "+50",
+            "icon": "gear_value_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+140",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "連接額外傷害",
+            "value": "50",
+            "add": "+50",
+            "icon": "gear_value_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2004",
@@ -4127,7 +4411,43 @@
       "tags": [
         "ELEMENT",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "原子傷害",
+            "value": "5%",
+            "add": "+0.5",
+            "icon": "Element_icon.png"
+          },
+          {
+            "label": "原子旋轉速度",
+            "value": "7s",
+            "add": "+0.5",
+            "icon": "Element_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "原子傷害",
+            "value": "5%",
+            "add": "",
+            "icon": "Element_icon.png"
+          },
+          {
+            "label": "原子旋轉速度",
+            "value": "7s",
+            "add": "",
+            "icon": "Element_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2005",
@@ -4180,7 +4500,31 @@
           "icon": "neon_value_icon.png"
         }
       ],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "傷害增加量",
+            "value": "300",
+            "add": "+400",
+            "icon": "neon_value_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+150",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "傷害增加量",
+            "value": "300",
+            "add": "+200",
+            "icon": "neon_value_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2006",
@@ -4237,7 +4581,31 @@
       "tags": [
         "SAW",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "鋸齒傷害",
+            "value": "500",
+            "add": "+3000",
+            "icon": "SawBlade_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "鋸齒傷害",
+            "value": "500",
+            "add": "+2500",
+            "icon": "SawBlade_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2007",
@@ -4297,7 +4665,43 @@
       ],
       "tags": [
         "SP_GAIN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "SP獲得量",
+            "value": "10",
+            "add": "",
+            "icon": "MineSp_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "12s",
+            "add": "-0.5",
+            "icon": "MineSp_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "SP獲得量",
+            "value": "10",
+            "add": "+100",
+            "icon": "MineSp_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "12s",
+            "add": "",
+            "icon": "MineSp_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2008",
@@ -4357,7 +4761,43 @@
       ],
       "tags": [
         "CHAIN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "最大距離倍率",
+            "value": "400倍",
+            "add": "+100",
+            "icon": "NodeAttackIcon.png"
+          },
+          {
+            "label": "攻擊週期",
+            "value": "5s",
+            "add": "+100",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+40",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "最大距離倍率",
+            "value": "400倍",
+            "add": "",
+            "icon": "NodeAttackIcon.png"
+          },
+          {
+            "label": "攻擊週期",
+            "value": "5s",
+            "add": "",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2009",
@@ -4412,7 +4852,31 @@
       ],
       "tags": [
         "LASER"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "傷害增加量",
+            "value": "50",
+            "add": "+150",
+            "icon": "Ray_value_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+100",
+        "interval_add": "-0.05",
+        "special_stats": [
+          {
+            "label": "傷害增加量",
+            "value": "50",
+            "add": "+150",
+            "icon": "Ray_value_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "2201",
@@ -8177,7 +8641,31 @@
       ],
       "tags": [
         "CHAIN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+80",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "連鎖傷害",
+            "value": "40",
+            "add": "+100",
+            "icon": "Electric_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+80",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "連鎖傷害",
+            "value": "40",
+            "add": "+55",
+            "icon": "Electric_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3002",
@@ -8233,7 +8721,31 @@
       ],
       "tags": [
         "RESONANCE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "攻擊速度增益量",
+            "value": "4%",
+            "add": "+0.5",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "攻擊速度增益量",
+            "value": "4%",
+            "add": "+2",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3003",
@@ -8299,7 +8811,55 @@
       "tags": [
         "BULLET",
         "SHURIKEN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "需要攻擊次數",
+            "value": "20",
+            "add": "",
+            "icon": "Shuriken_icon.png"
+          },
+          {
+            "label": "魔彈傷害",
+            "value": "250%",
+            "add": "",
+            "icon": "Shuriken_icon.png"
+          },
+          {
+            "label": "魔彈發射數量",
+            "value": "2",
+            "add": "",
+            "icon": "Shuriken_castcnt_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+180",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "需要攻擊次數",
+            "value": "20",
+            "add": "-1",
+            "icon": "Shuriken_icon.png"
+          },
+          {
+            "label": "魔彈傷害",
+            "value": "250%",
+            "add": "-1",
+            "icon": "Shuriken_icon.png"
+          },
+          {
+            "label": "魔彈發射數量",
+            "value": "2",
+            "add": "-1",
+            "icon": "Shuriken_castcnt_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3004",
@@ -8349,7 +8909,17 @@
       "tags": [
         "MERGE",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": []
+      },
+      "dot_data": {
+        "attack_add": "+25",
+        "interval_add": "",
+        "special_stats": []
+      }
     },
     {
       "id": "3005",
@@ -8404,7 +8974,31 @@
       ],
       "tags": [
         "COMBO"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "每次連擊傷害增加",
+            "value": "50",
+            "add": "+75",
+            "icon": "Combo_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "每次連擊傷害增加",
+            "value": "50",
+            "add": "+50",
+            "icon": "Combo_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3006",
@@ -8457,7 +9051,31 @@
           "icon": "AdjustInfo_interval_icon.png"
         }
       ],
-      "tags": []
+      "tags": [],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "技能冷卻時間",
+            "value": "10s",
+            "add": "",
+            "icon": "AdjustInfo_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+25",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "技能冷卻時間",
+            "value": "10s",
+            "add": "-0.5",
+            "icon": "AdjustInfo_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3007",
@@ -8519,7 +9137,43 @@
       "tags": [
         "POTION",
         "MERGE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "煉金增益量",
+            "value": "10%",
+            "add": "+15",
+            "icon": "Potion_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "+15",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+25",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "煉金增益量",
+            "value": "10%",
+            "add": "",
+            "icon": "Potion_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      }
     },
     {
       "id": "3201",
@@ -11737,7 +12391,43 @@
       "tags": [
         "BUBBLE",
         "MERGE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+60",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "",
+            "icon": "Bubble_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "90s",
+            "add": "",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+60",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "",
+            "icon": "Bubble_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "90s",
+            "add": "",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4002",
@@ -11794,7 +12484,31 @@
       "tags": [
         "LOCK",
         "MERGE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+30",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "持續時間",
+            "value": "3s",
+            "add": "+0.5",
+            "icon": "Lock_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+15",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "持續時間",
+            "value": "3s",
+            "add": "",
+            "icon": "Lock_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4003",
@@ -11859,7 +12573,55 @@
       ],
       "tags": [
         "CHARGE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+25",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "封印力量",
+            "value": "0.5",
+            "add": "+0.45",
+            "icon": "Punch_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "+0.45",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "拳擊最大補充量",
+            "value": "10s",
+            "add": "+0.45",
+            "icon": "Punch_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "封印力量",
+            "value": "0.5",
+            "add": "",
+            "icon": "Punch_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "1",
+            "add": "",
+            "icon": "fire_splash_range_icon.png"
+          },
+          {
+            "label": "拳擊最大補充量",
+            "value": "10s",
+            "add": "",
+            "icon": "Punch_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4004",
@@ -11920,7 +12682,43 @@
       ],
       "tags": [
         "GROWTH"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+20",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "成長機率",
+            "value": "40%",
+            "add": "+3",
+            "icon": "BrokenGrowth_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "20s",
+            "add": "-1",
+            "icon": "BrokenGrowth_interval_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+10",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "成長機率",
+            "value": "40%",
+            "add": "",
+            "icon": "BrokenGrowth_icon.png"
+          },
+          {
+            "label": "技能冷卻時間",
+            "value": "20s",
+            "add": "",
+            "icon": "BrokenGrowth_interval_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4005",
@@ -11981,7 +12779,43 @@
       ],
       "tags": [
         "EXECUTIONER"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "執行劍傷害",
+            "value": "200%",
+            "add": "+300",
+            "icon": "Executioner_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "111",
+            "add": "+300",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "執行劍傷害",
+            "value": "200%",
+            "add": "+200",
+            "icon": "Executioner_icon.png"
+          },
+          {
+            "label": "zh-tw",
+            "value": "111",
+            "add": "+200",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4006",
@@ -12032,7 +12866,17 @@
       "tags": [
         "BLESS",
         "MERGE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": []
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": []
+      }
     },
     {
       "id": "4007",
@@ -12089,7 +12933,31 @@
         "ALIGNMENT",
         "SPAWN",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "傷害增益量",
+            "value": "20%",
+            "add": "+20",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "傷害增益量",
+            "value": "20%",
+            "add": "+40",
+            "icon": "NodeAttackIcon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4008",
@@ -12155,7 +13023,55 @@
       "tags": [
         "TAEGEUK",
         "HARMONY"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "極致和諧傷害",
+            "value": "1000",
+            "add": "",
+            "icon": "Bingo_icon.png"
+          },
+          {
+            "label": "橫排攻擊速度增加量",
+            "value": "50%",
+            "add": "",
+            "icon": "Bingo_icon.png"
+          },
+          {
+            "label": "直排傷害增加量",
+            "value": "50%",
+            "add": "",
+            "icon": "Bingo02_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "極致和諧傷害",
+            "value": "1000",
+            "add": "+1500",
+            "icon": "Bingo_icon.png"
+          },
+          {
+            "label": "橫排攻擊速度增加量",
+            "value": "50%",
+            "add": "+1500",
+            "icon": "Bingo_icon.png"
+          },
+          {
+            "label": "直排傷害增加量",
+            "value": "50%",
+            "add": "+1500",
+            "icon": "Bingo02_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "4201",
@@ -15906,7 +16822,31 @@
       ],
       "tags": [
         "ALONE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "孤獨傷害",
+            "value": "250",
+            "add": "+300",
+            "icon": "Solitude_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+120",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "孤獨傷害",
+            "value": "250",
+            "add": "+250",
+            "icon": "Solitude_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5002",
@@ -15954,7 +16894,17 @@
       "special_stats": [],
       "tags": [
         "STUN"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": []
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": []
+      }
     },
     {
       "id": "5003",
@@ -16017,7 +16967,43 @@
         "TYRANT",
         "MERGE",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "暴君化傷害",
+            "value": "1000%",
+            "add": "+500",
+            "icon": "Tyrant_icon.png"
+          },
+          {
+            "label": "攻擊週期",
+            "value": "10s",
+            "add": "+500",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+150",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "暴君化傷害",
+            "value": "1000%",
+            "add": "+250",
+            "icon": "Tyrant_icon.png"
+          },
+          {
+            "label": "攻擊週期",
+            "value": "10s",
+            "add": "+250",
+            "icon": "attackspeed_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5004",
@@ -16077,7 +17063,43 @@
       ],
       "tags": [
         "DOOM"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "zh-tw",
+            "value": "2500",
+            "add": "+1000",
+            "icon": "NodeAttackIcon.png"
+          },
+          {
+            "label": "爆炸範圍",
+            "value": "2",
+            "add": "+0.1",
+            "icon": "Doom_range.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "zh-tw",
+            "value": "2500",
+            "add": "",
+            "icon": "NodeAttackIcon.png"
+          },
+          {
+            "label": "爆炸範圍",
+            "value": "2",
+            "add": "",
+            "icon": "Doom_range.png"
+          }
+        ]
+      }
     },
     {
       "id": "5005",
@@ -16139,7 +17161,43 @@
       "tags": [
         "MUTATION",
         "FAILURE"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "變異傷害",
+            "value": "50",
+            "add": "+250",
+            "icon": "Mutation_icon.png"
+          },
+          {
+            "label": "變種登場機率",
+            "value": "25%",
+            "add": "+250",
+            "icon": "Mutation_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "變異傷害",
+            "value": "50",
+            "add": "+150",
+            "icon": "Mutation_icon.png"
+          },
+          {
+            "label": "變種登場機率",
+            "value": "25%",
+            "add": "+150",
+            "icon": "Mutation_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5006",
@@ -16197,7 +17255,31 @@
         "TRANSFER",
         "MERGE",
         "SUMMON"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+100",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "SP獲得量",
+            "value": "50",
+            "add": "+20",
+            "icon": "Box_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "SP獲得量",
+            "value": "50",
+            "add": "+50",
+            "icon": "Box_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5007",
@@ -16258,7 +17340,43 @@
       ],
       "tags": [
         "PREDATOR"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "吞噬增加量",
+            "value": "15",
+            "add": "+25",
+            "icon": "Predator_icon.png"
+          },
+          {
+            "label": "吞噬範圍",
+            "value": "1.2",
+            "add": "+0.05",
+            "icon": "Predator_splash.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "",
+        "interval_add": "-0.08",
+        "special_stats": [
+          {
+            "label": "吞噬增加量",
+            "value": "15",
+            "add": "+25",
+            "icon": "Predator_icon.png"
+          },
+          {
+            "label": "吞噬範圍",
+            "value": "1.2",
+            "add": "",
+            "icon": "Predator_splash.png"
+          }
+        ]
+      }
     },
     {
       "id": "5008",
@@ -16314,7 +17432,31 @@
       ],
       "tags": [
         "NORMAL_MONSTER"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+60",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "暴斃機率",
+            "value": "5",
+            "add": "+1.5",
+            "icon": "Death_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+50",
+        "interval_add": "-0.07",
+        "special_stats": [
+          {
+            "label": "暴斃機率",
+            "value": "5",
+            "add": "+1",
+            "icon": "Death_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5009",
@@ -16369,7 +17511,31 @@
       ],
       "tags": [
         "DECAY"
-      ]
+      ],
+      "powerup_data": {
+        "attack_add": "+20",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "腐敗增幅量",
+            "value": "5",
+            "add": "+1.5",
+            "icon": "decay_effect_icon.png"
+          }
+        ]
+      },
+      "dot_data": {
+        "attack_add": "+10",
+        "interval_add": "",
+        "special_stats": [
+          {
+            "label": "腐敗增幅量",
+            "value": "5",
+            "add": "+2",
+            "icon": "decay_effect_icon.png"
+          }
+        ]
+      }
     },
     {
       "id": "5101",

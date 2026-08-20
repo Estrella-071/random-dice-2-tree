@@ -353,20 +353,59 @@ server.listen(3000, async () => {
     console.log(`✓ Predator Dice opened: "${pTitle}", Stats:`, pStats);
 
     // Verify Attack=1000, AttackInterval=2.7, Target=範圍前, Special=吞噬增加量 15, 吞噬範圍 1.2
-    if (!pStats.some(s => s.label === '攻擊力' && s.val === '1000')) {
+    if (!pStats.some(s => s.label === '攻擊力' && s.val.startsWith('1000'))) {
       throw new Error(`Predator attack should be 1000, got: ${JSON.stringify(pStats)}`);
     }
-    if (!pStats.some(s => s.label === '目標' && s.val === '範圍前')) {
+    if (!pStats.some(s => s.label === '目標' && s.val.startsWith('範圍前'))) {
       throw new Error(`Predator target should be 範圍前, got: ${JSON.stringify(pStats)}`);
     }
-    if (!pStats.some(s => s.label === '吞噬增加量' && s.val === '15')) {
+    if (!pStats.some(s => s.label === '吞噬增加量' && s.val.startsWith('15'))) {
       throw new Error(`Predator special 吞噬增加量 15 missing! Got: ${JSON.stringify(pStats)}`);
     }
-    if (!pStats.some(s => s.label === '吞噬範圍' && s.val === '1.2')) {
+    if (!pStats.some(s => s.label === '吞噬範圍' && s.val.startsWith('1.2'))) {
       throw new Error(`Predator special 吞噬範圍 1.2 missing! Got: ${JSON.stringify(pStats)}`);
     }
     console.log('✓ Predator Dice 2-column grid & special stats 100% matched!');
-    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_dice.png' });
+
+    // Test clicking "強化" (Power-up) button
+    await page.evaluate(() => {
+      document.querySelector('.btn-powerup')?.click();
+    });
+    await page.waitForTimeout(200);
+    const powerupStats = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.dice-stat-item')).map(el => ({
+        label: el.querySelector('.dice-stat-label')?.textContent.trim(),
+        val: el.querySelector('.dice-stat-val')?.textContent.trim().replace(/\s+/g, ' ')
+      }));
+    });
+    console.log('✓ Power-up mode stats:', powerupStats);
+    if (!powerupStats.some(s => s.label === '吞噬增加量' && s.val === '15 (+25)')) {
+      throw new Error(`Power-up mode expected 吞噬增加量 15 (+25), got: ${JSON.stringify(powerupStats)}`);
+    }
+    if (!powerupStats.some(s => s.label === '吞噬範圍' && s.val === '1.2 (+0.05)')) {
+      throw new Error(`Power-up mode expected 吞噬範圍 1.2 (+0.05), got: ${JSON.stringify(powerupStats)}`);
+    }
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_powerup.png' });
+
+    // Test clicking "提升骰點" (Dot Upgrade) button
+    await page.evaluate(() => {
+      document.querySelector('.btn-dot')?.click();
+    });
+    await page.waitForTimeout(200);
+    const dotStats = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.dice-stat-item')).map(el => ({
+        label: el.querySelector('.dice-stat-label')?.textContent.trim(),
+        val: el.querySelector('.dice-stat-val')?.textContent.trim().replace(/\s+/g, ' ')
+      }));
+    });
+    console.log('✓ Dot upgrade mode stats:', dotStats);
+    if (!dotStats.some(s => s.label === '攻擊速度' && s.val === '2.7 (-0.08)')) {
+      throw new Error(`Dot mode expected 攻擊速度 2.7 (-0.08), got: ${JSON.stringify(dotStats)}`);
+    }
+    if (!dotStats.some(s => s.label === '吞噬增加量' && s.val === '15 (+25)')) {
+      throw new Error(`Dot mode expected 吞噬增加量 15 (+25), got: ${JSON.stringify(dotStats)}`);
+    }
+    await page.screenshot({ path: 'C:/Users/zhiwa/.gemini/antigravity/brain/e6521c8b-03b0-4e50-8b8d-8ef940f47abc/tooltip_predator_dot.png' });
 
     // Test Tag Popover click on #吞噬
     await page.evaluate(() => {
