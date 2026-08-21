@@ -7,6 +7,12 @@ import { chromium } from 'playwright';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const siteDir = path.resolve(process.env.VERIFY_SITE_DIR || path.join(__dirname, 'site'));
+const allowedSiteDirs = [path.join(__dirname, 'site'), path.join(__dirname, '.pages')]
+  .map(directory => path.resolve(directory));
+const comparablePath = value => process.platform === 'win32' ? value.toLowerCase() : value;
+if (!allowedSiteDirs.some(directory => comparablePath(directory) === comparablePath(siteDir))) {
+  throw new Error(`VERIFY_SITE_DIR must point to repository site/ or verified .pages/ staging: ${siteDir}`);
+}
 const artifactDir = path.resolve(process.env.VERIFY_ARTIFACT_DIR || path.join(__dirname, 'artifacts', 'verify-suite'));
 const requestedPort = Number.parseInt(process.env.VERIFY_PORT || '0', 10);
 

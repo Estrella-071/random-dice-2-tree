@@ -1,25 +1,26 @@
 # 測試規範
 
-## 必跑檢查
+## 檢查分流
 
 ```bash
 npm ci
-npm run validate
-npm run build:pages
+npm run audit:deps
 npm run setup:browser
-npm run test:browser
+npm run verify
 ```
 
-`validate` 包含資料結構、節點邊、icon 路徑、生成檔一致性與追蹤文件相對連結檢查。`build:pages` 會重建部署 staging 並檢查 allowlist 中的每個檔案。
+上方命令適用於 runtime/UI 變更與完整 clean-clone 驗證。文件變更執行 `npm run check:docs`；公開資料 provenance 變更執行 `npm run check:provenance` 與 `npm run validate`；PNG 變更先執行 `npm run audit:assets`；依賴變更執行 `npm run audit:deps`。
 
-## Browser smoke scope
+`npm run verify` 依序執行 `validate`、`build:pages`，再以 `.pages/` staging 執行 browser suite。`validate` 會檢查資料結構、節點邊、icon 路徑、生成檔一致性、asset inventory 與追蹤文件的相對連結。
 
-Browser suite 覆蓋 file/http 載入、樹節點互動、tooltip、篩選、縮放、拖曳、手機 viewport、免責 widget 與 loading state。它不是完整的 screen-reader、鍵盤、真機、跨瀏覽器、效能或部署驗證。
+## 瀏覽器 smoke 測試範圍
 
-CI 會先建立 `.pages/`，再以 `VERIFY_SITE_DIR=.pages` 對實際 Pages staging 執行 smoke suite；本機若要驗證部署 artifact，可先執行 `npm run build:pages`，再設定同名環境變數執行 `npm run test:browser`。
+Browser suite 覆蓋 file/http 載入、樹節點互動、tooltip、篩選、縮放、拖曳、手機 viewport、免責 widget 與 loading state。screen-reader、鍵盤、真機、跨瀏覽器、效能與部署需要另外測試。
+
+CI 的 static job 會建立並上傳 `.pages/`，browser job 下載同一份 staging，再以 `VERIFY_SITE_DIR=.pages` 執行 smoke suite。文件-only 與公開 metadata-only PR 使用 scope skip 成功結束，外部研究 workspace 不屬於本 repository 的 CI 範圍。screen-reader、鍵盤、真機、跨瀏覽器、效能與部署請另外測試。
 
 ## PR 要求
 
 - 資料或生成檔變更：附上資料版本、來源、變更摘要與驗證命令。
-- UI 變更：說明桌面與手機 viewport 的結果；必要時附本地截圖，但不要提交私人路徑。
+- UI 變更：說明桌面與手機 viewport 的結果；必要時附本地截圖，截圖檔請留在 `artifacts/`。
 - 安全或第三方素材變更：依 [SECURITY.md](SECURITY.md) 與 [NOTICE.md](NOTICE.md) 說明影響。

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const provenance = JSON.parse(fs.readFileSync(path.join(rootDir, 'research', 'provenance.json'), 'utf8'));
+const provenance = JSON.parse(fs.readFileSync(path.join(rootDir, 'data', 'provenance.json'), 'utf8'));
 const data = JSON.parse(fs.readFileSync(path.join(rootDir, 'site', 'data', 'dice_tree.json'), 'utf8'));
 const errors = [];
 
@@ -15,7 +15,7 @@ function sha256(relativePath) {
 for (const entry of Object.values(provenance.publishedData || {})) {
   if (!entry || typeof entry !== 'object' || !entry.path || !entry.sha256) continue;
   if (!fs.existsSync(path.join(rootDir, entry.path))) errors.push(`${entry.path} is missing`);
-  else if (sha256(entry.path) !== entry.sha256.toUpperCase()) errors.push(`${entry.path} hash differs from research/provenance.json`);
+  else if (sha256(entry.path) !== entry.sha256.toUpperCase()) errors.push(`${entry.path} hash differs from data/provenance.json`);
 }
 if (provenance.publishedData?.nodeCount !== data.summary?.node_count) errors.push('provenance nodeCount does not match data summary');
 if (provenance.publishedData?.edgeCount !== data.summary?.edge_count) errors.push('provenance edgeCount does not match data summary');

@@ -2,24 +2,21 @@
 
 ## 網站與驗證
 
-需求：Node.js 20 以上、npm 10 以上。
+環境需求：Node.js 20 以上、npm 10 以上。
 
 ```bash
 git clone https://github.com/Estrella-071/random-dice-2-tree.git
 cd random-dice-2-tree
 npm ci
-npm run validate
-npm run build:pages
+npm run audit:deps
 npm run setup:browser
-npm run test:browser
+npm run verify
 ```
 
-`npm run test:browser` 會自行啟動 loopback 的暫時 port；可用 `VERIFY_PORT` 指定 port，用 `VERIFY_ARTIFACT_DIR` 指定本地截圖輸出目錄。不要把截圖或本機路徑提交到 Git。
+`npm run verify` 會自行啟動 loopback 的暫時 port；可用 `VERIFY_PORT` 指定 port，用 `VERIFY_ARTIFACT_DIR` 指定本地截圖輸出目錄。截圖與本機路徑留在本機即可。Ubuntu/CI 若缺少系統相依套件，使用 `npx playwright install --with-deps chromium`；Windows/macOS 使用 `npm run setup:browser`。
 
 ## 研究資料
 
-研究腳本讀取外部取得的 Unity/iOS client，並只寫入被 `.gitignore` 排除的研究輸出。原始 IPA 不隨 repository 發布，也不應提交到 Git。要重現研究結果，需取得合法且相同版本的輸入，記錄輸入 SHA-256、Python 版本、依賴 lock 與工具版本；若缺少其中任一項，結果必須標為未驗證。
+解包工具、原始 IPA、解包目錄與研究輸出由外部研究 workspace 管理，不在本網站 repository，也不會被 Pages 部署。研究 workspace 的輸入與輸出需自行記錄合法來源、SHA-256、Python 版本、依賴 lock 與工具版本；資料不齊時請標為未驗證。
 
-`research/README.md` 只記錄可公開驗證的流程與快照狀態，不保證被忽略的本機輸出在遠端存在。
-
-`npm run validate` 也會比對 [research/provenance.json](research/provenance.json) 中的公開 JSON/SVG SHA-256 與節點/邊數；若資料更新，必須同步更新 provenance 並在 PR 說明新的 client snapshot。
+網站 repository 只保留公開快照的驗證 metadata：[data/provenance.json](data/provenance.json) 與 [data/asset-inventory.json](data/asset-inventory.json)。`npm run validate` 會檢查公開 JSON/SVG 的 SHA-256、節點/邊數與 runtime 資產清單。

@@ -1,6 +1,6 @@
 # Changelog
 
-本專案目前沒有正式 release tag。資料與網站版本必須以 Git commit、client snapshot、來源日期與 provenance manifest 共同識別。
+資料與網站版本以 Git commit、client snapshot、來源日期與 provenance manifest 共同識別；正式 release 另加 Git tag。
 
 ## Unreleased
 

@@ -24,20 +24,20 @@ assignees: ''
 （預期的正常操作結果）
 
 ### 實際行為
-（實際看到的結果；請勿貼上秘密或私人資料）
+（實際看到的結果；公開內容請先移除秘密與私人資料）
 
 ### 螢幕截圖
 （如有畫面異常截圖，請在此上傳）
 
 ### 環境資訊
-- **網站 URL**：
-- **repository commit / Pages 日期**：
-- **裝置類型**：桌面電腦 / 行動裝置 / 平板
-- **作業系統**：Windows / macOS / iOS / Android
-- **瀏覽器與版本**：Chrome / Safari / Edge / Firefox
+- **網站 URL（如適用）**：
+- **repository commit / Pages 日期（如可取得）**：
+- **裝置類型（如適用）**：桌面電腦 / 行動裝置 / 平板
+- **作業系統（如適用）**：Windows / macOS / iOS / Android
+- **瀏覽器與版本（如適用）**：Chrome / Safari / Edge / Firefox
 
 ### Console / Network 訊息
-（如有，請貼上已移除個資、token、cookie 的錯誤訊息）
+（如有再貼；請先移除個資、token 與 cookie）
 
 ### 安全確認
-若問題可能造成 XSS、資料外洩或秘密暴露，請勿公開提交；改依 [SECURITY.md](../../SECURITY.md) 私下回報。
+若問題可能造成 XSS、資料外洩或秘密暴露，請依 [SECURITY.md](../../SECURITY.md) 私下回報。

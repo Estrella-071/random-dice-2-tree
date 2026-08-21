@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const siteDir = path.join(rootDir, 'site');
 const allowlistPath = path.join(siteDir, 'runtime-allowlist.json');
-const inventoryPath = path.join(rootDir, 'research', 'asset-inventory.json');
+const inventoryPath = path.join(rootDir, 'data', 'asset-inventory.json');
 const checkOnly = process.argv.includes('--check');
 const allowlist = JSON.parse(fs.readFileSync(allowlistPath, 'utf8'));
 const deployed = new Set([...allowlist.staticFiles, ...allowlist.iconFiles]);
@@ -61,7 +61,7 @@ if (checkOnly) {
     process.exit(1);
   }
   if (inventory.quarantinedFileCount > 0) {
-    console.error(`Unallowlisted PNG assets are tracked under site/: ${inventory.quarantinedFileCount}. Remove them or add an explicit runtime allowlist entry before merging.`);
+    console.error(`Unallowlisted PNG assets are tracked under site/: ${inventory.quarantinedFileCount}. Remove extraction dumps; only intentionally reviewed runtime assets with provenance may be added to the allowlist.`);
     process.exit(1);
   }
   console.log(`Asset inventory is current: ${files.length} PNG files, ${inventory.deployedFileCount} allowlisted, ${inventory.quarantinedFileCount} quarantined.`);

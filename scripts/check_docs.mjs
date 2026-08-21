@@ -18,9 +18,12 @@ const docs = [
   'GOVERNANCE.md',
   'NOTICE.md',
   'CHANGELOG.md',
-  'research/README.md',
   'site/README.md',
-  'xlsx_build/README.md',
+  '.github/pull_request_template.md',
+  '.github/ISSUE_TEMPLATE/bug_report.md',
+  '.github/ISSUE_TEMPLATE/data_correction.md',
+  '.github/ISSUE_TEMPLATE/documentation.md',
+  '.github/ISSUE_TEMPLATE/feature_request.md',
 ];
 const errors = [];
 const linkPattern = /\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;

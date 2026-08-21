@@ -18,4 +18,4 @@ site/data/dice_tree.svg   ─┘                         └> tree_svg.js
 
 ## Deployment
 
-`.github/workflows/pages.yml` 只會部署 `scripts/build_pages.mjs` 產生的 `.pages/`。canonical JSON/SVG source、研究資料、測試截圖、一次性腳本與未列入 allowlist 的素材不會進入 Pages artifact；未使用的 extraction dump 也不納入公開 Git tree。部署只帶瀏覽器需要的 generated JS bundles。
+`.github/workflows/ci.yml` 的 `deploy` job 使用 `scripts/build_pages.mjs` 產生、並由 static/browser jobs 驗證的 `.pages/`。Pages artifact 只包含瀏覽器需要的 generated JS bundles、allowlist 檔案與 `runtime-manifest.json`；canonical JSON/SVG source 與公開 metadata 留在 repository，研究資料、測試截圖、一次性腳本與 extraction dump 留在外部研究 workspace。既有公開歷史的素材界線由 [NOTICE.md](NOTICE.md) 說明。

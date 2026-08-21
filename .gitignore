@@ -15,14 +15,12 @@ test-results/
 *.tar
 *.gz
 
-# Raw App Dumps & Extractions
+# Raw App Dumps & Extractions (keep these out if copied into the website tree)
+/unpacked/
+/research/
+/outputs/
+/xlsx_build/
 Random Dice 2 1.0.0/
-outputs/
-research/random-dice-2-1.0.0/
-research/string_literals.txt
-research/*.txt
-!research/requirements.txt
-research/*.png
 
 # Python Cache
 __pycache__/

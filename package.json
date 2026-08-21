@@ -2,10 +2,11 @@
   "name": "random-dice-2-tree",
   "version": "0.1.0",
   "private": true,
-  "description": "Random Dice 2 community dice tree reference site and research tooling.",
+  "description": "Random Dice 2 community dice tree reference site.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "scripts": {
     "validate:data": "node scripts/validate_data.mjs",
@@ -17,7 +18,9 @@
     "audit:deps": "npm audit --omit=optional --audit-level=high",
     "build:pages": "node scripts/build_pages.mjs",
     "check:docs": "node scripts/check_docs.mjs",
-    "validate": "npm run validate:data && npm run check:provenance && npm run check:generated && npm run check:assets && npm run check:docs",
+    "test:ci-scope": "node scripts/ci_scope_test.mjs",
+    "verify": "node scripts/verify_local.mjs",
+    "validate": "npm run validate:data && npm run check:provenance && npm run check:generated && npm run check:assets && npm run test:ci-scope && npm run check:docs",
     "setup:browser": "playwright install chromium",
     "test:browser": "node verify_suite.mjs"
   },
